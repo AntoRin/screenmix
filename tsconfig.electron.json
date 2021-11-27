@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src/electron",
+    "outDir": "dist/screenmix/electron",
+    "module": "commonjs",
+    "target": "es5"
+  },
+  "include": ["src/electron/**/*"]
+}

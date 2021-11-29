@@ -4,8 +4,9 @@
   "main": "dist/screenmix/electron/main.js",
   "scripts": {
     "ng": "ng",
-    "start": "npm run build && electron .",
+    "start": "npm run build:dev && electron .",
     "serve": "ng serve -o",
+    "build:dev": "ng build --configuration development && tsc -p tsconfig.electron.json",
     "build": "ng build --configuration production && tsc -p tsconfig.electron.json",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"

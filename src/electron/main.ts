@@ -3,8 +3,11 @@ import { app, BrowserWindow } from "electron";
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1280,
+    height: 720,
+    webPreferences: {
+      devTools: true,
+    },
   });
 
   win.loadFile(path.join(__dirname, "../index.html"));

@@ -1,10 +1,17 @@
-import { ipcRenderer, contextBridge } from "electron";
+import { contextBridge, ipcRenderer } from "electron";
+import { RendererProcessCtx } from "./types";
 
-function sendSynchronousMessage(channel: string, ...args: any[]): any {
-  return ipcRenderer.sendSync(channel, args);
-}
+const exposedApis: RendererProcessCtx = {
+  selectDirectory: async () => {
+    return await ipcRenderer.invoke("ipc:selectDirectory");
+  },
+};
 
-contextBridge.exposeInMainWorld(
-  "sendSynchronousMessage",
-  sendSynchronousMessage
-);
+contextBridge.exposeInMainWorld("rendererProcessctrl", exposedApis);
+
+process.once("loaded", () => {
+  window.addEventListener("message", async (event: MessageEvent) => {
+    try {
+    } catch (e) {}
+  });
+});

@@ -1,37 +1,34 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  OnInit,
-  ViewChild,
-} from "@angular/core";
+import { Component, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
+import { DirectorySelectResponse } from "../../../electron/types";
 
 @Component({
   selector: "app-startup",
   templateUrl: "./startup.component.html",
   styleUrls: ["./startup.component.css"],
 })
-export class StartupComponent implements OnInit, AfterViewInit {
-  @ViewChild("directoryInput") fileInputElementRef!: ElementRef;
-
+export class StartupComponent implements OnInit {
   public selectedDirectory: string | undefined;
 
-  constructor() {}
+  constructor(private _router: Router) {}
 
   ngOnInit(): void {}
 
-  ngAfterViewInit(): void {
-    const fileInputElement: HTMLInputElement =
-      this.fileInputElementRef.nativeElement;
+  async selectDirectory(): Promise<void> {
+    try {
+      const selectResponse: DirectorySelectResponse =
+        await window.rendererProcessctrl.selectDirectory();
 
-    fileInputElement.onchange = () => {
-      if (fileInputElement.files?.length) {
-        const selectedPath: string = (fileInputElement.files[0] as any).path;
-        this.selectedDirectory = selectedPath;
-        console.log(
-          (window as any).sendSynchronousMessage("resolvePath", selectedPath)
-        );
+      if (!selectResponse.canceled) {
+        this.selectedDirectory = selectResponse.filePaths[0];
       }
-    };
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  handleConfigSubmit(): void {
+    console.log("Submitted");
+    this._router.navigate(["dashboard"]);
   }
 }

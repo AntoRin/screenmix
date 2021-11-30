@@ -1,43 +1,42 @@
 <div class="h-screen flex flex-col justify-center items-center bg-gray-900">
   <p-card
     header="Welcome to Screenmix"
-    subheader="Card Subheader"
-    [style]="{ width: '360px' }"
+    subheader="Basic Settings"
+    [style]="{
+      width: '600px',
+      height: '400px',
+      maxWidth: '80vw',
+      maxHeight: '75vh'
+    }"
     styleClass="p-card-shadow"
   >
     <div class="card">
-      <h5>Where do you want to save your screen shots?</h5>
-      <div class="p-formgroup-inline m-5">
-        <div class="p-field">
-          <label
-            for="location"
-            pButton
-            styleClass="p-button-sm"
-            pRipple
-            type="button"
-            class="p-button-outlined"
-            >Choose Directory</label
-          >
-          <input
-            #directoryInput
-            id="location"
-            type="file"
-            webkitdirectory
-            directory
-            class="invisible"
-          />
-          <h3>{{ selectedDirectory }}</h3>
-        </div>
-        <div class="flex justify-end">
-          <button
-            pButton
-            pRipple
-            type="button"
-            styleClass="p-button-sm"
-            label="Submit"
-          ></button>
-        </div>
+      <h5 class="font-semibold">
+        Where do you want to save your screen shots?
+      </h5>
+      <div class="flex justify-center">
+        <button
+          pButton
+          styleClass="p-button-sm"
+          pRipple
+          type="button"
+          class="p-button-outlined"
+          (click)="selectDirectory()"
+        >
+          Choose Directory
+        </button>
+        <h3 class="caret-blue-800">{{ selectedDirectory }}</h3>
       </div>
     </div>
+    <ng-template pTemplate="footer">
+      <div class="flex justify-end">
+        <button
+          pButton
+          label="Save"
+          icon="pi pi-check"
+          (click)="handleConfigSubmit()"
+        ></button>
+      </div>
+    </ng-template>
   </p-card>
 </div>

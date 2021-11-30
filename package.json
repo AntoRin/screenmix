@@ -5,6 +5,8 @@
   "scripts": {
     "ng": "ng",
     "start": "npm run build:dev && electron .",
+    "electron": "electron .",
+    "dev": "nodemon -e ts,html,css,js --ignore dist/ --exec \"npm run build:dev\"",
     "serve": "ng serve -o",
     "build:dev": "ng build --configuration development && tsc -p tsconfig.electron.json",
     "build": "ng build --configuration production && tsc -p tsconfig.electron.json",

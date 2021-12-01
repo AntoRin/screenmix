@@ -28,7 +28,10 @@ export class StartupComponent implements OnInit {
   }
 
   handleConfigSubmit(): void {
-    console.log("Submitted");
+    if (!this.selectedDirectory) {
+      return;
+    }
+
     this._router.navigate(["dashboard"]);
   }
 }

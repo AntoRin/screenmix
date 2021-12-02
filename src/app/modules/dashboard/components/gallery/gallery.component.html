@@ -1,1 +1,8 @@
-<p>gallery works!</p>
+<div class="flex justify-around flex-wrap items-center m-4">
+  <p-image
+    class="m-2"
+    [preview]="true"
+    *ngFor="let path of imagePaths"
+    [src]="path"
+  ></p-image>
+</div>

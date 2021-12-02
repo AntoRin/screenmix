@@ -5,15 +5,12 @@ declare global {
 }
 
 export interface RendererProcessCtx {
-  selectBaseDirectory: (...args: any[]) => Promise<string | undefined>;
-  getBaseDirectory: (...args: any[]) => Promise<string | undefined>;
-  getPreferencesSetStatus: (...args: any[]) => Promise<boolean>;
+  selectBaseDirectory(...args: any[]): Promise<string | undefined>;
+  getBaseDirectory(...args: any[]): Promise<string | undefined>;
+  getPreferencesSetStatus(...args: any[]): Promise<boolean>;
+  listScreenshotPaths(...args: any[]): Promise<string[]>;
 }
 
 export type UserDataFields = "baseDirectory" | "preferencesSetStatus";
-
-// export interface UserDataStore {
-//   [key: UserDataFields]: any;
-// }
 
 type UserDataStore = Partial<Record<UserDataFields, any>>;

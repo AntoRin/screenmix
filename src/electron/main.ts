@@ -63,6 +63,11 @@ class Screenmix {
       IpcEvents.GET_PREFERENCES_SET_STATUS,
       async (event, ...args) => await this._ipcHandler.getPreferencesSetStatus()
     );
+
+    ipcMain.handle(
+      IpcEvents.LIST_SCREENSHOT_PATHS,
+      async (event, arg) => await this._ipcHandler.listScreenshotPaths(arg)
+    );
   }
 }
 

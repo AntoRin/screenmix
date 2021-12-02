@@ -20,6 +20,11 @@ class Preload {
         await ipcRenderer.invoke(IpcEvents.GET_SELECTED_DIRECTORY),
       getPreferencesSetStatus: async () =>
         await ipcRenderer.invoke(IpcEvents.GET_PREFERENCES_SET_STATUS),
+      listScreenshotPaths: async (baseDirectory: string) =>
+        await ipcRenderer.invoke(
+          IpcEvents.LIST_SCREENSHOT_PATHS,
+          baseDirectory
+        ),
     };
   }
 }

@@ -6,6 +6,7 @@ import { ButtonModule } from "primeng/button";
 import { ProgressBarModule } from "primeng/progressbar";
 import { MenubarModule } from "primeng/menubar";
 import { InputTextModule } from "primeng/inputtext";
+import { ImageModule } from "primeng/image";
 
 @NgModule({
   declarations: [],
@@ -17,6 +18,7 @@ import { InputTextModule } from "primeng/inputtext";
     ProgressBarModule,
     MenubarModule,
     InputTextModule,
+    ImageModule,
   ],
 })
 export class PrimengModule {}

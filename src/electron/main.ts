@@ -1,10 +1,18 @@
 import path from "path";
-import { app, BrowserWindow, ipcMain, dialog } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
+import { Store } from "./services/Store";
+import { IpcEvents } from "./IpcEvents";
+import { IpcHandler } from "./services/IpcHandler";
 
-class MainProcess {
+class Screenmix {
   private _mainWindow: BrowserWindow | undefined;
+  private _store: Store;
+  private _ipcHandler: IpcHandler;
 
-  constructor() {}
+  constructor() {
+    this._store = new Store();
+    this._ipcHandler = new IpcHandler(this._store);
+  }
 
   public init(): void {
     app.whenReady().then(() => {
@@ -41,19 +49,23 @@ class MainProcess {
   private _initializeIpcListeners(): void {
     if (!this._mainWindow) throw new Error("NO_WINDOW");
 
-    ipcMain.handle(
-      "ipc:selectDirectory",
-      async (event, ...args) => await this._selectDirectory()
-    );
-  }
-
-  private async _selectDirectory() {
-    return await dialog.showOpenDialog(this._mainWindow!, {
-      properties: ["openDirectory"],
+    ipcMain.handle(IpcEvents.SELECT_DIRECTORY, async (event, ...args) => {
+      if (!this._mainWindow) return;
+      return await this._ipcHandler.selectBaseDirectory(this._mainWindow);
     });
+
+    ipcMain.handle(
+      IpcEvents.GET_SELECTED_DIRECTORY,
+      async (event, ...args) => await this._ipcHandler.getBaseDirectory()
+    );
+
+    ipcMain.handle(
+      IpcEvents.GET_PREFERENCES_SET_STATUS,
+      async (event, ...args) => await this._ipcHandler.getPreferencesSetStatus()
+    );
   }
 }
 
-const mainProcess: MainProcess = new MainProcess();
+const screenmix: Screenmix = new Screenmix();
 
-mainProcess.init();
+screenmix.init();

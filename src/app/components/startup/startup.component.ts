@@ -1,6 +1,5 @@
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
-import { DirectorySelectResponse } from "../../../electron/types";
 
 @Component({
   selector: "app-startup",
@@ -9,18 +8,25 @@ import { DirectorySelectResponse } from "../../../electron/types";
 })
 export class StartupComponent implements OnInit {
   public selectedDirectory: string | undefined;
+  public isLoading: boolean = false;
 
   constructor(private _router: Router) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.isLoading = true;
+    window.rendererProcessctrl.getPreferencesSetStatus().then((status) => {
+      this.isLoading = false;
+      if (status) this._router.navigate(["dashboard"]);
+    });
+  }
 
   async selectDirectory(): Promise<void> {
     try {
-      const selectResponse: DirectorySelectResponse =
-        await window.rendererProcessctrl.selectDirectory();
+      const selectResponse: string | undefined =
+        await window.rendererProcessctrl.selectBaseDirectory();
 
-      if (!selectResponse.canceled) {
-        this.selectedDirectory = selectResponse.filePaths[0];
+      if (selectResponse) {
+        this.selectedDirectory = selectResponse;
       }
     } catch (error) {
       console.log(error);
@@ -31,7 +37,6 @@ export class StartupComponent implements OnInit {
     if (!this.selectedDirectory) {
       return;
     }
-
     this._router.navigate(["dashboard"]);
   }
 }

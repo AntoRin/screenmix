@@ -1,7 +1,6 @@
 import path from "path";
 import { app, BrowserWindow, ipcMain } from "electron";
 import { Store } from "./services/Store";
-import { IpcEvents } from "./IpcEvents";
 import { IpcHandler } from "./services/IpcHandler";
 
 class Screenmix {
@@ -49,23 +48,23 @@ class Screenmix {
   private _initializeIpcListeners(): void {
     if (!this._mainWindow) throw new Error("NO_WINDOW");
 
-    ipcMain.handle(IpcEvents.SELECT_DIRECTORY, async (event, ...args) => {
+    ipcMain.handle("ipc:selectBaseDirectory", async (event, ...args) => {
       if (!this._mainWindow) return;
       return await this._ipcHandler.selectBaseDirectory(this._mainWindow);
     });
 
     ipcMain.handle(
-      IpcEvents.GET_SELECTED_DIRECTORY,
+      "ipc:getBaseDirectory",
       async (event, ...args) => await this._ipcHandler.getBaseDirectory()
     );
 
     ipcMain.handle(
-      IpcEvents.GET_PREFERENCES_SET_STATUS,
+      "ipc:getPreferenceSetStatus",
       async (event, ...args) => await this._ipcHandler.getPreferencesSetStatus()
     );
 
     ipcMain.handle(
-      IpcEvents.LIST_SCREENSHOT_PATHS,
+      "ipc:listScreenshotPaths",
       async (event, arg) => await this._ipcHandler.listScreenshotPaths(arg)
     );
   }

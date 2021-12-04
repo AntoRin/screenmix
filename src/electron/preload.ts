@@ -1,5 +1,4 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { IpcEvents } from "./IpcEvents";
 import { RendererProcessCtx } from "./types";
 
 class Preload {
@@ -15,16 +14,13 @@ class Preload {
   get exposedApis(): RendererProcessCtx {
     return {
       selectBaseDirectory: async () =>
-        await ipcRenderer.invoke(IpcEvents.SELECT_DIRECTORY),
+        await ipcRenderer.invoke("ipc:selectBaseDirectory"),
       getBaseDirectory: async () =>
-        await ipcRenderer.invoke(IpcEvents.GET_SELECTED_DIRECTORY),
+        await ipcRenderer.invoke("ipc:getBaseDirectory"),
       getPreferencesSetStatus: async () =>
-        await ipcRenderer.invoke(IpcEvents.GET_PREFERENCES_SET_STATUS),
+        await ipcRenderer.invoke("ipc:getPreferenceSetStatus"),
       listScreenshotPaths: async (baseDirectory: string) =>
-        await ipcRenderer.invoke(
-          IpcEvents.LIST_SCREENSHOT_PATHS,
-          baseDirectory
-        ),
+        await ipcRenderer.invoke("ipc:listScreenshotPaths", baseDirectory),
     };
   }
 }

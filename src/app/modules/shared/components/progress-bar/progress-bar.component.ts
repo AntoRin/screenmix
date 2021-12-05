@@ -17,7 +17,6 @@ export class ProgressBarComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this._progressBarToggle.subscribe((toggle: boolean) => {
-      console.log(toggle);
       if (toggle) {
         this.showProgressBar = true;
       } else {

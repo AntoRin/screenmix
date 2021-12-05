@@ -1,5 +1,11 @@
 <p-progressBar
-  class="fixed top-0"
+  *ngIf="showProgressBar"
   mode="indeterminate"
-  [style]="{ height: '6px' }"
+  [style]="{
+    height: '6px',
+    zIndex: '100',
+    position: 'fixed',
+    top: 0,
+    width: '100vw'
+  }"
 ></p-progressBar>

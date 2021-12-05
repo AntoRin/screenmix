@@ -1,4 +1,13 @@
-<div class="flex justify-around flex-wrap items-center m-4">
+<div
+  class="grid m-2"
+  style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr))"
+>
+  <video
+    #videoContainer
+    width="1280px"
+    height="720px"
+    style="display: none"
+  ></video>
   <p-image
     class="m-2"
     [preview]="true"

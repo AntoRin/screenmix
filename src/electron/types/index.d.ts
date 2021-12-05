@@ -9,8 +9,15 @@ export interface RendererProcessCtx {
   getBaseDirectory(...args: any[]): Promise<string | undefined>;
   getPreferencesSetStatus(...args: any[]): Promise<boolean>;
   listScreenshotPaths(...args: any[]): Promise<string[]>;
+  getDesktopSourceId(...args: any[]): Promise<string | undefined>;
+  saveCapture(data: CaptureData): Promise<any>;
 }
 
 export type UserDataFields = "baseDirectory" | "preferencesSetStatus";
 
-type UserDataStore = Partial<Record<UserDataFields, any>>;
+export type UserDataStore = Partial<Record<UserDataFields, any>>;
+
+export interface CaptureData {
+  dataUrl: string;
+  mode: "image" | "video";
+}

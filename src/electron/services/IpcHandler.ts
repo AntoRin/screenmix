@@ -1,6 +1,6 @@
 import path from "path";
-import { BrowserWindow, dialog } from "electron";
-import { RendererProcessCtx } from "../types";
+import { BrowserWindow, dialog, desktopCapturer } from "electron";
+import { CaptureData, RendererProcessCtx } from "../types";
 import { Store } from "./Store";
 import { Dirent, promises as fsp } from "fs";
 
@@ -14,13 +14,7 @@ export class IpcHandler implements RendererProcessCtx {
   }
 
   async selectBaseDirectory(window: BrowserWindow) {
-    const dialogResponse = await dialog.showOpenDialog(window, {
-      properties: ["openDirectory"],
-    });
-
-    if (dialogResponse.canceled) return undefined;
-
-    const selectedDir: string = dialogResponse.filePaths[0];
+    const [selectedDir] = await this._selectDirectories(window);
 
     await this._store.write({
       baseDirectory: selectedDir,
@@ -78,6 +72,53 @@ export class IpcHandler implements RendererProcessCtx {
       return files;
     } catch (error) {
       throw error;
+    }
+  }
+
+  private async _selectDirectories(window: BrowserWindow): Promise<string[]> {
+    try {
+      const dialogResponse = await dialog.showOpenDialog(window, {
+        properties: ["openDirectory"],
+      });
+
+      if (dialogResponse.canceled) return [];
+
+      return dialogResponse.filePaths;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getDesktopSourceId() {
+    try {
+      const sources = await desktopCapturer.getSources({
+        types: ["window", "screen"],
+      });
+
+      const requiredSource = sources.find((s) => s.name === "Entire Screen");
+
+      return requiredSource?.id;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async saveCapture(captureData: CaptureData) {
+    try {
+      const base64Data = captureData.dataUrl.split(";base64,")[1];
+
+      const baseDir = await this._store.read("baseDirectory");
+
+      const fileName =
+        captureData.mode === "image"
+          ? String(Date.now()) + ".png"
+          : String(Date.now()) + ".mp4";
+
+      await fsp.writeFile(path.join(baseDir, fileName), base64Data, {
+        encoding: "base64",
+      });
+    } catch (error) {
+      console.log(error);
     }
   }
 }

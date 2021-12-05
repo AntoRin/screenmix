@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
+import { ProgressBarService } from "../../modules/shared/services/progress-bar.service";
 
 @Component({
   selector: "app-startup",
@@ -8,14 +9,16 @@ import { Router } from "@angular/router";
 })
 export class StartupComponent implements OnInit {
   public selectedDirectory: string | undefined;
-  public isLoading: boolean = false;
 
-  constructor(private _router: Router) {}
+  constructor(
+    private _router: Router,
+    private _progressBarService: ProgressBarService
+  ) {}
 
   ngOnInit(): void {
-    this.isLoading = true;
+    this._progressBarService.toggleOn();
     window.rendererProcessctrl.getPreferencesSetStatus().then((status) => {
-      this.isLoading = false;
+      this._progressBarService.toggleOff();
       if (status) this._router.navigate(["dashboard"]);
     });
   }

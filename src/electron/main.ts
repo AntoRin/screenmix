@@ -29,6 +29,8 @@ class Screenmix {
     app.on("window-all-closed", () => {
       if (process.platform !== "darwin") app.quit();
     });
+
+    app.commandLine.appendSwitch("ignore-certificate-errors");
   }
 
   private _createMainWindow(): void {
@@ -66,6 +68,16 @@ class Screenmix {
     ipcMain.handle(
       "ipc:listScreenshotPaths",
       async (event, arg) => await this._ipcHandler.listScreenshotPaths(arg)
+    );
+
+    ipcMain.handle(
+      "ipc:getDesktopSourceId",
+      async (event, ...args) => await this._ipcHandler.getDesktopSourceId()
+    );
+
+    ipcMain.handle(
+      "ipc:saveCapturedScreenshot",
+      async (event, data) => await this._ipcHandler.saveCapture(data)
     );
   }
 }

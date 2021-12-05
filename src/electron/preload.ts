@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { RendererProcessCtx } from "./types";
+import { CaptureData, RendererProcessCtx } from "./types";
 
 class Preload {
   constructor() {
@@ -21,6 +21,18 @@ class Preload {
         await ipcRenderer.invoke("ipc:getPreferenceSetStatus"),
       listScreenshotPaths: async (baseDirectory: string) =>
         await ipcRenderer.invoke("ipc:listScreenshotPaths", baseDirectory),
+      getDesktopSourceId: async () =>
+        await ipcRenderer.invoke("ipc:getDesktopSourceId"),
+      saveCapture: async (captureData: CaptureData) => {
+        try {
+          return await ipcRenderer.invoke(
+            "ipc:saveCapturedScreenshot",
+            captureData
+          );
+        } catch (error) {
+          console.log(error);
+        }
+      },
     };
   }
 }

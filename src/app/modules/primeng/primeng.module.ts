@@ -7,6 +7,8 @@ import { ProgressBarModule } from "primeng/progressbar";
 import { MenubarModule } from "primeng/menubar";
 import { InputTextModule } from "primeng/inputtext";
 import { ImageModule } from "primeng/image";
+import { BlockUIModule } from "primeng/blockui";
+import { TagModule } from "primeng/tag";
 
 @NgModule({
   declarations: [],
@@ -19,6 +21,8 @@ import { ImageModule } from "primeng/image";
     MenubarModule,
     InputTextModule,
     ImageModule,
+    BlockUIModule,
+    TagModule,
   ],
 })
 export class PrimengModule {}

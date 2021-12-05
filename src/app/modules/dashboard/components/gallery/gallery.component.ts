@@ -7,7 +7,8 @@ import {
   ViewChild,
 } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
-import { CaptureMode } from "../../../../types";
+import { Subject } from "rxjs";
+import { CaptureMode, ProcessNotification } from "../../../../types";
 import { ProgressBarService } from "../../../shared/services/progress-bar.service";
 
 @Component({
@@ -20,7 +21,10 @@ export class GalleryComponent implements OnInit {
   imagePaths: string[] = [];
 
   @ViewChild("videoContainer") vidRef!: ElementRef;
-  testImg: string = "";
+
+  public videoCaptureInProgress: boolean = false;
+  private _processNotificationSubject: Subject<ProcessNotification> =
+    new Subject<ProcessNotification>();
 
   constructor(
     private _sanitizer: DomSanitizer,
@@ -28,6 +32,10 @@ export class GalleryComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.getGallery();
+  }
+
+  getGallery() {
     this._progressBarService.toggleOn();
 
     window.rendererProcessctrl
@@ -37,7 +45,7 @@ export class GalleryComponent implements OnInit {
           (x) => this._sanitizer.bypassSecurityTrustResourceUrl(x) as string
         );
 
-        this._progressBarService.toggleOff();
+        setTimeout(() => this._progressBarService.toggleOff(), 5000);
       })
       .catch((e) => {});
   }
@@ -45,6 +53,9 @@ export class GalleryComponent implements OnInit {
   @HostListener("window:keydown", ["$event"])
   handleHotKeyDown(event: KeyboardEvent): void {
     if (event.key === "Home") {
+      if (this.videoCaptureInProgress)
+        return this._processNotificationSubject.next("stopVideoCapture");
+
       this.captureScreen("video");
     }
 
@@ -81,8 +92,6 @@ export class GalleryComponent implements OnInit {
 
   recordStream(stream: MediaStream, successCb: Function, failureCb: Function) {
     try {
-      const recordTime = 5000;
-
       const recorder: MediaRecorder = new MediaRecorder(stream);
 
       const chunks: Blob[] = [];
@@ -90,6 +99,14 @@ export class GalleryComponent implements OnInit {
       recorder.ondataavailable = (e) => {
         if (e.data.size) chunks.push(e.data);
       };
+
+      this._processNotificationSubject.asObservable().subscribe((status) => {
+        if (status === "stopVideoCapture" && recorder.state === "recording") {
+          recorder.stop();
+        } else {
+          recorder.onstart = () => recorder.stop();
+        }
+      });
 
       recorder.start();
 
@@ -111,8 +128,6 @@ export class GalleryComponent implements OnInit {
           failureCb(error);
         }
       };
-
-      setTimeout(() => recorder.stop(), recordTime);
     } catch (error) {
       failureCb(error);
     }
@@ -120,11 +135,15 @@ export class GalleryComponent implements OnInit {
 
   async handleVideoCapture(stream: MediaStream) {
     try {
+      this.videoCaptureInProgress = true;
+
       const dataUrl = await new Promise<string>((resolve, reject) => {
         this.recordStream(stream, resolve, reject);
       });
 
       this.destroyMediaStream(stream);
+
+      this.videoCaptureInProgress = false;
 
       await window.rendererProcessctrl.saveCapture({
         dataUrl,
@@ -149,8 +168,6 @@ export class GalleryComponent implements OnInit {
 
         ctx!.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
         const imageDataUrl = canvas.toDataURL("image/png");
-
-        this.testImg = imageDataUrl;
 
         this.destroyMediaStream(stream);
 

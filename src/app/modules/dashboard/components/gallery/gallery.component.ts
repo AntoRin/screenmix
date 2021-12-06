@@ -25,6 +25,7 @@ export class GalleryComponent implements OnInit {
   public videoCaptureInProgress: boolean = false;
   private _processNotificationSubject: Subject<ProcessNotification> =
     new Subject<ProcessNotification>();
+  private _streamRef: MediaStream | undefined;
 
   constructor(
     private _sanitizer: DomSanitizer,
@@ -45,7 +46,7 @@ export class GalleryComponent implements OnInit {
           (x) => this._sanitizer.bypassSecurityTrustResourceUrl(x) as string
         );
 
-        setTimeout(() => this._progressBarService.toggleOff(), 5000);
+        this._progressBarService.toggleOff();
       })
       .catch((e) => {});
   }
@@ -66,21 +67,29 @@ export class GalleryComponent implements OnInit {
 
   async captureScreen(mode: CaptureMode): Promise<void> {
     try {
-      const sourceId = await window.rendererProcessctrl.getDesktopSourceId();
+      let stream: MediaStream;
 
-      const stream: MediaStream = await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: {
-          mandatory: {
-            chromeMediaSource: "desktop",
-            chromeMediaSourceId: sourceId,
-            minWidth: 1280,
-            maxWidth: 1280,
-            minHeight: 720,
-            maxHeight: 720,
-          },
-        } as any,
-      });
+      if (this._streamRef?.active) {
+        stream = this._streamRef.clone();
+      } else {
+        const srcId = await window.rendererProcessctrl.getDesktopSourceId();
+
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: {
+            mandatory: {
+              chromeMediaSource: "desktop",
+              chromeMediaSourceId: srcId,
+              minWidth: 1280,
+              maxWidth: 1280,
+              minHeight: 720,
+              maxHeight: 720,
+            },
+          } as any,
+        });
+
+        this._streamRef = stream;
+      }
 
       if (mode === "image") return this.handleImageCapture(stream);
 
@@ -156,7 +165,10 @@ export class GalleryComponent implements OnInit {
 
   async handleImageCapture(stream: MediaStream) {
     try {
-      const videoElement: HTMLVideoElement = this.vidRef.nativeElement;
+      const videoElement: HTMLVideoElement = document.createElement("video");
+
+      videoElement.style.width = "1280px";
+      videoElement.style.height = "720px";
 
       videoElement.onloadedmetadata = async (e) => {
         videoElement.play();
@@ -170,6 +182,8 @@ export class GalleryComponent implements OnInit {
         const imageDataUrl = canvas.toDataURL("image/png");
 
         this.destroyMediaStream(stream);
+        videoElement.remove();
+        canvas.remove();
 
         await window.rendererProcessctrl.saveCapture({
           dataUrl: imageDataUrl,

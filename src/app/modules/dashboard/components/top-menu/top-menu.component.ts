@@ -1,5 +1,6 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, EventEmitter, OnInit, Output } from "@angular/core";
 import { MenuItem } from "primeng/api";
+import { DashboardTab } from "../../../../types";
 
 @Component({
   selector: "app-top-menu",
@@ -7,7 +8,10 @@ import { MenuItem } from "primeng/api";
   styleUrls: ["./top-menu.component.css"],
 })
 export class TopMenuComponent implements OnInit {
-  menuItems: MenuItem[] = [
+  @Output() tabChangeEvent: EventEmitter<DashboardTab> =
+    new EventEmitter<DashboardTab>();
+
+  public menuItems: MenuItem[] = [
     {
       label: "File",
       icon: "pi pi-fw pi-file",
@@ -40,26 +44,9 @@ export class TopMenuComponent implements OnInit {
       ],
     },
     {
-      label: "Edit",
-      icon: "pi pi-fw pi-pencil",
-      items: [
-        {
-          label: "Left",
-          icon: "pi pi-fw pi-align-left",
-        },
-        {
-          label: "Right",
-          icon: "pi pi-fw pi-align-right",
-        },
-        {
-          label: "Center",
-          icon: "pi pi-fw pi-align-center",
-        },
-        {
-          label: "Justify",
-          icon: "pi pi-fw pi-align-justify",
-        },
-      ],
+      label: "Settings",
+      icon: "pi pi-fw pi-cog",
+      command: this.emitTabChangeEvent.bind(this, "settings"),
     },
     {
       label: "Users",
@@ -134,4 +121,8 @@ export class TopMenuComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {}
+
+  emitTabChangeEvent(tab: DashboardTab) {
+    this.tabChangeEvent.emit(tab);
+  }
 }

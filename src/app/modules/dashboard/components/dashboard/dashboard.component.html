@@ -1,6 +1,10 @@
 <div class="h-screen w-screen bg-gray-900 overflow-x-hidden">
-  <app-top-menu></app-top-menu>
+  <app-top-menu (tabChangeEvent)="changeTab($event)"></app-top-menu>
   <div class="">
-    <app-gallery [baseDirectory]="baseDirectory"></app-gallery>
+    <app-gallery
+      *ngIf="currentTab === 'gallery'"
+      [baseDirectory]="baseDirectory"
+    ></app-gallery>
+    <app-settings *ngIf="currentTab === 'settings'"></app-settings>
   </div>
 </div>

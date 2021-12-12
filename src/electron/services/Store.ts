@@ -18,13 +18,9 @@ export class Store {
         readFileSync(this._userDataPath, { encoding: "utf-8" })
       );
     } catch (e: any) {
-      if (e.name === "SyntaxError") this._userData = {};
+      if (e.name === "SyntaxError" || e.code === "ENOENT") this._userData = {};
       else throw e;
     }
-  }
-
-  _() {
-    console.log(this._userData);
   }
 
   private async backupData() {

@@ -4,6 +4,7 @@ import {
   dialog,
   desktopCapturer,
   globalShortcut,
+  ipcMain,
 } from "electron";
 import { CaptureData, RendererProcessCtx } from "../types";
 import { Store } from "./Store";
@@ -16,6 +17,35 @@ export class IpcHandler implements RendererProcessCtx {
   constructor(store: Store) {
     this._store = store;
     this._imageExtensions = [".jpg", ".png"];
+  }
+
+  public initializeIpcListeners(mainWindow?: BrowserWindow) {
+    if (!mainWindow) throw new Error("NO_WINDOW");
+
+    ipcMain.handle("ipc:selectBaseDirectory", () =>
+      this.selectBaseDirectory(mainWindow)
+    );
+
+    ipcMain.handle("ipc:getBaseDirectory", this.getBaseDirectory.bind(this));
+
+    ipcMain.handle(
+      "ipc:getPreferenceSetStatus",
+      this.getPreferencesSetStatus.bind(this)
+    );
+
+    ipcMain.handle(
+      "ipc:listScreenshotPaths",
+      (_, baseDir: string | undefined) => this.listScreenshotPaths(baseDir)
+    );
+
+    ipcMain.handle(
+      "ipc:getDesktopSourceId",
+      this.getDesktopSourceId.bind(this)
+    );
+
+    ipcMain.handle("ipc:saveCapturedScreenshot", (_, data: CaptureData) =>
+      this.saveCapture(data)
+    );
   }
 
   async registerGlobalShortcuts(window?: BrowserWindow) {

@@ -1,5 +1,5 @@
 import path from "path";
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow } from "electron";
 import { Store } from "./services/Store";
 import { IpcHandler } from "./services/IpcHandler";
 
@@ -26,7 +26,7 @@ class Screenmix {
 
       await this._ipcHandler.registerGlobalShortcuts(this._mainWindow);
 
-      this._initializeIpcListeners();
+      this._ipcHandler.initializeIpcListeners(this._mainWindow);
 
       app.on("window-all-closed", () => {
         if (process.platform !== "darwin") app.quit();
@@ -52,40 +52,6 @@ class Screenmix {
     });
 
     this._mainWindow.loadFile(path.join(__dirname, "../index.html"));
-  }
-
-  private _initializeIpcListeners(): void {
-    if (!this._mainWindow) throw new Error("NO_WINDOW");
-
-    ipcMain.handle("ipc:selectBaseDirectory", async (event, ...args) => {
-      if (!this._mainWindow) return;
-      return await this._ipcHandler.selectBaseDirectory(this._mainWindow);
-    });
-
-    ipcMain.handle(
-      "ipc:getBaseDirectory",
-      async (event, ...args) => await this._ipcHandler.getBaseDirectory()
-    );
-
-    ipcMain.handle(
-      "ipc:getPreferenceSetStatus",
-      async (event, ...args) => await this._ipcHandler.getPreferencesSetStatus()
-    );
-
-    ipcMain.handle(
-      "ipc:listScreenshotPaths",
-      async (event, arg) => await this._ipcHandler.listScreenshotPaths(arg)
-    );
-
-    ipcMain.handle(
-      "ipc:getDesktopSourceId",
-      async (event, ...args) => await this._ipcHandler.getDesktopSourceId()
-    );
-
-    ipcMain.handle(
-      "ipc:saveCapturedScreenshot",
-      async (event, data) => await this._ipcHandler.saveCapture(data)
-    );
   }
 }
 

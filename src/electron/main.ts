@@ -13,8 +13,9 @@ class Screenmix {
     this._ipcHandler = new IpcHandler(this._store);
   }
 
-  public init(): void {
-    app.whenReady().then(() => {
+  public async init(): Promise<void> {
+    try {
+      await app.whenReady();
       this._createMainWindow();
 
       app.on("activate", () => {
@@ -23,14 +24,20 @@ class Screenmix {
         }
       });
 
+      await this._ipcHandler.registerGlobalShortcuts(this._mainWindow);
+
       this._initializeIpcListeners();
-    });
 
-    app.on("window-all-closed", () => {
-      if (process.platform !== "darwin") app.quit();
-    });
+      app.on("window-all-closed", () => {
+        if (process.platform !== "darwin") app.quit();
+      });
 
-    app.commandLine.appendSwitch("ignore-certificate-errors");
+      app.on("will-quit", () => {
+        this._ipcHandler.unregisterGlobalShortcuts();
+      });
+    } catch (error) {
+      throw error;
+    }
   }
 
   private _createMainWindow(): void {
@@ -84,4 +91,6 @@ class Screenmix {
 
 const screenmix: Screenmix = new Screenmix();
 
-screenmix.init();
+screenmix.init().catch((e) => {
+  throw e;
+});

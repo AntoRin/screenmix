@@ -1,8 +1,13 @@
 import path from "path";
-import { BrowserWindow, dialog, desktopCapturer } from "electron";
+import {
+  BrowserWindow,
+  dialog,
+  desktopCapturer,
+  globalShortcut,
+} from "electron";
 import { CaptureData, RendererProcessCtx } from "../types";
 import { Store } from "./Store";
-import { Dirent, promises as fsp } from "fs";
+import { Dirent, promises as fsp, statSync } from "fs";
 
 export class IpcHandler implements RendererProcessCtx {
   private _store: Store;
@@ -11,6 +16,28 @@ export class IpcHandler implements RendererProcessCtx {
   constructor(store: Store) {
     this._store = store;
     this._imageExtensions = [".jpg", ".png"];
+  }
+
+  async registerGlobalShortcuts(window?: BrowserWindow) {
+    try {
+      if (!window) throw new Error("NO_WINDOW");
+
+      const ssKeyBinds: string[] = (await this._store.read("ssKeyBinds")) || [];
+      const scKeyBinds: string[] = (await this._store.read("scKeyBinds")) || [];
+
+      globalShortcut.registerAll(ssKeyBinds, () => {
+        this.takeScreenshot(window);
+      });
+      globalShortcut.registerAll(scKeyBinds, () => {
+        this.captureScreen(window);
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  unregisterGlobalShortcuts() {
+    globalShortcut.unregisterAll();
   }
 
   async selectBaseDirectory(window: BrowserWindow) {
@@ -69,10 +96,31 @@ export class IpcHandler implements RendererProcessCtx {
         }
       }
 
+      this._sortFilePathsBasedOnBirthTime(files);
+
       return files;
     } catch (error) {
       throw error;
     }
+  }
+
+  private _sortFilePathsBasedOnBirthTime(filePaths: string[]) {
+    try {
+      filePaths.sort((filePath1, filePath2) => {
+        const file1Time = statSync(filePath1).birthtime.getTime();
+        const file2Time = statSync(filePath2).birthtime.getTime();
+
+        return file1Time > file2Time ? -1 : file2Time > file1Time ? 1 : 0;
+      });
+    } catch (error) {}
+  }
+
+  public takeScreenshot(window: BrowserWindow) {
+    window.webContents.send("fromMain:takeScreenshot");
+  }
+
+  public captureScreen(window: BrowserWindow) {
+    window.webContents.send("fromMain:captureScreen");
   }
 
   private async _selectDirectories(window: BrowserWindow): Promise<string[]> {

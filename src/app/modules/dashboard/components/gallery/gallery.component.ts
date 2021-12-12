@@ -51,17 +51,17 @@ export class GalleryComponent implements OnInit {
       .catch((e) => {});
   }
 
-  @HostListener("window:keydown", ["$event"])
-  handleHotKeyDown(event: KeyboardEvent): void {
-    if (event.key === "Home") {
-      if (this.videoCaptureInProgress)
-        return this._processNotificationSubject.next("stopVideoCapture");
+  @HostListener("window:message", ["$event"])
+  handleScreenEvents(event: MessageEvent) {
+    switch (event.data) {
+      case "fromMain:takeScreenshot":
+        return this.captureScreen("image");
 
-      this.captureScreen("video");
-    }
+      case "fromMain:captureScreen":
+        if (this.videoCaptureInProgress)
+          return this._processNotificationSubject.next("stopVideoCapture");
 
-    if (event.key === "Insert") {
-      this.captureScreen("image");
+        this.captureScreen("video");
     }
   }
 
@@ -81,9 +81,9 @@ export class GalleryComponent implements OnInit {
               chromeMediaSource: "desktop",
               chromeMediaSourceId: srcId,
               minWidth: 1280,
-              maxWidth: 1280,
+              maxWidth: 1920,
               minHeight: 720,
-              maxHeight: 720,
+              maxHeight: 1080,
             },
           } as any,
         });
@@ -158,6 +158,8 @@ export class GalleryComponent implements OnInit {
         dataUrl,
         mode: "video",
       });
+
+      this.getGallery();
     } catch (error) {
       throw error;
     }
@@ -167,15 +169,15 @@ export class GalleryComponent implements OnInit {
     try {
       const videoElement: HTMLVideoElement = document.createElement("video");
 
-      videoElement.style.width = "1280px";
-      videoElement.style.height = "720px";
+      videoElement.style.width = "1920px";
+      videoElement.style.height = "1080px";
 
       videoElement.onloadedmetadata = async (e) => {
         videoElement.play();
 
         const canvas = document.createElement("canvas");
-        canvas.width = 1280;
-        canvas.height = 720;
+        canvas.width = 1920;
+        canvas.height = 1080;
         const ctx = canvas.getContext("2d");
 
         ctx!.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
@@ -189,6 +191,8 @@ export class GalleryComponent implements OnInit {
           dataUrl: imageDataUrl,
           mode: "image",
         });
+
+        this.getGallery();
       };
 
       videoElement.srcObject = stream;

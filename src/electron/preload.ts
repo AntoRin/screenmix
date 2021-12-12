@@ -9,6 +9,14 @@ class Preload {
         } catch (e) {}
       });
     });
+
+    ipcRenderer.on("fromMain:takeScreenshot", () => {
+      window.postMessage("fromMain:takeScreenshot");
+    });
+
+    ipcRenderer.on("fromMain:captureScreen", () => {
+      window.postMessage("fromMain:captureScreen");
+    });
   }
 
   get exposedApis(): RendererProcessCtx {

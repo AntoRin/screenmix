@@ -1,64 +1,52 @@
 import path from "path";
-import { writeFile, readFile } from "fs";
+import { readFileSync, promises as fsp } from "fs";
 import { app } from "electron";
 import { UserDataFields, UserDataStore } from "../types";
 
 export class Store {
   private _userDataPath: string;
+  private _userData: UserDataStore;
 
   constructor() {
     this._userDataPath = path.join(
       app.getPath("userData"),
       "userPreferences.json"
     );
+
+    try {
+      this._userData = JSON.parse(
+        readFileSync(this._userDataPath, { encoding: "utf-8" })
+      );
+    } catch (e: any) {
+      if (e.name === "SyntaxError") this._userData = {};
+      else throw e;
+    }
+  }
+
+  _() {
+    console.log(this._userData);
+  }
+
+  private async backupData() {
+    try {
+      await fsp.writeFile(
+        this._userDataPath,
+        JSON.stringify(this._userData, null, 3),
+        { encoding: "utf-8" }
+      );
+    } catch (error) {}
   }
 
   async write(data: UserDataStore): Promise<void> {
     try {
-      await new Promise<any>((resolve, reject) => {
-        readFile(this._userDataPath, { encoding: "utf-8" }, (e, d) => {
-          if (e) {
-            if (e.code === "ENOENT") d = "{}";
-            else return reject(e);
-          }
-
-          let json: any = {};
-
-          try {
-            json = JSON.parse(d);
-          } catch (error) {}
-
-          json = { ...json, ...data };
-
-          writeFile(this._userDataPath, JSON.stringify(json, null, 3), () =>
-            resolve({})
-          );
-        });
-      });
+      this._userData = { ...this._userData, ...data };
+      await this.backupData();
     } catch (error) {
       throw error;
     }
   }
 
-  async read(key: UserDataFields) {
-    try {
-      return (
-        (await new Promise<UserDataStore>((resolve, reject) => {
-          readFile(this._userDataPath, { encoding: "utf-8" }, (e, d) => {
-            if (e) {
-              if (e.code === "ENOENT") d = "{}";
-              else return reject(e);
-            }
-            let parsedData = {};
-            try {
-              parsedData = JSON.parse(d);
-            } catch (error) {}
-            resolve(parsedData);
-          });
-        })) as any
-      )[key];
-    } catch (error) {
-      throw error;
-    }
+  read(key: UserDataFields): any {
+    return this._userData[key];
   }
 }

@@ -13,7 +13,11 @@ export interface RendererProcessCtx {
   saveCapture(data: CaptureData): Promise<any>;
 }
 
-export type UserDataFields = "baseDirectory" | "preferencesSetStatus";
+export type UserDataFields =
+  | "baseDirectory"
+  | "preferencesSetStatus"
+  | "ssKeyBinds"
+  | "scKeyBinds";
 
 export type UserDataStore = Partial<Record<UserDataFields, any>>;
 

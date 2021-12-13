@@ -46,6 +46,10 @@ export class IpcHandler implements RendererProcessCtx {
     ipcMain.handle("ipc:saveCapturedScreenshot", (_, data: CaptureData) =>
       this.saveCapture(data)
     );
+
+    ipcMain.handle("ipc:updateBaseDirectory", (_, newDir: string) =>
+      this.updateBaseDirectory(newDir)
+    );
   }
 
   async registerGlobalShortcuts(window?: BrowserWindow) {
@@ -89,6 +93,15 @@ export class IpcHandler implements RendererProcessCtx {
     }
   }
 
+  async updateBaseDirectory(newDir: string) {
+    try {
+      console.log(newDir);
+      return await this._store.write({ baseDirectory: newDir });
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async getPreferencesSetStatus() {
     try {
       return (await this._store.read("preferencesSetStatus")) || false;
@@ -102,6 +115,8 @@ export class IpcHandler implements RendererProcessCtx {
       if (!baseDirectory) {
         baseDirectory = await this._store.read("baseDirectory");
       }
+
+      if (!baseDirectory) return [];
 
       let files: string[] = [];
 

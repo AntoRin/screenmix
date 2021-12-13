@@ -11,6 +11,7 @@ export interface RendererProcessCtx {
   listScreenshotPaths(...args: any[]): Promise<string[]>;
   getDesktopSourceId(...args: any[]): Promise<string | undefined>;
   saveCapture(data: CaptureData): Promise<any>;
+  updateBaseDirectory(newDir: string): Promise<void>;
 }
 
 export type UserDataFields =

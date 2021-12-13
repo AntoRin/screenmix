@@ -45,10 +45,9 @@ export class GalleryComponent implements OnInit {
         this.imagePaths = paths.map(
           (x) => this._sanitizer.bypassSecurityTrustResourceUrl(x) as string
         );
-
-        this._progressBarService.toggleOff();
       })
-      .catch((e) => {});
+      .catch((e) => {})
+      .finally(() => this._progressBarService.toggleOff());
   }
 
   @HostListener("window:message", ["$event"])

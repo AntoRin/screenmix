@@ -5,6 +5,10 @@
       *ngIf="currentTab === 'gallery'"
       [baseDirectory]="baseDirectory"
     ></app-gallery>
-    <app-settings *ngIf="currentTab === 'settings'"></app-settings>
+    <app-settings
+      [baseDirectory]="baseDirectory"
+      (directoryChangeEvent)="updateBaseDirectory($event)"
+      *ngIf="currentTab === 'settings'"
+    ></app-settings>
   </div>
 </div>

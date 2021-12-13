@@ -13,6 +13,10 @@ export class DashboardComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
+    this.getBaseDirectory();
+  }
+
+  getBaseDirectory() {
     window.rendererProcessctrl
       .getBaseDirectory()
       .then((dir) => {
@@ -23,5 +27,12 @@ export class DashboardComponent implements OnInit {
 
   changeTab(tab: DashboardTab) {
     this.currentTab = tab;
+  }
+
+  updateBaseDirectory(newDir: string) {
+    window.rendererProcessctrl
+      .updateBaseDirectory(newDir)
+      .then(() => this.getBaseDirectory())
+      .catch((e) => {});
   }
 }

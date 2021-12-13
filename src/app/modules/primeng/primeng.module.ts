@@ -9,6 +9,8 @@ import { InputTextModule } from "primeng/inputtext";
 import { ImageModule } from "primeng/image";
 import { BlockUIModule } from "primeng/blockui";
 import { TagModule } from "primeng/tag";
+import { TabViewModule } from "primeng/tabview";
+import { FieldsetModule } from "primeng/fieldset";
 
 @NgModule({
   declarations: [],
@@ -23,6 +25,8 @@ import { TagModule } from "primeng/tag";
     ImageModule,
     BlockUIModule,
     TagModule,
+    TabViewModule,
+    FieldsetModule,
   ],
 })
 export class PrimengModule {}

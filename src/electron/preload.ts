@@ -38,9 +38,11 @@ class Preload {
             captureData
           );
         } catch (error) {
-          console.log(error);
+          throw error;
         }
       },
+      updateBaseDirectory: async (newDir: string) =>
+        await ipcRenderer.invoke("ipc:updateBaseDirectory", newDir),
     };
   }
 }

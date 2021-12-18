@@ -3,11 +3,12 @@
   <div class="">
     <app-gallery
       *ngIf="currentTab === 'gallery'"
-      [baseDirectory]="baseDirectory"
+      [baseDirectory]="PREFERENCES.baseDirectory"
     ></app-gallery>
     <app-settings
-      [baseDirectory]="baseDirectory"
-      (directoryChangeEvent)="updateBaseDirectory($event)"
+      [PREFERENCES]="PREFERENCES"
+      (tabChangeEvent)="changeTab($event)"
+      (settingsUpdateEvent)="getAllPreferences()"
       *ngIf="currentTab === 'settings'"
     ></app-settings>
   </div>

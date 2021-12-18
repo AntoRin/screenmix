@@ -6,19 +6,16 @@ declare global {
 
 export interface RendererProcessCtx {
   selectBaseDirectory(...args: any[]): Promise<string | undefined>;
+  getDirectorySelection(...args: any[]): Promise<string>;
   getBaseDirectory(...args: any[]): Promise<string | undefined>;
-  getPreferencesSetStatus(...args: any[]): Promise<boolean>;
   listScreenshotPaths(...args: any[]): Promise<string[]>;
   getDesktopSourceId(...args: any[]): Promise<string | undefined>;
   saveCapture(data: CaptureData): Promise<any>;
-  updateBaseDirectory(newDir: string): Promise<void>;
+  saveChanges(data: UserDataStore): Promise<void>;
+  getAllPreferences(): Promise<UserDataStore>;
 }
 
-export type UserDataFields =
-  | "baseDirectory"
-  | "preferencesSetStatus"
-  | "ssKeyBinds"
-  | "scKeyBinds";
+export type UserDataFields = "baseDirectory" | "ssKeyBinds" | "scKeyBinds";
 
 export type UserDataStore = Partial<Record<UserDataFields, any>>;
 

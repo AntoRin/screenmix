@@ -18,10 +18,10 @@ export class StartupComponent implements OnInit {
   ngOnInit(): void {
     this._progressBarService.toggleOn();
     window.rendererProcessctrl
-      .getPreferencesSetStatus()
-      .then((status) => {
+      .getBaseDirectory()
+      .then((baseDir) => {
         this._progressBarService.toggleOff();
-        if (status) this._router.navigate(["dashboard"]);
+        if (baseDir) this._router.navigate(["dashboard"]);
       })
       .catch((e) => {});
   }

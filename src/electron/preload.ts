@@ -21,28 +21,22 @@ class Preload {
 
   get exposedApis(): RendererProcessCtx {
     return {
-      selectBaseDirectory: async () =>
-        await ipcRenderer.invoke("ipc:selectBaseDirectory"),
-      getBaseDirectory: async () =>
-        await ipcRenderer.invoke("ipc:getBaseDirectory"),
-      getPreferencesSetStatus: async () =>
-        await ipcRenderer.invoke("ipc:getPreferenceSetStatus"),
-      listScreenshotPaths: async (baseDirectory: string) =>
-        await ipcRenderer.invoke("ipc:listScreenshotPaths", baseDirectory),
-      getDesktopSourceId: async () =>
-        await ipcRenderer.invoke("ipc:getDesktopSourceId"),
-      saveCapture: async (captureData: CaptureData) => {
+      selectBaseDirectory: () => ipcRenderer.invoke("ipc:selectBaseDirectory"),
+      getDirectorySelection: () =>
+        ipcRenderer.invoke("ipc:getDirectorySelection"),
+      getBaseDirectory: () => ipcRenderer.invoke("ipc:getBaseDirectory"),
+      listScreenshotPaths: (baseDirectory: string) =>
+        ipcRenderer.invoke("ipc:listScreenshotPaths", baseDirectory),
+      getDesktopSourceId: () => ipcRenderer.invoke("ipc:getDesktopSourceId"),
+      saveCapture: (captureData: CaptureData) => {
         try {
-          return await ipcRenderer.invoke(
-            "ipc:saveCapturedScreenshot",
-            captureData
-          );
+          return ipcRenderer.invoke("ipc:saveCapturedScreenshot", captureData);
         } catch (error) {
           throw error;
         }
       },
-      updateBaseDirectory: async (newDir: string) =>
-        await ipcRenderer.invoke("ipc:updateBaseDirectory", newDir),
+      saveChanges: (data) => ipcRenderer.invoke("ipc:saveChanges", data),
+      getAllPreferences: () => ipcRenderer.invoke("ipc:getAllPreferences"),
     };
   }
 }

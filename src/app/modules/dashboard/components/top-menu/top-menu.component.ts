@@ -13,6 +13,11 @@ export class TopMenuComponent implements OnInit {
 
   public menuItems: MenuItem[] = [
     {
+      label: "Home",
+      icon: "pi pi-home",
+      command: this.emitTabChangeEvent.bind(this, "gallery"),
+    },
+    {
       label: "File",
       icon: "pi pi-fw pi-file",
       items: [

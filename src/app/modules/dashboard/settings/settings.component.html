@@ -14,13 +14,35 @@
                 pButton
                 pRipple
                 icon="pi pi-folder"
-                (click)="updateBaseDirectory()"
+                (click)="updateDirectory()"
               ></button>
-              <input type="text" pInputText [(ngModel)]="baseDirectory" />
+              <input
+                type="text"
+                pInputText
+                [(ngModel)]="configSettings.baseDirectory"
+              />
             </div>
           </div>
         </div>
       </p-fieldset>
+      <div class="flex justify-end m-4">
+        <button
+          pButton
+          pRipple
+          type="button"
+          label="Save"
+          class="p-button-raised p-button-sm mx-2"
+          (click)="saveSettings()"
+        ></button>
+        <button
+          pButton
+          pRipple
+          type="button"
+          label="Cancel"
+          class="p-button-outlined p-button-sm mx-2"
+          (click)="cancelSettings()"
+        ></button>
+      </div>
     </p-tabPanel>
     <p-tabPanel header="Screenshot">
       <p>

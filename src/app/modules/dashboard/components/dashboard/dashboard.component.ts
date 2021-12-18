@@ -1,4 +1,5 @@
 import { Component, OnInit } from "@angular/core";
+import { UserDataStore } from "../../../../../electron/types";
 import { DashboardTab } from "../../../../types";
 
 @Component({
@@ -9,11 +10,22 @@ import { DashboardTab } from "../../../../types";
 export class DashboardComponent implements OnInit {
   currentTab: DashboardTab = "gallery";
   baseDirectory: string | undefined;
+  PREFERENCES: UserDataStore = {};
 
   constructor() {}
 
   ngOnInit(): void {
     this.getBaseDirectory();
+    this.getAllPreferences();
+  }
+
+  getAllPreferences() {
+    window.rendererProcessctrl
+      .getAllPreferences()
+      .then((data) => {
+        this.PREFERENCES = data;
+      })
+      .catch((e) => {});
   }
 
   getBaseDirectory() {
@@ -27,12 +39,5 @@ export class DashboardComponent implements OnInit {
 
   changeTab(tab: DashboardTab) {
     this.currentTab = tab;
-  }
-
-  updateBaseDirectory(newDir: string) {
-    window.rendererProcessctrl
-      .updateBaseDirectory(newDir)
-      .then(() => this.getBaseDirectory())
-      .catch((e) => {});
   }
 }

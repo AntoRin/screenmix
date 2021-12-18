@@ -6,7 +6,7 @@ import {
   globalShortcut,
   ipcMain,
 } from "electron";
-import { CaptureData, RendererProcessCtx } from "../types";
+import { CaptureData, RendererProcessCtx, UserDataStore } from "../types";
 import { Store } from "./Store";
 import { Dirent, promises as fsp, statSync } from "fs";
 
@@ -29,11 +29,6 @@ export class IpcHandler implements RendererProcessCtx {
     ipcMain.handle("ipc:getBaseDirectory", this.getBaseDirectory.bind(this));
 
     ipcMain.handle(
-      "ipc:getPreferenceSetStatus",
-      this.getPreferencesSetStatus.bind(this)
-    );
-
-    ipcMain.handle(
       "ipc:listScreenshotPaths",
       (_, baseDir: string | undefined) => this.listScreenshotPaths(baseDir)
     );
@@ -47,9 +42,14 @@ export class IpcHandler implements RendererProcessCtx {
       this.saveCapture(data)
     );
 
-    ipcMain.handle("ipc:updateBaseDirectory", (_, newDir: string) =>
-      this.updateBaseDirectory(newDir)
+    ipcMain.handle("ipc:getAllPreferences", this.getAllPreferences.bind(this));
+
+    ipcMain.handle(
+      "ipc:getDirectorySelection",
+      this.getDirectorySelection.bind(this, mainWindow)
     );
+
+    ipcMain.handle("ipc:saveChanges", (_, data) => this.saveChanges(data));
   }
 
   async registerGlobalShortcuts(window?: BrowserWindow) {
@@ -74,12 +74,15 @@ export class IpcHandler implements RendererProcessCtx {
     globalShortcut.unregisterAll();
   }
 
+  async getDirectorySelection(window: BrowserWindow) {
+    return (await this._selectDirectories(window))[0];
+  }
+
   async selectBaseDirectory(window: BrowserWindow) {
     const [selectedDir] = await this._selectDirectories(window);
 
     await this._store.write({
       baseDirectory: selectedDir,
-      preferencesSetStatus: true,
     });
 
     return selectedDir;
@@ -93,21 +96,16 @@ export class IpcHandler implements RendererProcessCtx {
     }
   }
 
-  async updateBaseDirectory(newDir: string) {
+  async saveChanges(data: UserDataStore) {
     try {
-      console.log(newDir);
-      return await this._store.write({ baseDirectory: newDir });
+      await this._store.write(data);
     } catch (error) {
       throw error;
     }
   }
 
-  async getPreferencesSetStatus() {
-    try {
-      return (await this._store.read("preferencesSetStatus")) || false;
-    } catch (error) {
-      throw error;
-    }
+  async getAllPreferences() {
+    return this._store.read(undefined);
   }
 
   async listScreenshotPaths(baseDirectory?: string): Promise<string[]> {

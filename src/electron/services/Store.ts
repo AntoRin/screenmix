@@ -42,7 +42,8 @@ export class Store {
     }
   }
 
-  read(key: UserDataFields): any {
+  read(key: UserDataFields | undefined): any {
+    if (!key) return this._userData;
     return this._userData[key];
   }
 }

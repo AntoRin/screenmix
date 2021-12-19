@@ -58,5 +58,5 @@ class Screenmix {
 const screenmix: Screenmix = new Screenmix();
 
 screenmix.init().catch((e) => {
-  throw e;
+  process.exit(1);
 });

@@ -16,7 +16,7 @@ export interface RendererProcessCtx {
   registerGlobalShortcuts(): Promise<void>;
 }
 
-export type UserDataFields = "baseDirectory" | "ssKeyBinds" | "scKeyBinds";
+export type UserDataFields = "baseDirectory" | "ssHotKey" | "scHotKey";
 
 export type UserDataStore = Partial<Record<UserDataFields, any>>;
 

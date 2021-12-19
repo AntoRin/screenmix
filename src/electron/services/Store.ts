@@ -14,13 +14,23 @@ export class Store {
     );
 
     try {
-      this._userData = JSON.parse(
-        readFileSync(this._userDataPath, { encoding: "utf-8" })
-      );
+      this._userData = {
+        ...this.defaults,
+        ...JSON.parse(readFileSync(this._userDataPath, { encoding: "utf-8" })),
+      };
     } catch (e: any) {
-      if (e.name === "SyntaxError" || e.code === "ENOENT") this._userData = {};
+      if (e.name === "SyntaxError" || e.code === "ENOENT")
+        this._userData = this.defaults;
       else throw e;
     }
+  }
+
+  private get defaults(): UserDataStore {
+    return {
+      baseDirectory: app.getPath("home"),
+      scHotKey: "Home",
+      ssHotKey: "Insert",
+    };
   }
 
   private async backupData() {

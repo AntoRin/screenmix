@@ -27,6 +27,9 @@
       </p-fieldset>
       <ng-container *ngTemplateOutlet="settingsActionTemplate"></ng-container>
     </p-tabPanel>
+
+    <!-- - Screenshot Tab -->
+
     <p-tabPanel header="Screenshot">
       <p-fieldset legend="Key Binds" [toggleable]="true">
         <div class="container-grid">
@@ -37,23 +40,22 @@
             >
           </div>
           <div class="m-2">
-            <div
-              class="p-inputgroup"
-              *ngFor="
-                let keyBind of configSettings.ssKeyBinds;
-                let keyBindIdx = index
-              "
-            >
+            <div class="p-inputgroup">
               <button
                 type="button"
                 pButton
                 pRipple
                 icon="pi pi-folder"
-                (click)="keybindSelectionActive = true"
+                (click)="keybindSelectionActive = 'ss'"
               ></button>
-              <input type="text" disabled pInputText [value]="keyBind" />
+              <input
+                type="text"
+                disabled
+                pInputText
+                [value]="configSettings.ssHotKey"
+              />
               <p-dialog
-                (onHide)="removeListenerAndUpdateKeybind('ss', keyBindIdx)"
+                (onHide)="removeListenerAndUpdateKeybind('ss')"
                 (onShow)="listenForKeybinds()"
                 [focusTrap]="true"
                 [focusOnShow]="true"
@@ -61,7 +63,7 @@
                 [resizable]="true"
                 header="Listening for new Keybind"
                 [closable]="false"
-                [(visible)]="keybindSelectionActive"
+                [visible]="keybindSelectionActive === 'ss'"
                 [style]="{
                   width: '50vw',
                   height: '50vh'
@@ -71,7 +73,7 @@
                 <ng-template pTemplate="footer">
                   <p-button
                     icon="pi pi-check"
-                    (click)="keybindSelectionActive = false"
+                    (click)="keybindSelectionActive = null"
                     label="Okay"
                     styleClass="p-button-text"
                   ></p-button>
@@ -83,20 +85,68 @@
       </p-fieldset>
       <ng-container *ngTemplateOutlet="settingsActionTemplate"></ng-container>
     </p-tabPanel>
-    <p-tabPanel header="Screen Capture">
-      <p>
-        At vero eos et accusamus et iusto odio dignissimos ducimus qui
-        blanditiis praesentium voluptatum deleniti atque corrupti quos dolores
-        et quas molestias excepturi sint occaecati cupiditate non provident,
-        similique sunt in culpa qui officia deserunt mollitia animi, id est
-        laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita
-        distinctio. Nam libero tempore, cum soluta nobis est eligendi optio
-        cumque nihil impedit quo minus.
-      </p>
+
+    <!-- - Screen Recorder Tab -->
+
+    <p-tabPanel header="Screen Recording">
+      <p-fieldset legend="Key Binds" [toggleable]="true">
+        <div class="container-grid">
+          <div class="m-1">
+            <h4 class="text-xl font-bold">Key Combinations</h4>
+            <span class="text-base"
+              >Set up key combinations for enabling Screen Capture</span
+            >
+          </div>
+          <div class="m-2">
+            <div class="p-inputgroup">
+              <button
+                type="button"
+                pButton
+                pRipple
+                icon="pi pi-folder"
+                (click)="keybindSelectionActive = 'sc'"
+              ></button>
+              <input
+                type="text"
+                disabled
+                pInputText
+                [value]="configSettings.scHotKey"
+              />
+              <p-dialog
+                (onHide)="removeListenerAndUpdateKeybind('sc')"
+                (onShow)="listenForKeybinds()"
+                [focusTrap]="true"
+                [focusOnShow]="true"
+                [modal]="true"
+                [resizable]="true"
+                header="Listening for new Keybind"
+                [closable]="false"
+                [visible]="keybindSelectionActive === 'sc'"
+                [style]="{
+                  width: '50vw',
+                  height: '50vh'
+                }"
+              >
+                <span>{{ recordedKeybind }}</span>
+                <ng-template pTemplate="footer">
+                  <p-button
+                    icon="pi pi-check"
+                    (click)="keybindSelectionActive = null"
+                    label="Okay"
+                    styleClass="p-button-text"
+                  ></p-button>
+                </ng-template>
+              </p-dialog>
+            </div>
+          </div>
+        </div>
+      </p-fieldset>
       <ng-container *ngTemplateOutlet="settingsActionTemplate"></ng-container>
     </p-tabPanel>
   </p-tabView>
 </div>
+
+<!-- - Tab Action Items Template -->
 
 <ng-template #settingsActionTemplate>
   <div class="flex justify-end m-4">

@@ -62,13 +62,13 @@ export class IpcHandler implements RendererProcessCtx {
 
       this.unregisterGlobalShortcuts();
 
-      const ssKeyBinds: string[] = (await this._store.read("ssKeyBinds")) || [];
-      const scKeyBinds: string[] = (await this._store.read("scKeyBinds")) || [];
+      const ssHotKey: string = await this._store.read("ssHotKey");
+      const scHotKey: string = await this._store.read("scHotKey");
 
-      globalShortcut.registerAll(ssKeyBinds, () => {
+      globalShortcut.registerAll([ssHotKey], () => {
         this.takeScreenshot(window);
       });
-      globalShortcut.registerAll(scKeyBinds, () => {
+      globalShortcut.registerAll([scHotKey], () => {
         this.captureScreen(window);
       });
     } catch (error) {

@@ -19,7 +19,7 @@ export class SettingsComponent implements OnInit {
 
   constructor() {}
 
-  keybindSelectionActive: boolean = false;
+  keybindSelectionActive: "ss" | "sc" | null = null;
 
   ngOnInit(): void {
     this.configSettings = JSON.parse(JSON.stringify(this.PREFERENCES));
@@ -60,14 +60,18 @@ export class SettingsComponent implements OnInit {
     this.recordedKeybind = modifiers.join("+");
   }
 
-  removeListenerAndUpdateKeybind(captureType: "ss" | "sc", keybindIdx: number) {
+  removeListenerAndUpdateKeybind(captureType: "ss" | "sc") {
     window.removeAllListeners!("keydown");
 
+    if (!this.recordedKeybind) return;
+
     if (captureType === "ss") {
-      this.configSettings.ssKeyBinds[keybindIdx] = this.recordedKeybind;
+      this.configSettings.ssHotKey = this.recordedKeybind;
     } else if (captureType === "sc") {
-      this.configSettings.scKeyBinds[keybindIdx] = this.recordedKeybind;
+      this.configSettings.scHotKey = this.recordedKeybind;
     }
+
+    this.recordedKeybind = "";
   }
 
   async saveSettings() {

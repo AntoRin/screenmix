@@ -28,13 +28,8 @@ class Preload {
       listScreenshotPaths: (baseDirectory: string) =>
         ipcRenderer.invoke("ipc:listScreenshotPaths", baseDirectory),
       getDesktopSourceId: () => ipcRenderer.invoke("ipc:getDesktopSourceId"),
-      saveCapture: (captureData: CaptureData) => {
-        try {
-          return ipcRenderer.invoke("ipc:saveCapturedScreenshot", captureData);
-        } catch (error) {
-          throw error;
-        }
-      },
+      saveCapture: (captureData: CaptureData) =>
+        ipcRenderer.invoke("ipc:saveCapturedScreenshot", captureData),
       saveChanges: (data) => ipcRenderer.invoke("ipc:saveChanges", data),
       getAllPreferences: () => ipcRenderer.invoke("ipc:getAllPreferences"),
       registerGlobalShortcuts: () =>

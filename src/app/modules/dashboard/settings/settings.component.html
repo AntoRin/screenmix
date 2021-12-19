@@ -25,35 +25,63 @@
           </div>
         </div>
       </p-fieldset>
-      <div class="flex justify-end m-4">
-        <button
-          pButton
-          pRipple
-          type="button"
-          label="Save"
-          class="p-button-raised p-button-sm mx-2"
-          (click)="saveSettings()"
-        ></button>
-        <button
-          pButton
-          pRipple
-          type="button"
-          label="Cancel"
-          class="p-button-outlined p-button-sm mx-2"
-          (click)="cancelSettings()"
-        ></button>
-      </div>
+      <ng-container *ngTemplateOutlet="settingsActionTemplate"></ng-container>
     </p-tabPanel>
     <p-tabPanel header="Screenshot">
-      <p>
-        Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-        accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab
-        illo inventore veritatis et quasi architecto beatae vitae dicta sunt
-        explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut
-        odit aut fugit, sed quia consequuntur magni dolores eos qui ratione
-        voluptatem sequi nesciunt. Consectetur, adipisci velit, sed quia non
-        numquam eius modi.
-      </p>
+      <p-fieldset legend="Key Binds" [toggleable]="true">
+        <div class="container-grid">
+          <div class="m-1">
+            <h4 class="text-xl font-bold">Key Combinations</h4>
+            <span class="text-base"
+              >Set up key combinations for taking screenshots</span
+            >
+          </div>
+          <div class="m-2">
+            <div
+              class="p-inputgroup"
+              *ngFor="
+                let keyBind of configSettings.ssKeyBinds;
+                let keyBindIdx = index
+              "
+            >
+              <button
+                type="button"
+                pButton
+                pRipple
+                icon="pi pi-folder"
+                (click)="keybindSelectionActive = true"
+              ></button>
+              <input type="text" disabled pInputText [value]="keyBind" />
+              <p-dialog
+                (onHide)="removeListenerAndUpdateKeybind('ss', keyBindIdx)"
+                (onShow)="listenForKeybinds()"
+                [focusTrap]="true"
+                [focusOnShow]="true"
+                [modal]="true"
+                [resizable]="true"
+                header="Listening for new Keybind"
+                [closable]="false"
+                [(visible)]="keybindSelectionActive"
+                [style]="{
+                  width: '50vw',
+                  height: '50vh'
+                }"
+              >
+                <span>{{ recordedKeybind }}</span>
+                <ng-template pTemplate="footer">
+                  <p-button
+                    icon="pi pi-check"
+                    (click)="keybindSelectionActive = false"
+                    label="Okay"
+                    styleClass="p-button-text"
+                  ></p-button>
+                </ng-template>
+              </p-dialog>
+            </div>
+          </div>
+        </div>
+      </p-fieldset>
+      <ng-container *ngTemplateOutlet="settingsActionTemplate"></ng-container>
     </p-tabPanel>
     <p-tabPanel header="Screen Capture">
       <p>
@@ -65,6 +93,28 @@
         distinctio. Nam libero tempore, cum soluta nobis est eligendi optio
         cumque nihil impedit quo minus.
       </p>
+      <ng-container *ngTemplateOutlet="settingsActionTemplate"></ng-container>
     </p-tabPanel>
   </p-tabView>
 </div>
+
+<ng-template #settingsActionTemplate>
+  <div class="flex justify-end m-4">
+    <button
+      pButton
+      pRipple
+      type="button"
+      label="Save"
+      class="p-button-raised p-button-sm mx-2"
+      (click)="saveSettings()"
+    ></button>
+    <button
+      pButton
+      pRipple
+      type="button"
+      label="Cancel"
+      class="p-button-outlined p-button-sm mx-2"
+      (click)="cancelSettings()"
+    ></button>
+  </div>
+</ng-template>

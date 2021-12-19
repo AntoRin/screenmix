@@ -11,6 +11,7 @@ import { BlockUIModule } from "primeng/blockui";
 import { TagModule } from "primeng/tag";
 import { TabViewModule } from "primeng/tabview";
 import { FieldsetModule } from "primeng/fieldset";
+import { DialogModule } from "primeng/dialog";
 
 @NgModule({
   declarations: [],
@@ -27,6 +28,7 @@ import { FieldsetModule } from "primeng/fieldset";
     TagModule,
     TabViewModule,
     FieldsetModule,
+    DialogModule,
   ],
 })
 export class PrimengModule {}

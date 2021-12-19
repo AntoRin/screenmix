@@ -13,6 +13,7 @@ export interface RendererProcessCtx {
   saveCapture(data: CaptureData): Promise<any>;
   saveChanges(data: UserDataStore): Promise<void>;
   getAllPreferences(): Promise<UserDataStore>;
+  registerGlobalShortcuts(): Promise<void>;
 }
 
 export type UserDataFields = "baseDirectory" | "ssKeyBinds" | "scKeyBinds";

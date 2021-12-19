@@ -37,6 +37,8 @@ class Preload {
       },
       saveChanges: (data) => ipcRenderer.invoke("ipc:saveChanges", data),
       getAllPreferences: () => ipcRenderer.invoke("ipc:getAllPreferences"),
+      registerGlobalShortcuts: () =>
+        ipcRenderer.invoke("ipc:registerGlobalShortcuts"),
     };
   }
 }

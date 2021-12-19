@@ -15,7 +15,11 @@ export class SettingsComponent implements OnInit {
 
   configSettings: UserDataStore = {};
 
+  recordedKeybind: string = "";
+
   constructor() {}
+
+  keybindSelectionActive: boolean = false;
 
   ngOnInit(): void {
     this.configSettings = JSON.parse(JSON.stringify(this.PREFERENCES));
@@ -30,13 +34,48 @@ export class SettingsComponent implements OnInit {
       .catch((e) => {});
   }
 
-  saveSettings() {
-    window.rendererProcessctrl
-      .saveChanges(this.configSettings)
-      .then(() => {
-        this.settingsUpdateEvent.emit();
-      })
-      .catch((e) => {});
+  listenForKeybinds() {
+    window.addEventListener("keydown", this.handleNewKeybind.bind(this));
+  }
+
+  handleNewKeybind(ev: KeyboardEvent) {
+    console.log(ev);
+    const modifiers: string[] = [];
+
+    const keyMap: any = {
+      altKey: "Alt",
+      metaKey: "Meta",
+      shiftKey: "Shift",
+      ctrlKey: "Control",
+    };
+
+    Object.getOwnPropertyNames(keyMap).forEach((modifier: string) => {
+      if ((ev as any)[modifier]) {
+        modifiers.push(keyMap[modifier]);
+      }
+    });
+
+    if (!modifiers.includes(ev.key)) modifiers.push(ev.key);
+
+    this.recordedKeybind = modifiers.join("+");
+  }
+
+  removeListenerAndUpdateKeybind(captureType: "ss" | "sc", keybindIdx: number) {
+    window.removeAllListeners!("keydown");
+
+    if (captureType === "ss") {
+      this.configSettings.ssKeyBinds[keybindIdx] = this.recordedKeybind;
+    } else if (captureType === "sc") {
+      this.configSettings.scKeyBinds[keybindIdx] = this.recordedKeybind;
+    }
+  }
+
+  async saveSettings() {
+    try {
+      await window.rendererProcessctrl.saveChanges(this.configSettings);
+      await window.rendererProcessctrl.registerGlobalShortcuts();
+      this.settingsUpdateEvent.emit();
+    } catch (error) {}
   }
 
   cancelSettings() {

@@ -50,11 +50,17 @@ export class IpcHandler implements RendererProcessCtx {
     );
 
     ipcMain.handle("ipc:saveChanges", (_, data) => this.saveChanges(data));
+
+    ipcMain.handle("ipc:registerGlobalShortcuts", () =>
+      this.registerGlobalShortcuts(mainWindow)
+    );
   }
 
   async registerGlobalShortcuts(window?: BrowserWindow) {
     try {
       if (!window) throw new Error("NO_WINDOW");
+
+      this.unregisterGlobalShortcuts();
 
       const ssKeyBinds: string[] = (await this._store.read("ssKeyBinds")) || [];
       const scKeyBinds: string[] = (await this._store.read("scKeyBinds")) || [];

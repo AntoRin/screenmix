@@ -1,6 +1,6 @@
-<p-blockUI *ngIf="showProgressBar" [blocked]="true"></p-blockUI>
+<p-blockUI *ngIf="progressBarUserCount" [blocked]="true"></p-blockUI>
 <p-progressBar
-  *ngIf="showProgressBar"
+  *ngIf="progressBarUserCount"
   mode="indeterminate"
   [style]="{
     height: '6px',

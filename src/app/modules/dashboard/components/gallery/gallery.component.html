@@ -10,10 +10,17 @@
   class="grid m-2"
   style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr))"
 >
-  <p-image
-    class="m-2 image-display"
-    [preview]="true"
-    *ngFor="let path of imagePaths"
-    [src]="path"
-  ></p-image>
+  <div *ngFor="let mediaFile of mediaFiles">
+    <p-image
+      *ngIf="mediaFile.type === 'image'"
+      class="m-2 image-display"
+      [preview]="true"
+      [src]="mediaFile.path"
+    ></p-image>
+    <video
+      *ngIf="mediaFile.type === 'video'"
+      [src]="mediaFile.path"
+      controls
+    ></video>
+  </div>
 </div>

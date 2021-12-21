@@ -2,8 +2,9 @@
   <app-top-menu (tabChangeEvent)="changeTab($event)"></app-top-menu>
   <div class="">
     <app-gallery
+      (newGalleryEvent)="getGallery()"
       *ngIf="currentTab === 'gallery'"
-      [baseDirectory]="PREFERENCES.baseDirectory"
+      [mediaFiles]="mediaFiles"
     ></app-gallery>
     <app-settings
       [PREFERENCES]="PREFERENCES"

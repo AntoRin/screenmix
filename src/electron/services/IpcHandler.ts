@@ -6,17 +6,24 @@ import {
   globalShortcut,
   ipcMain,
 } from "electron";
-import { CaptureData, RendererProcessCtx, UserDataStore } from "../types";
+import {
+  CaptureData,
+  MediaFile,
+  RendererProcessCtx,
+  UserDataStore,
+} from "../types";
 import { Store } from "./Store";
 import { Dirent, promises as fsp, statSync } from "fs";
 
 export class IpcHandler implements RendererProcessCtx {
   private _store: Store;
   private _imageExtensions: string[];
+  private _videoExtensions: string[];
 
   constructor(store: Store) {
     this._store = store;
     this._imageExtensions = [".jpg", ".png"];
+    this._videoExtensions = [".mp4"];
   }
 
   public initializeIpcListeners(mainWindow?: BrowserWindow) {
@@ -114,7 +121,7 @@ export class IpcHandler implements RendererProcessCtx {
     return this._store.read(undefined);
   }
 
-  async listScreenshotPaths(baseDirectory?: string): Promise<string[]> {
+  async listScreenshotPaths(baseDirectory?: string): Promise<MediaFile[]> {
     try {
       if (!baseDirectory) {
         baseDirectory = await this._store.read("baseDirectory");
@@ -132,9 +139,12 @@ export class IpcHandler implements RendererProcessCtx {
         for (const fileData of directoryContents) {
           if (
             fileData.isFile() &&
-            this._imageExtensions.includes(
+            (this._imageExtensions.includes(
               path.extname(fileData.name).toLowerCase()
-            )
+            ) ||
+              this._videoExtensions.includes(
+                path.extname(fileData.name).toLowerCase()
+              ))
           ) {
             files.push(path.join(baseDirectory!, fileData.name));
           }
@@ -147,7 +157,13 @@ export class IpcHandler implements RendererProcessCtx {
 
       this._sortFilePathsBasedOnBirthTime(files);
 
-      return files;
+      return files.map((f) => ({
+        name: path.basename(f),
+        path: f,
+        type: this._imageExtensions.includes(path.extname(f))
+          ? "image"
+          : "video",
+      }));
     } catch (error) {
       throw error;
     }

@@ -9,7 +9,7 @@ import { ProgressBarService } from "../../services/progress-bar.service";
 })
 export class ProgressBarComponent implements OnInit, OnDestroy {
   private _progressBarToggle: Subject<boolean>;
-  public showProgressBar: boolean = false;
+  public progressBarUserCount = 0;
 
   constructor(private _progressBarService: ProgressBarService) {
     this._progressBarToggle = this._progressBarService.subject;
@@ -18,9 +18,9 @@ export class ProgressBarComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this._progressBarToggle.subscribe((toggle: boolean) => {
       if (toggle) {
-        this.showProgressBar = true;
+        this.progressBarUserCount++;
       } else {
-        this.showProgressBar = false;
+        this.progressBarUserCount && this.progressBarUserCount--;
       }
     });
   }

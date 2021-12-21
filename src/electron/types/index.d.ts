@@ -4,11 +4,17 @@ declare global {
   }
 }
 
+export interface MediaFile {
+  name: string;
+  type: "video" | "image";
+  path: string;
+}
+
 export interface RendererProcessCtx {
   selectBaseDirectory(...args: any[]): Promise<string | undefined>;
   getDirectorySelection(...args: any[]): Promise<string>;
   getBaseDirectory(...args: any[]): Promise<string | undefined>;
-  listScreenshotPaths(...args: any[]): Promise<string[]>;
+  listScreenshotPaths(...args: any[]): Promise<MediaFile[]>;
   getDesktopSourceId(...args: any[]): Promise<string | undefined>;
   saveCapture(data: CaptureData): Promise<any>;
   saveChanges(data: UserDataStore): Promise<void>;

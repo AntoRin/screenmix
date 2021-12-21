@@ -1,15 +1,16 @@
 import {
   Component,
   ElementRef,
+  EventEmitter,
   HostListener,
   Input,
   OnInit,
+  Output,
   ViewChild,
 } from "@angular/core";
-import { DomSanitizer } from "@angular/platform-browser";
 import { Subject } from "rxjs";
+import { MediaFile } from "../../../../../electron/types";
 import { CaptureMode, ProcessNotification } from "../../../../types";
-import { ProgressBarService } from "../../../shared/services/progress-bar.service";
 
 @Component({
   selector: "app-gallery",
@@ -17,8 +18,9 @@ import { ProgressBarService } from "../../../shared/services/progress-bar.servic
   styleUrls: ["./gallery.component.css"],
 })
 export class GalleryComponent implements OnInit {
-  @Input() baseDirectory: string | undefined;
-  imagePaths: string[] = [];
+  @Input() mediaFiles: MediaFile[] = [];
+
+  @Output() newGalleryEvent: EventEmitter<void> = new EventEmitter<void>();
 
   @ViewChild("videoContainer") vidRef!: ElementRef;
 
@@ -27,28 +29,9 @@ export class GalleryComponent implements OnInit {
     new Subject<ProcessNotification>();
   private _streamRef: MediaStream | undefined;
 
-  constructor(
-    private _sanitizer: DomSanitizer,
-    private _progressBarService: ProgressBarService
-  ) {}
+  constructor() {}
 
-  ngOnInit(): void {
-    this.getGallery();
-  }
-
-  getGallery() {
-    this._progressBarService.toggleOn();
-
-    window.rendererProcessctrl
-      .listScreenshotPaths(this.baseDirectory)
-      .then((paths: string[]) => {
-        this.imagePaths = paths.map(
-          (x) => this._sanitizer.bypassSecurityTrustResourceUrl(x) as string
-        );
-      })
-      .catch((e) => {})
-      .finally(() => this._progressBarService.toggleOff());
-  }
+  ngOnInit(): void {}
 
   @HostListener("window:message", ["$event"])
   handleScreenEvents(event: MessageEvent) {
@@ -158,7 +141,7 @@ export class GalleryComponent implements OnInit {
         mode: "video",
       });
 
-      this.getGallery();
+      this.newGalleryEvent.emit();
     } catch (error) {
       throw error;
     }
@@ -191,7 +174,7 @@ export class GalleryComponent implements OnInit {
           mode: "image",
         });
 
-        this.getGallery();
+        this.newGalleryEvent.emit();
       };
 
       videoElement.srcObject = stream;

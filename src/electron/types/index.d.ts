@@ -14,7 +14,7 @@ export interface RendererProcessCtx {
   selectBaseDirectory(...args: any[]): Promise<string | undefined>;
   getDirectorySelection(...args: any[]): Promise<string>;
   getBaseDirectory(...args: any[]): Promise<string | undefined>;
-  listScreenshotPaths(...args: any[]): Promise<MediaFile[]>;
+  listMediaPaths(...args: any[]): Promise<MediaFile[]>;
   getDesktopSourceId(...args: any[]): Promise<string | undefined>;
   saveCapture(data: CaptureData): Promise<any>;
   saveChanges(data: UserDataStore): Promise<void>;
@@ -22,7 +22,12 @@ export interface RendererProcessCtx {
   registerGlobalShortcuts(): Promise<void>;
 }
 
-export type UserDataFields = "baseDirectory" | "ssHotKey" | "scHotKey";
+export type UserDataFields =
+  | "baseDirectory"
+  | "ssHotKey"
+  | "scHotKey"
+  | "ssResolution"
+  | "scResolution";
 
 export type UserDataStore = Partial<Record<UserDataFields, any>>;
 

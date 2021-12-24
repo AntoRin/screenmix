@@ -35,9 +35,8 @@ export class IpcHandler implements RendererProcessCtx {
 
     ipcMain.handle("ipc:getBaseDirectory", this.getBaseDirectory.bind(this));
 
-    ipcMain.handle(
-      "ipc:listScreenshotPaths",
-      (_, baseDir: string | undefined) => this.listScreenshotPaths(baseDir)
+    ipcMain.handle("ipc:listMediaPaths", (_, baseDir: string | undefined) =>
+      this.listMediaPaths(baseDir)
     );
 
     ipcMain.handle(
@@ -121,7 +120,7 @@ export class IpcHandler implements RendererProcessCtx {
     return this._store.read(undefined);
   }
 
-  async listScreenshotPaths(baseDirectory?: string): Promise<MediaFile[]> {
+  async listMediaPaths(baseDirectory?: string): Promise<MediaFile[]> {
     try {
       if (!baseDirectory) {
         baseDirectory = await this._store.read("baseDirectory");

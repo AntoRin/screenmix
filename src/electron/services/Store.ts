@@ -30,6 +30,8 @@ export class Store {
       baseDirectory: app.getPath("home"),
       scHotKey: "Home",
       ssHotKey: "Insert",
+      ssResolution: "800x600",
+      scResolution: "800x600",
     };
   }
 

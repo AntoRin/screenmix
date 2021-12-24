@@ -25,8 +25,8 @@ class Preload {
       getDirectorySelection: () =>
         ipcRenderer.invoke("ipc:getDirectorySelection"),
       getBaseDirectory: () => ipcRenderer.invoke("ipc:getBaseDirectory"),
-      listScreenshotPaths: (baseDirectory: string) =>
-        ipcRenderer.invoke("ipc:listScreenshotPaths", baseDirectory),
+      listMediaPaths: (baseDirectory: string) =>
+        ipcRenderer.invoke("ipc:listMediaPaths", baseDirectory),
       getDesktopSourceId: () => ipcRenderer.invoke("ipc:getDesktopSourceId"),
       saveCapture: (captureData: CaptureData) =>
         ipcRenderer.invoke("ipc:saveCapturedScreenshot", captureData),

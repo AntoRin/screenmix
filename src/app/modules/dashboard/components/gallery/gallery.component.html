@@ -1,23 +1,17 @@
-<div class="m-2 flex justify-end">
-  <p-tag
-    *ngIf="videoCaptureInProgress"
-    icon="pi pi-times"
-    severity="danger"
-    value="Recording"
-  ></p-tag>
-</div>
 <div
   class="grid m-2"
   style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr))"
 >
   <div *ngFor="let mediaFile of mediaFiles">
     <p-image
+      styleClass="m-2"
       *ngIf="mediaFile.type === 'image'"
-      class="m-2 image-display"
+      class="m-2 h-full image-display"
       [preview]="true"
       [src]="mediaFile.path"
     ></p-image>
     <video
+      class="m-2 h-full w-full"
       *ngIf="mediaFile.type === 'video'"
       [src]="mediaFile.path"
       controls

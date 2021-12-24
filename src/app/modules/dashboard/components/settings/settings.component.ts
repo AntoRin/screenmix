@@ -33,7 +33,6 @@ export class SettingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.configSettings = JSON.parse(JSON.stringify(this.PREFERENCES));
-    console.log(this.configSettings);
   }
 
   updateDirectory() {

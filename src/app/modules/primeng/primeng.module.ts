@@ -12,6 +12,8 @@ import { TagModule } from "primeng/tag";
 import { TabViewModule } from "primeng/tabview";
 import { FieldsetModule } from "primeng/fieldset";
 import { DialogModule } from "primeng/dialog";
+import { DropdownModule } from "primeng/dropdown";
+import { DividerModule } from "primeng/divider";
 
 @NgModule({
   declarations: [],
@@ -29,6 +31,8 @@ import { DialogModule } from "primeng/dialog";
     TabViewModule,
     FieldsetModule,
     DialogModule,
+    DropdownModule,
+    DividerModule,
   ],
 })
 export class PrimengModule {}

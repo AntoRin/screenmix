@@ -1,6 +1,14 @@
 <div class="h-screen w-screen bg-gray-900 overflow-x-hidden">
   <app-top-menu (tabChangeEvent)="changeTab($event)"></app-top-menu>
-  <div class="">
+  <div>
+    <div class="m-2 flex justify-end">
+      <p-tag
+        *ngIf="showVideoCaptureMarker"
+        icon="pi pi-times"
+        severity="danger"
+        value="Recording"
+      ></p-tag>
+    </div>
     <app-gallery
       (newGalleryEvent)="getGallery()"
       *ngIf="currentTab === 'gallery'"

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { UserDataStore } from "../../../../electron/types";
-import { DashboardTab } from "../../../types";
+import { UserDataStore } from "../../../../../electron/types";
+import { DashboardTab } from "../../../../types";
 
 @Component({
   selector: "app-settings",
@@ -17,12 +17,23 @@ export class SettingsComponent implements OnInit {
 
   recordedKeybind: string = "";
 
+  availableScreenResolutions: string[] = [
+    "1920x1080",
+    "1600×900",
+    "1366×768",
+    "1280×720",
+    "1152×648",
+    "1024×576",
+    "800x600",
+  ];
+
   constructor() {}
 
   keybindSelectionActive: "ss" | "sc" | null = null;
 
   ngOnInit(): void {
     this.configSettings = JSON.parse(JSON.stringify(this.PREFERENCES));
+    console.log(this.configSettings);
   }
 
   updateDirectory() {

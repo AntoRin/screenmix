@@ -1,12 +1,18 @@
 <div class="card">
   <p-tabView>
-    <p-tabPanel header="General">
-      <p-fieldset legend="Storage" [toggleable]="true">
+    <p-tabPanel header="Configure Your Preferences">
+      <p-fieldset styleClass="my-5" legend="Storage" [toggleable]="true">
         <div class="container-grid">
-          <div class="m-1">
-            <h4 class="text-xl font-bold">Directory</h4>
-            <span class="text-base">Choose a directory to work with</span>
-          </div>
+          <ng-container
+            *ngTemplateOutlet="
+              settingsDetails;
+              context: {
+                title: 'Directory',
+                description: 'Choose a directory to work with'
+              }
+            "
+          >
+          </ng-container>
           <div class="m-2">
             <div class="p-inputgroup">
               <button
@@ -25,27 +31,28 @@
           </div>
         </div>
       </p-fieldset>
-      <ng-container *ngTemplateOutlet="settingsActionTemplate"></ng-container>
-    </p-tabPanel>
 
-    <!-- - Screenshot Tab -->
+      <!-- - Screenshot Tab -->
 
-    <p-tabPanel header="Screenshot">
-      <p-fieldset legend="Key Binds" [toggleable]="true">
+      <p-fieldset styleClass="my-5" legend="Screenshot" [toggleable]="true">
         <div class="container-grid">
-          <div class="m-1">
-            <h4 class="text-xl font-bold">Key Combinations</h4>
-            <span class="text-base"
-              >Set up key combinations for taking screenshots</span
-            >
-          </div>
+          <ng-container
+            *ngTemplateOutlet="
+              settingsDetails;
+              context: {
+                title: 'Screenshot Hot-Key',
+                description: 'Set up key combinations for taking screenshots'
+              }
+            "
+          >
+          </ng-container>
           <div class="m-2">
             <div class="p-inputgroup">
               <button
                 type="button"
                 pButton
                 pRipple
-                icon="pi pi-folder"
+                icon="pi pi-camera"
                 (click)="keybindSelectionActive = 'ss'"
               ></button>
               <input
@@ -82,28 +89,51 @@
             </div>
           </div>
         </div>
-      </p-fieldset>
-      <ng-container *ngTemplateOutlet="settingsActionTemplate"></ng-container>
-    </p-tabPanel>
-
-    <!-- - Screen Recorder Tab -->
-
-    <p-tabPanel header="Screen Recording">
-      <p-fieldset legend="Key Binds" [toggleable]="true">
+        <p-divider></p-divider>
         <div class="container-grid">
-          <div class="m-1">
-            <h4 class="text-xl font-bold">Key Combinations</h4>
-            <span class="text-base"
-              >Set up key combinations for enabling Screen Capture</span
-            >
+          <ng-container
+            *ngTemplateOutlet="
+              settingsDetails;
+              context: {
+                title: 'Screenshot Resolution',
+                description: 'The resolution for screenshots'
+              }
+            "
+          >
+          </ng-container>
+          <div class="m-2">
+            <p-dropdown
+              [options]="availableScreenResolutions"
+              [(ngModel)]="configSettings.ssResolution"
+              placeholder="Resolution"
+              [showClear]="false"
+            ></p-dropdown>
           </div>
+        </div>
+      </p-fieldset>
+
+      <!-- - Screen Recorder Tab -->
+
+      <p-fieldset styleClass="my-5" legend="Screen Capture" [toggleable]="true">
+        <div class="container-grid">
+          <ng-container
+            *ngTemplateOutlet="
+              settingsDetails;
+              context: {
+                title: 'Screen Capture Hot-Key',
+                description:
+                  'Set up key combinations for enabling Screen Capture'
+              }
+            "
+          >
+          </ng-container>
           <div class="m-2">
             <div class="p-inputgroup">
               <button
                 type="button"
                 pButton
                 pRipple
-                icon="pi pi-folder"
+                icon="pi pi-video"
                 (click)="keybindSelectionActive = 'sc'"
               ></button>
               <input
@@ -140,6 +170,27 @@
             </div>
           </div>
         </div>
+        <p-divider></p-divider>
+        <div class="container-grid">
+          <ng-container
+            *ngTemplateOutlet="
+              settingsDetails;
+              context: {
+                title: 'Screen Capture Resolution',
+                description: 'The resolution for screen captures'
+              }
+            "
+          >
+          </ng-container>
+          <div class="m-2">
+            <p-dropdown
+              [options]="availableScreenResolutions"
+              [(ngModel)]="configSettings.scResolution"
+              placeholder="Resolution"
+              [showClear]="false"
+            ></p-dropdown>
+          </div>
+        </div>
       </p-fieldset>
       <ng-container *ngTemplateOutlet="settingsActionTemplate"></ng-container>
     </p-tabPanel>
@@ -147,6 +198,13 @@
 </div>
 
 <!-- - Tab Action Items Template -->
+
+<ng-template #settingsDetails let-title="title" let-description="description">
+  <div class="m-1">
+    <h4 class="text-xl font-bold">{{ title }}</h4>
+    <span class="text-base">{{ description }}</span>
+  </div>
+</ng-template>
 
 <ng-template #settingsActionTemplate>
   <div class="flex justify-end m-4">

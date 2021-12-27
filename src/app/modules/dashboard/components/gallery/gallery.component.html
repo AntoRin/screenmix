@@ -54,37 +54,29 @@
   <div class="h-[7%] flex justify-center">
     <div
       *ngIf="!imageEditor"
-      class="bg-black flex justify-center items-center text-white p-1"
+      class="bg-black flex justify-center items-center p-1 image-toolbar"
     >
       <span (click)="previousImage()" class="pi pi-angle-left"></span>
       <span (click)="nextImage()" class="pi pi-angle-right"></span>
-      <span
-        (click)="showImageInEditor(spotlightImage)"
-        class="pi pi-pencil cursor-pointer mx-1"
-      ></span>
-      <span
-        (click)="closeImageSpotlight()"
-        class="pi pi-times cursor-pointer mx-1"
-      ></span>
+      <span (click)="closeImageSpotlight()" class="pi pi-times"></span>
     </div>
     <div
       *ngIf="imageEditor"
-      class="bg-black flex justify-center items-center text-white p-1"
+      class="
+        bg-black
+        flex
+        justify-center
+        items-center
+        text-white
+        p-1
+        image-toolbar
+      "
     >
-      <p-tag
-        styleClass="p-mr-2 cursor-pointer"
-        icon="pi pi-check"
-        severity="success"
-        value="Apply Changes"
-        (click)="applyChanges()"
-      ></p-tag>
-      <p-tag
-        icon="pi pi-times"
-        styleClass="p-mr-2 cursor-pointer"
-        severity="danger"
-        value="Cancel"
-        (click)="cancelEditing()"
-      ></p-tag>
+      <span (click)="rotateLeft()" class="pi pi-replay"></span>
+      <span (click)="rotateRight()" class="pi pi-refresh"></span>
+      <span class="pi pi-stop"></span>
+      <span (click)="applyChanges()" class="pi pi-check"></span>
+      <span (click)="cancelEditing()" class="pi pi-times"></span>
     </div>
   </div>
 </div>

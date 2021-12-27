@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, ElementRef, Input, OnInit, ViewChild } from "@angular/core";
 import { MediaFile } from "../../../../../electron/types";
 import Cropper from "cropperjs";
 import { MenuItem } from "primeng/api";
@@ -10,6 +10,7 @@ import { MenuItem } from "primeng/api";
 })
 export class GalleryComponent implements OnInit {
   @Input() mediaFiles: MediaFile[] = [];
+  @ViewChild("spotlightImage") spotlightImgRef: ElementRef | undefined;
 
   spotlightImageSrc: string | undefined;
   spotlightImageIdx: number | undefined;
@@ -19,6 +20,10 @@ export class GalleryComponent implements OnInit {
     {
       label: "Edit",
       icon: "pi pi-pencil",
+      command: () => {
+        if (!this.spotlightImgRef) return;
+        this.showImageInEditor(this.spotlightImgRef.nativeElement);
+      },
     },
   ];
 
@@ -100,6 +105,16 @@ export class GalleryComponent implements OnInit {
       idx: prevIdx,
     };
     console.log(this.spotlightImageIdx);
+  }
+
+  rotateLeft() {
+    if (!this.imageEditor) return;
+    this.imageEditor.rotate(-90);
+  }
+
+  rotateRight() {
+    if (!this.imageEditor) return;
+    this.imageEditor.rotate(90);
   }
 
   applyChanges() {}

@@ -2,19 +2,89 @@
   class="grid m-2"
   style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr))"
 >
-  <div *ngFor="let mediaFile of mediaFiles">
-    <p-image
+  <div *ngFor="let mediaFile of mediaFiles; let mediaIdx = index">
+    <!-- <p-image
       styleClass="m-2"
       *ngIf="mediaFile.type === 'image'"
       class="m-2 h-full image-display"
       [preview]="true"
       [src]="mediaFile.path"
-    ></p-image>
+    ></p-image> -->
+    <img
+      *ngIf="mediaFile.type === 'image'"
+      (click)="showImageInSpotlight(mediaIdx)"
+      [src]="mediaFile.path"
+      class="
+        m-2
+        h-full
+        image-display
+        cursor-pointer
+        hover:border-solid hover:border-2 hover:border-yellow-300
+        transition-all
+      "
+      alt=""
+    />
     <video
       class="m-2 h-full w-full"
       *ngIf="mediaFile.type === 'video'"
       [src]="mediaFile.path"
       controls
     ></video>
+  </div>
+</div>
+<div
+  *ngIf="spotlightImageSrc"
+  class="top-0 bottom-0 left-0 right-0 fixed z-50 bg-black bg-opacity-75"
+>
+  <div class="bg-black h-[7%] flex justify-end p-1">
+    <span
+      (click)="imageMenu.toggle($event)"
+      class="pi pi-ellipsis-v text-xl text-white mx-4 cursor-pointer"
+    ></span>
+    <p-menu #imageMenu [popup]="true" [model]="imageOptions"></p-menu>
+  </div>
+  <div class="flex justify-center h-[86%]">
+    <img
+      #spotlightImage
+      [src]="spotlightImageSrc"
+      class="h-[100%] w-auto"
+      alt=""
+    />
+  </div>
+  <div class="h-[7%] flex justify-center">
+    <div
+      *ngIf="!imageEditor"
+      class="bg-black flex justify-center items-center text-white p-1"
+    >
+      <span (click)="previousImage()" class="pi pi-angle-left"></span>
+      <span (click)="nextImage()" class="pi pi-angle-right"></span>
+      <span
+        (click)="showImageInEditor(spotlightImage)"
+        class="pi pi-pencil cursor-pointer mx-1"
+      ></span>
+      <span
+        (click)="closeImageSpotlight()"
+        class="pi pi-times cursor-pointer mx-1"
+      ></span>
+    </div>
+    <div
+      *ngIf="imageEditor"
+      class="bg-black flex justify-center items-center text-white p-1"
+    >
+      <p-tag
+        styleClass="p-mr-2 cursor-pointer"
+        icon="pi pi-check"
+        severity="success"
+        value="Apply Changes"
+        (click)="applyChanges()"
+      ></p-tag>
+      <p-tag
+        icon="pi pi-times"
+        styleClass="p-mr-2 cursor-pointer"
+        severity="danger"
+        value="Cancel"
+        (click)="cancelEditing()"
+      ></p-tag>
+    </div>
   </div>
 </div>

@@ -159,7 +159,7 @@ export class IpcHandler implements RendererProcessCtx {
       return files.map((f) => ({
         name: path.basename(f),
         path: f,
-        type: this._imageExtensions.includes(path.extname(f))
+        type: this._imageExtensions.includes(path.extname(f).toLowerCase())
           ? "image"
           : "video",
       }));

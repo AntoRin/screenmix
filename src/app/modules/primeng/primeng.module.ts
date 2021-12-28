@@ -14,6 +14,7 @@ import { FieldsetModule } from "primeng/fieldset";
 import { DialogModule } from "primeng/dialog";
 import { DropdownModule } from "primeng/dropdown";
 import { DividerModule } from "primeng/divider";
+import { SplitButtonModule } from "primeng/splitbutton";
 
 @NgModule({
   declarations: [],
@@ -33,6 +34,7 @@ import { DividerModule } from "primeng/divider";
     DialogModule,
     DropdownModule,
     DividerModule,
+    SplitButtonModule,
   ],
 })
 export class PrimengModule {}

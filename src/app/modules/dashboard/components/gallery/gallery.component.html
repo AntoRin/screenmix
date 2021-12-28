@@ -1,15 +1,14 @@
 <div
-  class="grid m-2"
-  style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr))"
+  class="grid m-2 gap-2"
+  style="
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-auto-rows: 200px;
+  "
 >
-  <div *ngFor="let mediaFile of mediaFiles; let mediaIdx = index">
-    <!-- <p-image
-      styleClass="m-2"
-      *ngIf="mediaFile.type === 'image'"
-      class="m-2 h-full image-display"
-      [preview]="true"
-      [src]="mediaFile.path"
-    ></p-image> -->
+  <div
+    class="m-auto flex justify-center items-center"
+    *ngFor="let mediaFile of mediaFiles; let mediaIdx = index"
+  >
     <img
       *ngIf="mediaFile.type === 'image'"
       (click)="showImageInSpotlight(mediaIdx)"
@@ -32,18 +31,67 @@
     ></video>
   </div>
 </div>
+
+<!-- - Spotlight Image -->
+
 <div
   *ngIf="spotlightImageSrc"
   class="top-0 bottom-0 left-0 right-0 fixed z-50 bg-black bg-opacity-75"
 >
-  <div class="bg-black h-[7%] flex justify-end p-1">
+  <!-- - Top Menu -->
+  <div class="bg-black h-[60px] flex justify-end items-center p-1">
+    <button
+      *ngIf="editState"
+      (click)="saveOptionsMenu.toggle($event)"
+      label="Save"
+      pButton
+      pRipple
+      icon="pi pi-angle-down"
+      iconPos="right"
+      class="p-button-raised p-button-sm p-button-text"
+      styleClass="p-button-sm"
+    ></button>
+    <p-menu
+      #saveOptionsMenu
+      [popup]="true"
+      [model]="[
+        {
+          label: 'Save',
+          icon: 'pi pi-save',
+          command: applyChanges
+        },
+        {
+          separator: true
+        },
+        {
+          label: 'Save as a new file',
+          icon: 'pi pi-plus',
+          command: applyChanges
+        }
+      ]"
+    ></p-menu>
+    <button
+      (click)="editState ? cancelEditing() : closeImageSpotlight()"
+      [label]="editState ? 'Discard Changes' : 'Close'"
+      pButton
+      pRipple
+      icon="pi pi-times"
+      iconPos="right"
+      class="p-button-raised p-button-danger p-button-sm p-button-text"
+      styleClass="p-button-sm"
+    ></button>
     <span
       (click)="imageMenu.toggle($event)"
       class="pi pi-ellipsis-v text-xl text-white mx-4 cursor-pointer"
     ></span>
     <p-menu #imageMenu [popup]="true" [model]="imageOptions"></p-menu>
   </div>
-  <div class="flex justify-center h-[86%]">
+
+  <!-- - Image -->
+  <div
+    class="flex justify-center items-center"
+    style="height: calc(100vh - 120px)"
+  >
     <img
       #spotlightImage
       [src]="spotlightImageSrc"
@@ -51,17 +99,21 @@
       alt=""
     />
   </div>
-  <div class="h-[7%] flex justify-center">
+
+  <!-- - Bottom Toolbar -->
+  <div class="h-[60px] flex justify-center items-center">
+    <!-- - If not in edit mode -->
     <div
-      *ngIf="!imageEditor"
+      *ngIf="!editState"
       class="bg-black flex justify-center items-center p-1 image-toolbar"
     >
       <span (click)="previousImage()" class="pi pi-angle-left"></span>
       <span (click)="nextImage()" class="pi pi-angle-right"></span>
-      <span (click)="closeImageSpotlight()" class="pi pi-times"></span>
     </div>
+
+    <!-- - If in edit mode -->
     <div
-      *ngIf="imageEditor"
+      *ngIf="editState"
       class="
         bg-black
         flex
@@ -72,11 +124,22 @@
         image-toolbar
       "
     >
-      <span (click)="rotateLeft()" class="pi pi-replay"></span>
-      <span (click)="rotateRight()" class="pi pi-refresh"></span>
-      <span class="pi pi-stop"></span>
-      <span (click)="applyChanges()" class="pi pi-check"></span>
-      <span (click)="cancelEditing()" class="pi pi-times"></span>
+      <span
+        *ngIf="imageEditor"
+        (click)="rotateLeft()"
+        class="pi pi-replay"
+      ></span>
+      <span
+        *ngIf="imageEditor"
+        (click)="rotateRight()"
+        class="pi pi-refresh"
+      ></span>
+      <span
+        *ngIf="imageEditor"
+        (click)="cropPreview()"
+        class="pi pi-eye"
+      ></span>
+      <span (click)="resetImageToPrevEditingState()" class="pi pi-ban"></span>
     </div>
   </div>
 </div>

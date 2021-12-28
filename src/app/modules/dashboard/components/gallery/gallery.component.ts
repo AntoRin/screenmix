@@ -15,15 +15,19 @@ export class GalleryComponent implements OnInit {
   spotlightImageSrc: string | undefined;
   spotlightImageIdx: number | undefined;
   imageEditor: Cropper | null = null;
+  editState:
+    | {
+        idx: number;
+        src: string;
+      }
+    | undefined
+    | null;
 
   imageOptions: MenuItem[] = [
     {
       label: "Edit",
       icon: "pi pi-pencil",
-      command: () => {
-        if (!this.spotlightImgRef) return;
-        this.showImageInEditor(this.spotlightImgRef.nativeElement);
-      },
+      command: this.enableImageEditing.bind(this),
     },
   ];
 
@@ -33,7 +37,9 @@ export class GalleryComponent implements OnInit {
   }
 
   get spotlightImage() {
-    return !this.spotlightImageSrc || !this.spotlightImageIdx
+    return !this.spotlightImageSrc ||
+      this.spotlightImageIdx === null ||
+      this.spotlightImageIdx === undefined
       ? undefined
       : {
           src: this.spotlightImageSrc,
@@ -52,18 +58,30 @@ export class GalleryComponent implements OnInit {
         : undefined;
   }
 
+  enableImageEditing() {
+    if (!this.spotlightImgRef) return;
+    this.showImageInEditor(this.spotlightImgRef.nativeElement);
+  }
+
   showImageInEditor(imageElement: HTMLImageElement) {
-    if (this.imageEditor) return;
+    if (this.imageEditor || !this.spotlightImage) return;
 
     this.imageEditor = new Cropper(imageElement, {
-      zoomable: false,
+      zoomable: true,
       scalable: false,
-      aspectRatio: 1,
+      background: false,
       crop: () => {},
     });
+
+    this.editState = {
+      ...(this.editState || {}),
+      idx: this.editState?.idx || this.spotlightImage.idx,
+      src: this.editState?.src || this.spotlightImage.src,
+    };
   }
 
   nextImage() {
+    console.log(this.spotlightImage);
     if (!this.spotlightImage) return;
 
     let nextIdx: number = this.spotlightImage.idx;
@@ -104,7 +122,6 @@ export class GalleryComponent implements OnInit {
       src: this.mediaFiles[prevIdx].path,
       idx: prevIdx,
     };
-    console.log(this.spotlightImageIdx);
   }
 
   rotateLeft() {
@@ -117,9 +134,55 @@ export class GalleryComponent implements OnInit {
     this.imageEditor.rotate(90);
   }
 
+  cropPreview() {
+    if (!this.imageEditor || !this.spotlightImage) return;
+
+    this.spotlightImage = {
+      idx: this.spotlightImage.idx,
+      src: this.imageEditor.getCroppedCanvas({}).toDataURL("image/png"),
+    };
+    this.waitAndEnableEditingForNewImage();
+    this._destroyImageEditor();
+  }
+
+  /**
+   * Wait until UI is updated with new image before enabling editing again
+   */
+  waitAndEnableEditingForNewImage() {
+    (this.spotlightImgRef?.nativeElement as HTMLImageElement).addEventListener(
+      "load",
+      () => {
+        this.enableImageEditing();
+        (this.spotlightImgRef?.nativeElement as HTMLImageElement)
+          .removeAllListeners!("load");
+      }
+    );
+  }
+
+  resetImage(resetState?: boolean) {
+    if (!this.editState) return;
+    this.spotlightImage = {
+      idx: this.editState.idx,
+      src: this.editState.src,
+    };
+    if (resetState) this.editState = null;
+  }
+
+  resetImageToPrevEditingState() {
+    if (this.spotlightImage?.src === this.editState?.src) return;
+    this.waitAndEnableEditingForNewImage();
+    this.resetImage(false);
+    this._destroyImageEditor();
+  }
+
   applyChanges() {}
 
   cancelEditing() {
+    this.resetImage(true);
+    this._destroyImageEditor();
+  }
+
+  private _destroyImageEditor() {
     if (!this.imageEditor) return;
     this.imageEditor.destroy();
     this.imageEditor = null;

@@ -10,13 +10,15 @@ class Preload {
       });
     });
 
-    ipcRenderer.on("fromMain:takeScreenshot", () => {
-      window.postMessage("fromMain:takeScreenshot");
-    });
+    const fromMainEvents: string[] = [
+      "fromMain:takeScreenshot",
+      "fromMain:captureScreen",
+      "fromMain:NewItemInGallery",
+    ];
 
-    ipcRenderer.on("fromMain:captureScreen", () => {
-      window.postMessage("fromMain:captureScreen");
-    });
+    fromMainEvents.forEach((eventName) =>
+      ipcRenderer.on(eventName, () => window.postMessage(eventName))
+    );
   }
 
   get exposedApis(): RendererProcessCtx {
@@ -34,6 +36,8 @@ class Preload {
       getAllPreferences: () => ipcRenderer.invoke("ipc:getAllPreferences"),
       registerGlobalShortcuts: () =>
         ipcRenderer.invoke("ipc:registerGlobalShortcuts"),
+      saveEditedImage: (data: CaptureData) =>
+        ipcRenderer.invoke("ipc:saveEditedImage", data),
     };
   }
 }

@@ -51,28 +51,10 @@
       class="p-button-raised p-button-sm p-button-text"
       styleClass="p-button-sm"
     ></button>
-    <p-menu
-      #saveOptionsMenu
-      [popup]="true"
-      [model]="[
-        {
-          label: 'Save',
-          icon: 'pi pi-save',
-          command: applyChanges
-        },
-        {
-          separator: true
-        },
-        {
-          label: 'Save as a new file',
-          icon: 'pi pi-plus',
-          command: applyChanges
-        }
-      ]"
-    ></p-menu>
+    <p-menu #saveOptionsMenu [popup]="true" [model]="saveOptions"></p-menu>
     <button
-      (click)="editState ? cancelEditing() : closeImageSpotlight()"
-      [label]="editState ? 'Discard Changes' : 'Close'"
+      (click)="editState ? exitEditor() : closeImageSpotlight()"
+      [label]="editState ? 'Exit Editor' : 'Close'"
       pButton
       pRipple
       icon="pi pi-times"
@@ -114,32 +96,50 @@
     <!-- - If in edit mode -->
     <div
       *ngIf="editState"
-      class="
-        bg-black
-        flex
-        justify-center
-        items-center
-        text-white
-        p-1
-        image-toolbar
-      "
+      class="bg-black flex justify-center items-center p-1"
     >
-      <span
-        *ngIf="imageEditor"
-        (click)="rotateLeft()"
-        class="pi pi-replay"
-      ></span>
-      <span
-        *ngIf="imageEditor"
-        (click)="rotateRight()"
-        class="pi pi-refresh"
-      ></span>
-      <span
-        *ngIf="imageEditor"
-        (click)="cropPreview()"
-        class="pi pi-eye"
-      ></span>
-      <span (click)="resetImageToPrevEditingState()" class="pi pi-ban"></span>
+      <span class="p-buttonset">
+        <button
+          *ngIf="imageEditor"
+          (click)="rotateLeft()"
+          pButton
+          pRipple
+          type="button"
+          icon="pi pi-replay"
+          label="Rotate Left"
+          class="p-button-raised p-button-sm p-button-help py-1"
+        ></button>
+        <button
+          *ngIf="imageEditor"
+          (click)="rotateRight()"
+          pButton
+          pRipple
+          type="button"
+          icon="pi pi-refresh"
+          label="Rotate Right"
+          class="p-button-raised p-button-sm p-button-help py-1"
+        ></button>
+        <button
+          *ngIf="imageEditor"
+          (click)="cropPreview()"
+          pButton
+          pRipple
+          type="button"
+          icon="pi pi-eye"
+          label="Crop"
+          class="p-button-raised p-button-sm p-button-help py-1"
+        ></button>
+        <button
+          *ngIf="imageEditor"
+          (click)="resetImageToPrevEditingState()"
+          pButton
+          pRipple
+          type="button"
+          icon="pi pi-ban"
+          label="Reset Image"
+          class="p-button-raised p-button-sm p-button-help py-1"
+        ></button>
+      </span>
     </div>
   </div>
 </div>

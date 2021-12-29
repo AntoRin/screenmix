@@ -17,6 +17,7 @@ import { Dirent, promises as fsp, statSync } from "fs";
 
 export class IpcHandler implements RendererProcessCtx {
   private _store: Store;
+  private _mainWindow: BrowserWindow | undefined;
   private _imageExtensions: string[];
   private _videoExtensions: string[];
 
@@ -28,6 +29,8 @@ export class IpcHandler implements RendererProcessCtx {
 
   public initializeIpcListeners(mainWindow?: BrowserWindow) {
     if (!mainWindow) throw new Error("NO_WINDOW");
+
+    this._mainWindow = mainWindow;
 
     ipcMain.handle("ipc:selectBaseDirectory", () =>
       this.selectBaseDirectory(mainWindow)
@@ -59,6 +62,10 @@ export class IpcHandler implements RendererProcessCtx {
 
     ipcMain.handle("ipc:registerGlobalShortcuts", () =>
       this.registerGlobalShortcuts(mainWindow)
+    );
+
+    ipcMain.handle("ipc:saveEditedImage", (_, data) =>
+      this.saveEditedImage(data)
     );
   }
 
@@ -215,6 +222,11 @@ export class IpcHandler implements RendererProcessCtx {
     }
   }
 
+  private _notifiyOfNewGalleryItem() {
+    if (!this._mainWindow) return;
+    this._mainWindow.webContents.send("fromMain:NewItemInGallery");
+  }
+
   async saveCapture(captureData: CaptureData) {
     try {
       const base64Data = captureData.dataUrl.split(";base64,")[1];
@@ -223,14 +235,28 @@ export class IpcHandler implements RendererProcessCtx {
 
       const fileName =
         captureData.mode === "image"
-          ? String(Date.now()) + ".png"
-          : String(Date.now()) + ".mp4";
+          ? captureData.name || String(Date.now()) + ".png"
+          : captureData.name || String(Date.now()) + ".mp4";
 
       await fsp.writeFile(path.join(baseDir, fileName), base64Data, {
         encoding: "base64",
       });
+
+      this._notifiyOfNewGalleryItem();
     } catch (error) {
-      console.log(error);
+      throw error;
+    }
+  }
+
+  async saveEditedImage(imageData: CaptureData) {
+    try {
+      if (imageData.mode !== "image") throw new Error("INVALID_CAPTURE_MODE");
+
+      if (!imageData.name) throw new Error("INVALID_IMAGE_NAME");
+
+      await this.saveCapture(imageData);
+    } catch (error) {
+      throw error;
     }
   }
 }

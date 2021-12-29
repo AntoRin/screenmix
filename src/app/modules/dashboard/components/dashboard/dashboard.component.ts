@@ -28,14 +28,11 @@ export class DashboardComponent implements OnInit {
     this._mediaStreamService.streamNotifications$
       .asObservable()
       .subscribe((notification) => {
-        if (notification === "newItem") {
-          this.getGallery();
-        } else if (notification === "videoCaptureStart") {
+        if (notification === "videoCaptureStart") {
           this.showVideoCaptureMarker = true;
         } else if (notification === "videoCaptureEnd") {
           this.showVideoCaptureMarker = false;
         }
-        return;
       });
   }
 
@@ -53,6 +50,10 @@ export class DashboardComponent implements OnInit {
           "video",
           this.PREFERENCES.scResolution
         );
+
+      case "fromMain:NewItemInGallery":
+        console.log("newItem");
+        return this.getGallery();
 
       default:
         return;

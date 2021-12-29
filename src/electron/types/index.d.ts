@@ -20,6 +20,7 @@ export interface RendererProcessCtx {
   saveChanges(data: UserDataStore): Promise<void>;
   getAllPreferences(): Promise<UserDataStore>;
   registerGlobalShortcuts(): Promise<void>;
+  saveEditedImage(data: CaptureData): Promise<void>;
 }
 
 export type UserDataFields =
@@ -34,4 +35,5 @@ export type UserDataStore = Partial<Record<UserDataFields, any>>;
 export interface CaptureData {
   dataUrl: string;
   mode: "image" | "video";
+  name?: string;
 }

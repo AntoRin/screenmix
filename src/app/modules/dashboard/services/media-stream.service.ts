@@ -11,9 +11,7 @@ export class MediaStreamService {
     new Subject<ProcessNotification>();
   private _streamRef: MediaStream | undefined;
 
-  streamNotifications$: Subject<
-    "newItem" | "videoCaptureStart" | "videoCaptureEnd"
-  > = new Subject<"newItem" | "videoCaptureStart" | "videoCaptureEnd">();
+  streamNotifications$ = new Subject<"videoCaptureStart" | "videoCaptureEnd">();
 
   constructor() {}
 
@@ -135,8 +133,6 @@ export class MediaStreamService {
         dataUrl,
         mode: "video",
       });
-
-      this.streamNotifications$.next("newItem");
     } catch (error) {
       throw error;
     }
@@ -174,8 +170,6 @@ export class MediaStreamService {
           dataUrl: imageDataUrl,
           mode: "image",
         });
-
-        this.streamNotifications$.next("newItem");
       };
 
       videoElement.srcObject = stream;

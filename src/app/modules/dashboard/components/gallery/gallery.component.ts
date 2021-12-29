@@ -2,6 +2,7 @@ import { Component, ElementRef, Input, OnInit, ViewChild } from "@angular/core";
 import { MediaFile } from "../../../../../electron/types";
 import Cropper from "cropperjs";
 import { MenuItem } from "primeng/api";
+import { EditState } from "../../../../types";
 
 @Component({
   selector: "app-gallery",
@@ -15,19 +16,29 @@ export class GalleryComponent implements OnInit {
   spotlightImageSrc: string | undefined;
   spotlightImageIdx: number | undefined;
   imageEditor: Cropper | null = null;
-  editState:
-    | {
-        idx: number;
-        src: string;
-      }
-    | undefined
-    | null;
+  editState: EditState | null | undefined;
 
   imageOptions: MenuItem[] = [
     {
       label: "Edit",
       icon: "pi pi-pencil",
       command: this.enableImageEditing.bind(this),
+    },
+  ];
+
+  saveOptions = [
+    {
+      label: "Save",
+      icon: "pi pi-save",
+      command: this.applyChanges.bind(this),
+    },
+    {
+      separator: true,
+    },
+    {
+      label: "Save as a new file",
+      icon: "pi pi-plus",
+      command: this.applyChanges.bind(this),
     },
   ];
 
@@ -75,8 +86,10 @@ export class GalleryComponent implements OnInit {
 
     this.editState = {
       ...(this.editState || {}),
-      idx: this.editState?.idx || this.spotlightImage.idx,
-      src: this.editState?.src || this.spotlightImage.src,
+      previousImageIdx:
+        this.editState?.previousImageIdx || this.spotlightImage.idx,
+      previousImageSrc:
+        this.editState?.previousImageSrc || this.spotlightImage.src,
     };
   }
 
@@ -159,26 +172,47 @@ export class GalleryComponent implements OnInit {
     );
   }
 
-  resetImage(resetState?: boolean) {
+  /**
+   * If there's a backed-up src of the spotlight image, this updates the current spotlight image with that src.
+   */
+  resetImage() {
     if (!this.editState) return;
     this.spotlightImage = {
-      idx: this.editState.idx,
-      src: this.editState.src,
+      idx: this.editState.previousImageIdx,
+      src: this.editState.previousImageSrc,
     };
-    if (resetState) this.editState = null;
   }
 
+  /**
+   * Reset edits to original using backed-up image src, wait until UI loads the new image, and then enable editing again.
+   */
   resetImageToPrevEditingState() {
-    if (this.spotlightImage?.src === this.editState?.src) return;
+    if (this.spotlightImage?.src === this.editState?.previousImageSrc) return;
+
     this.waitAndEnableEditingForNewImage();
-    this.resetImage(false);
+    this.resetImage();
     this._destroyImageEditor();
   }
 
-  applyChanges() {}
+  async applyChanges() {
+    try {
+      if (!this.spotlightImage || !this.imageEditor) return;
 
-  cancelEditing() {
-    this.resetImage(true);
+      await window.rendererProcessctrl.saveEditedImage({
+        dataUrl: this.imageEditor.getCroppedCanvas({}).toDataURL("image/png"),
+        mode: "image",
+        name: this.mediaFiles[this.spotlightImage.idx].name,
+      });
+
+      this.exitEditor();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  exitEditor(preserveEdits: boolean = false) {
+    if (!preserveEdits) this.resetImage();
+    this.editState = null;
     this._destroyImageEditor();
   }
 
@@ -189,7 +223,7 @@ export class GalleryComponent implements OnInit {
   }
 
   closeImageSpotlight() {
-    this.cancelEditing();
+    this.exitEditor();
     this.spotlightImage = undefined;
   }
 }

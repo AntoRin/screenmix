@@ -1,4 +1,12 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from "@angular/core";
+import {
+  Component,
+  ElementRef,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+  ViewChild,
+} from "@angular/core";
 import { MediaFile } from "../../../../../electron/types";
 import Cropper from "cropperjs";
 import { MenuItem } from "primeng/api";
@@ -9,7 +17,7 @@ import { EditState } from "../../../../types";
   templateUrl: "./gallery.component.html",
   styleUrls: ["./gallery.component.css"],
 })
-export class GalleryComponent implements OnInit {
+export class GalleryComponent implements OnInit, OnChanges {
   @Input() mediaFiles: MediaFile[] = [];
   @ViewChild("spotlightImage") spotlightImgRef: ElementRef | undefined;
 
@@ -61,6 +69,13 @@ export class GalleryComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {}
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (!this.spotlightImage) return;
+
+    this.spotlightImage.src =
+      changes["mediaFiles"].currentValue[this.spotlightImage.idx].path;
+  }
 
   showImageInSpotlight(imageIdx: number) {
     this.spotlightImage =
@@ -148,70 +163,43 @@ export class GalleryComponent implements OnInit {
   }
 
   cropPreview() {
-    if (!this.imageEditor || !this.spotlightImage) return;
+    if (!this.imageEditor) return;
 
-    this.spotlightImage = {
-      idx: this.spotlightImage.idx,
-      src: this.imageEditor.getCroppedCanvas({}).toDataURL("image/png"),
-    };
-    this.waitAndEnableEditingForNewImage();
-    this._destroyImageEditor();
-  }
-
-  /**
-   * Wait until UI is updated with new image before enabling editing again
-   */
-  waitAndEnableEditingForNewImage() {
-    (this.spotlightImgRef?.nativeElement as HTMLImageElement).addEventListener(
-      "load",
-      () => {
-        this.enableImageEditing();
-        (this.spotlightImgRef?.nativeElement as HTMLImageElement)
-          .removeAllListeners!("load");
-      }
+    this.imageEditor.replace(
+      this.imageEditor.getCroppedCanvas({}).toDataURL("image/png")
     );
-  }
-
-  /**
-   * If there's a backed-up src of the spotlight image, this updates the current spotlight image with that src.
-   */
-  resetImage() {
-    if (!this.editState) return;
-    this.spotlightImage = {
-      idx: this.editState.previousImageIdx,
-      src: this.editState.previousImageSrc,
-    };
   }
 
   /**
    * Reset edits to original using backed-up image src, wait until UI loads the new image, and then enable editing again.
    */
   resetImageToPrevEditingState() {
-    if (this.spotlightImage?.src === this.editState?.previousImageSrc) return;
-
-    this.waitAndEnableEditingForNewImage();
-    this.resetImage();
-    this._destroyImageEditor();
+    if (!this.imageEditor || !this.editState) return;
+    this.imageEditor.replace(this.editState.previousImageSrc);
   }
 
   async applyChanges() {
     try {
       if (!this.spotlightImage || !this.imageEditor) return;
 
+      const editedImgUrl: string = this.imageEditor
+        .getCroppedCanvas({})
+        .toDataURL("image/png");
+
+      this.exitEditor();
+
       await window.rendererProcessctrl.saveEditedImage({
-        dataUrl: this.imageEditor.getCroppedCanvas({}).toDataURL("image/png"),
+        dataUrl: editedImgUrl,
         mode: "image",
         name: this.mediaFiles[this.spotlightImage.idx].name,
       });
-
-      this.exitEditor();
+      console.log("saved");
     } catch (error) {
       console.log(error);
     }
   }
 
-  exitEditor(preserveEdits: boolean = false) {
-    if (!preserveEdits) this.resetImage();
+  exitEditor() {
     this.editState = null;
     this._destroyImageEditor();
   }

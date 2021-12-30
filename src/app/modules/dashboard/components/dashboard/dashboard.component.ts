@@ -1,5 +1,4 @@
 import { Component, HostListener, OnInit } from "@angular/core";
-import { DomSanitizer } from "@angular/platform-browser";
 import { MediaFile, UserDataStore } from "../../../../../electron/types";
 import { DashboardTab } from "../../../../types";
 import { ProgressBarService } from "../../../shared/services/progress-bar.service";
@@ -18,7 +17,6 @@ export class DashboardComponent implements OnInit {
   showVideoCaptureMarker: boolean = false;
 
   constructor(
-    private _sanitizer: DomSanitizer,
     private _mediaStreamService: MediaStreamService,
     private _progressBarService: ProgressBarService
   ) {}
@@ -86,13 +84,9 @@ export class DashboardComponent implements OnInit {
   async getGallery() {
     try {
       this._progressBarService.toggleOn();
-      const paths = await window.rendererProcessctrl.listMediaPaths(
+      this.mediaFiles = await window.rendererProcessctrl.listMediaPaths(
         this.PREFERENCES.baseDirectory
       );
-      this.mediaFiles = paths.map((f: MediaFile) => ({
-        ...f,
-        path: this._sanitizer.bypassSecurityTrustResourceUrl(f.path) as string,
-      }));
     } catch (error) {
     } finally {
       this._progressBarService.toggleOff();

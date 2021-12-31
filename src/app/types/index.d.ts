@@ -5,6 +5,6 @@ export type ProcessNotification = "stopVideoCapture";
 export type DashboardTab = "gallery" | "settings";
 
 export interface EditState {
-  previousImageIdx: number;
+  previousImageIdx?: number;
   previousImageSrc: string;
 }

@@ -9,7 +9,6 @@ import {
 import { MediaFile } from "../../../../../electron/types";
 import Cropper from "cropperjs";
 import { MenuItem } from "primeng/api";
-import { EditState } from "../../../../types";
 
 @Component({
   selector: "app-gallery",
@@ -18,12 +17,11 @@ import { EditState } from "../../../../types";
 })
 export class GalleryComponent implements OnInit, OnChanges {
   @Input() mediaFiles: MediaFile[] = [];
-  @ViewChild("spotlightImage") spotlightImgRef: ElementRef | undefined;
+  @ViewChild("spotlightImageElement") spotlightImgRef: ElementRef | undefined;
 
-  spotlightImageSrc: string | undefined;
-  spotlightImageIdx: number | undefined;
   imageEditor: Cropper | null = null;
-  editState: EditState | null | undefined;
+
+  spotlightImage: MediaFile | null = null;
 
   imageOptions: MenuItem[] = [
     {
@@ -49,22 +47,6 @@ export class GalleryComponent implements OnInit, OnChanges {
     },
   ];
 
-  set spotlightImage(value: { src: string; idx: number } | undefined) {
-    this.spotlightImageSrc = value?.src;
-    this.spotlightImageIdx = value?.idx;
-  }
-
-  get spotlightImage() {
-    return !this.spotlightImageSrc ||
-      this.spotlightImageIdx === null ||
-      this.spotlightImageIdx === undefined
-      ? undefined
-      : {
-          src: this.spotlightImageSrc,
-          idx: this.spotlightImageIdx,
-        };
-  }
-
   constructor() {}
 
   ngOnInit(): void {}
@@ -72,6 +54,9 @@ export class GalleryComponent implements OnInit, OnChanges {
   ngOnChanges() {
     this.mediaFiles.forEach((f) => {
       f.path = this.bustCache(f.path);
+      if (f.name === this.spotlightImage?.name) {
+        this.spotlightImage = f;
+      }
     });
   }
 
@@ -82,8 +67,8 @@ export class GalleryComponent implements OnInit, OnChanges {
   showImageInSpotlight(imageIdx: number) {
     this.spotlightImage =
       this.mediaFiles[imageIdx].type === "image"
-        ? { src: this.mediaFiles[imageIdx].path, idx: imageIdx }
-        : undefined;
+        ? this.mediaFiles[imageIdx]
+        : null;
   }
 
   enableImageEditing() {
@@ -95,32 +80,26 @@ export class GalleryComponent implements OnInit, OnChanges {
     if (this.imageEditor || !this.spotlightImage) return;
 
     this.imageEditor = new Cropper(imageElement, {
+      guides: false,
+      autoCropArea: 1,
+      scalable: true,
       zoomable: true,
-      scalable: false,
       background: false,
-      crop: () => {},
+      cropend: () => {},
     });
-
-    this.editState = {
-      ...(this.editState || {}),
-      previousImageIdx:
-        this.editState?.previousImageIdx || this.spotlightImage.idx,
-      previousImageSrc:
-        this.editState?.previousImageSrc || this.spotlightImage.src,
-    };
   }
 
   nextImage() {
-    console.log(this.spotlightImage);
     if (!this.spotlightImage) return;
 
-    let nextIdx: number = this.spotlightImage.idx;
+    const currentIdx: number = this.mediaFiles.findIndex(
+      (f) => f.path === this.spotlightImage?.path
+    );
+
+    let nextIdx: number = currentIdx;
 
     for (
-      let idx = Math.min(
-        this.spotlightImage.idx + 1,
-        this.mediaFiles.length - 1
-      );
+      let idx = Math.min(currentIdx + 1, this.mediaFiles.length - 1);
       idx < this.mediaFiles.length;
       idx++
     ) {
@@ -130,28 +109,26 @@ export class GalleryComponent implements OnInit, OnChanges {
       }
     }
 
-    this.spotlightImage = {
-      src: this.mediaFiles[nextIdx].path,
-      idx: nextIdx,
-    };
+    this.spotlightImage = this.mediaFiles[nextIdx];
   }
 
   previousImage() {
     if (!this.spotlightImage) return;
 
-    let prevIdx: number = this.spotlightImage.idx;
+    const currentIdx = this.mediaFiles.findIndex(
+      (f) => f.path === this.spotlightImage?.path
+    );
 
-    for (let idx = Math.max(this.spotlightImage.idx - 1, 0); idx >= 0; idx--) {
+    let prevIdx: number = currentIdx;
+
+    for (let idx = Math.max(currentIdx - 1, 0); idx >= 0; idx--) {
       if (this.mediaFiles[idx].type === "image") {
         prevIdx = idx;
         break;
       }
     }
 
-    this.spotlightImage = {
-      src: this.mediaFiles[prevIdx].path,
-      idx: prevIdx,
-    };
+    this.spotlightImage = this.mediaFiles[prevIdx];
   }
 
   rotateLeft() {
@@ -176,8 +153,8 @@ export class GalleryComponent implements OnInit, OnChanges {
    * Reset edits to original using backed-up image src, wait until UI loads the new image, and then enable editing again.
    */
   resetImageToPrevEditingState() {
-    if (!this.imageEditor || !this.editState) return;
-    this.imageEditor.replace(this.editState.previousImageSrc);
+    if (!this.imageEditor || !this.spotlightImage) return;
+    this.imageEditor.replace(this.spotlightImage.path);
   }
 
   async applyChanges() {
@@ -190,10 +167,14 @@ export class GalleryComponent implements OnInit, OnChanges {
 
       this.exitEditor();
 
+      const currentIdx = this.mediaFiles.findIndex(
+        (f) => f.name === this.spotlightImage?.name
+      );
+
       await window.rendererProcessctrl.saveEditedImage({
         dataUrl: editedImgUrl,
         mode: "image",
-        name: this.mediaFiles[this.spotlightImage.idx].name,
+        name: this.mediaFiles[currentIdx].name,
       });
     } catch (error) {
       console.log(error);
@@ -201,7 +182,6 @@ export class GalleryComponent implements OnInit, OnChanges {
   }
 
   exitEditor() {
-    this.editState = null;
     this._destroyImageEditor();
   }
 
@@ -213,6 +193,6 @@ export class GalleryComponent implements OnInit, OnChanges {
 
   closeImageSpotlight() {
     this.exitEditor();
-    this.spotlightImage = undefined;
+    this.spotlightImage = null;
   }
 }

@@ -1,16 +1,13 @@
 import path from "path";
 import { app, BrowserWindow } from "electron";
-import { Store } from "./services/Store";
 import { IpcHandler } from "./services/IpcHandler";
 
 class Screenmix {
   private _mainWindow: BrowserWindow | undefined;
-  private _store: Store;
   private _ipcHandler: IpcHandler;
 
   constructor() {
-    this._store = new Store();
-    this._ipcHandler = new IpcHandler(this._store);
+    this._ipcHandler = new IpcHandler();
   }
 
   public async init(): Promise<void> {

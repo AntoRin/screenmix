@@ -21,8 +21,8 @@ export class IpcHandler implements RendererProcessCtx {
   private _imageExtensions: string[];
   private _videoExtensions: string[];
 
-  constructor(store: Store) {
-    this._store = store;
+  constructor() {
+    this._store = new Store();
     this._imageExtensions = [".jpg", ".png"];
     this._videoExtensions = [".mp4"];
   }
@@ -227,7 +227,7 @@ export class IpcHandler implements RendererProcessCtx {
     this._mainWindow.webContents.send("fromMain:NewItemInGallery");
   }
 
-  async saveCapture(captureData: CaptureData) {
+  async saveCapture(captureData: CaptureData, notify: boolean = true) {
     try {
       const base64Data = captureData.dataUrl.split(";base64,")[1];
 
@@ -242,7 +242,7 @@ export class IpcHandler implements RendererProcessCtx {
         encoding: "base64",
       });
 
-      this._notifiyOfNewGalleryItem();
+      if (notify) this._notifiyOfNewGalleryItem();
     } catch (error) {
       throw error;
     }
@@ -254,7 +254,7 @@ export class IpcHandler implements RendererProcessCtx {
 
       if (!imageData.name) throw new Error("INVALID_IMAGE_NAME");
 
-      await this.saveCapture(imageData);
+      await this.saveCapture(imageData, true);
     } catch (error) {
       throw error;
     }

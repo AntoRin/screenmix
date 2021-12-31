@@ -4,7 +4,6 @@ import {
   Input,
   OnChanges,
   OnInit,
-  SimpleChanges,
   ViewChild,
 } from "@angular/core";
 import { MediaFile } from "../../../../../electron/types";
@@ -70,11 +69,14 @@ export class GalleryComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {}
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (!this.spotlightImage) return;
+  ngOnChanges() {
+    this.mediaFiles.forEach((f) => {
+      f.path = this.bustCache(f.path);
+    });
+  }
 
-    this.spotlightImage.src =
-      changes["mediaFiles"].currentValue[this.spotlightImage.idx].path;
+  bustCache(url: string) {
+    return `${url}?nonce=${Date.now()}`;
   }
 
   showImageInSpotlight(imageIdx: number) {
@@ -193,7 +195,6 @@ export class GalleryComponent implements OnInit, OnChanges {
         mode: "image",
         name: this.mediaFiles[this.spotlightImage.idx].name,
       });
-      console.log("saved");
     } catch (error) {
       console.log(error);
     }

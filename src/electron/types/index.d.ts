@@ -8,6 +8,7 @@ export interface MediaFile {
   name: string;
   type: "video" | "image";
   path: string;
+  id?: string;
 }
 
 export interface RendererProcessCtx {

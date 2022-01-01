@@ -6,17 +6,39 @@
   "
 >
   <div
-    class="m-auto flex justify-center items-center overflow-hidden"
-    *ngFor="let mediaFile of mediaFiles; let mediaIdx = index"
+    class="
+      relative
+      m-2
+      bg-black
+      flex
+      justify-center
+      items-center
+      overflow-hidden
+    "
+    *ngFor="let mediaFile of mediaFileClones; let mediaIdx = index"
   >
+    <div class="absolute top-1 right-1">
+      <div class="p-field-checkbox">
+        <p-checkbox
+          [value]="mediaFile.customData?.selected || false"
+          (onChange)="
+            mediaFile.customData &&
+              (mediaFile.customData.selected = !mediaFile.customData?.selected)
+          "
+          [binary]="true"
+          inputId="binary"
+        ></p-checkbox>
+      </div>
+    </div>
     <img
       *ngIf="mediaFile.type === 'image'"
       (click)="showImageInSpotlight(mediaIdx)"
       [src]="mediaFile.path"
       class="
-        m-2
+        object-scale-down
+        m-auto
         h-full
-        image-display
+        w-full
         cursor-pointer
         hover:border-solid hover:border-2 hover:border-yellow-300
         transition-all
@@ -24,7 +46,7 @@
       alt=""
     />
     <video
-      class="m-2 h-full w-full"
+      class="h-full w-full"
       *ngIf="mediaFile.type === 'video'"
       [src]="mediaFile.path"
       controls

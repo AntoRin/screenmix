@@ -67,6 +67,10 @@ export class IpcHandler implements RendererProcessCtx {
     ipcMain.handle("ipc:saveEditedImage", (_, data) =>
       this.saveEditedImage(data)
     );
+
+    ipcMain.handle("ipc:deleteMediaFiles", (_, files: string[]) =>
+      this.deleteMediaFiles(files)
+    );
   }
 
   async registerGlobalShortcuts(window?: BrowserWindow) {
@@ -255,6 +259,13 @@ export class IpcHandler implements RendererProcessCtx {
       if (!imageData.name) throw new Error("INVALID_IMAGE_NAME");
 
       await this.saveCapture(imageData, true);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteMediaFiles(files: string[]) {
+    try {
     } catch (error) {
       throw error;
     }

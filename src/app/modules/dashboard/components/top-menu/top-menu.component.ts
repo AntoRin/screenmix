@@ -1,6 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from "@angular/core";
 import { MenuItem } from "primeng/api";
-import { DashboardTab } from "../../../../types";
+import { DashboardTab, TopMenuEvent } from "../../../../types";
 
 @Component({
   selector: "app-top-menu",
@@ -10,6 +10,8 @@ import { DashboardTab } from "../../../../types";
 export class TopMenuComponent implements OnInit {
   @Output() tabChangeEvent: EventEmitter<DashboardTab> =
     new EventEmitter<DashboardTab>();
+  @Output() topMenuSelectionEvent: EventEmitter<TopMenuEvent> =
+    new EventEmitter<TopMenuEvent>();
 
   public menuItems: MenuItem[] = [
     {
@@ -38,6 +40,9 @@ export class TopMenuComponent implements OnInit {
         {
           label: "Delete",
           icon: "pi pi-fw pi-trash",
+          command: () => {
+            this.topMenuSelectionEvent.emit("delete");
+          },
         },
         {
           separator: true,

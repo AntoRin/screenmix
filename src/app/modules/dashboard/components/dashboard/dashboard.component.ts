@@ -1,6 +1,7 @@
 import { Component, HostListener, OnInit } from "@angular/core";
+import { Subject } from "rxjs";
 import { MediaFile, UserDataStore } from "../../../../../electron/types";
-import { DashboardTab } from "../../../../types";
+import { DashboardTab, TopMenuEvent } from "../../../../types";
 import { ProgressBarService } from "../../../shared/services/progress-bar.service";
 import { MediaStreamService } from "../../services/media-stream.service";
 
@@ -15,6 +16,8 @@ export class DashboardComponent implements OnInit {
   mediaFiles: MediaFile[] = [];
 
   showVideoCaptureMarker: boolean = false;
+
+  galleryActions$: Subject<string> = new Subject<string>();
 
   constructor(
     private _mediaStreamService: MediaStreamService,
@@ -90,6 +93,12 @@ export class DashboardComponent implements OnInit {
     } catch (error) {
     } finally {
       this._progressBarService.toggleOff();
+    }
+  }
+
+  handleTopMenuSelection(event: TopMenuEvent) {
+    if (event === "delete") {
+      this.galleryActions$.next(event);
     }
   }
 }

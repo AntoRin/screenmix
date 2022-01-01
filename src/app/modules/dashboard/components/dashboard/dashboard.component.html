@@ -1,5 +1,8 @@
 <div class="h-screen w-screen bg-gray-900 overflow-x-hidden">
-  <app-top-menu (tabChangeEvent)="changeTab($event)"></app-top-menu>
+  <app-top-menu
+    (topMenuSelectionEvent)="handleTopMenuSelection($event)"
+    (tabChangeEvent)="changeTab($event)"
+  ></app-top-menu>
   <div>
     <div class="m-2 flex justify-end">
       <p-tag
@@ -13,6 +16,7 @@
       (newGalleryEvent)="getGallery()"
       *ngIf="currentTab === 'gallery'"
       [mediaFiles]="mediaFiles"
+      [actions$]="galleryActions$"
     ></app-gallery>
     <app-settings
       [PREFERENCES]="PREFERENCES"

@@ -38,6 +38,8 @@ class Preload {
         ipcRenderer.invoke("ipc:registerGlobalShortcuts"),
       saveEditedImage: (data: CaptureData) =>
         ipcRenderer.invoke("ipc:saveEditedImage", data),
+      deleteMediaFiles: (files: string[]) =>
+        ipcRenderer.invoke("ipc:deleteMediaFiles", files),
     };
   }
 }

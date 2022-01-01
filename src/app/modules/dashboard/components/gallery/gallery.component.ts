@@ -9,6 +9,7 @@ import {
 import { MediaFile } from "../../../../../electron/types";
 import Cropper from "cropperjs";
 import { MenuItem } from "primeng/api";
+import { Subject } from "rxjs";
 
 @Component({
   selector: "app-gallery",
@@ -17,7 +18,10 @@ import { MenuItem } from "primeng/api";
 })
 export class GalleryComponent implements OnInit, OnChanges {
   @Input() mediaFiles: MediaFile[] = [];
+  @Input() actions$: Subject<string> | undefined;
   @ViewChild("spotlightImageElement") spotlightImgRef: ElementRef | undefined;
+
+  mediaFileClones: MediaFile[] = [];
 
   imageEditor: Cropper | null = null;
 
@@ -49,11 +53,25 @@ export class GalleryComponent implements OnInit, OnChanges {
 
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    if (this.actions$)
+      this.actions$.asObservable().subscribe((action) => {
+        if (action === "delete") {
+          this.deleteSelectedItems();
+        }
+      });
+  }
 
   ngOnChanges() {
-    this.mediaFiles.forEach((f) => {
+    this.mediaFileClones = JSON.parse(JSON.stringify(this.mediaFiles));
+
+    this.mediaFileClones.forEach((f, i) => {
       f.path = this.bustCache(f.path);
+      f.customData = {
+        idx: i,
+        selected: false,
+      };
+
       if (f.name === this.spotlightImage?.name) {
         this.spotlightImage = f;
       }
@@ -66,8 +84,8 @@ export class GalleryComponent implements OnInit, OnChanges {
 
   showImageInSpotlight(imageIdx: number) {
     this.spotlightImage =
-      this.mediaFiles[imageIdx].type === "image"
-        ? this.mediaFiles[imageIdx]
+      this.mediaFileClones[imageIdx].type === "image"
+        ? this.mediaFileClones[imageIdx]
         : null;
   }
 
@@ -92,43 +110,43 @@ export class GalleryComponent implements OnInit, OnChanges {
   nextImage() {
     if (!this.spotlightImage) return;
 
-    const currentIdx: number = this.mediaFiles.findIndex(
+    const currentIdx: number = this.mediaFileClones.findIndex(
       (f) => f.path === this.spotlightImage?.path
     );
 
     let nextIdx: number = currentIdx;
 
     for (
-      let idx = Math.min(currentIdx + 1, this.mediaFiles.length - 1);
-      idx < this.mediaFiles.length;
+      let idx = Math.min(currentIdx + 1, this.mediaFileClones.length - 1);
+      idx < this.mediaFileClones.length;
       idx++
     ) {
-      if (this.mediaFiles[idx].type === "image") {
+      if (this.mediaFileClones[idx].type === "image") {
         nextIdx = idx;
         break;
       }
     }
 
-    this.spotlightImage = this.mediaFiles[nextIdx];
+    this.spotlightImage = this.mediaFileClones[nextIdx];
   }
 
   previousImage() {
     if (!this.spotlightImage) return;
 
-    const currentIdx = this.mediaFiles.findIndex(
+    const currentIdx = this.mediaFileClones.findIndex(
       (f) => f.path === this.spotlightImage?.path
     );
 
     let prevIdx: number = currentIdx;
 
     for (let idx = Math.max(currentIdx - 1, 0); idx >= 0; idx--) {
-      if (this.mediaFiles[idx].type === "image") {
+      if (this.mediaFileClones[idx].type === "image") {
         prevIdx = idx;
         break;
       }
     }
 
-    this.spotlightImage = this.mediaFiles[prevIdx];
+    this.spotlightImage = this.mediaFileClones[prevIdx];
   }
 
   rotateLeft() {
@@ -167,14 +185,14 @@ export class GalleryComponent implements OnInit, OnChanges {
 
       this.exitEditor();
 
-      const currentIdx = this.mediaFiles.findIndex(
+      const currentIdx = this.mediaFileClones.findIndex(
         (f) => f.name === this.spotlightImage?.name
       );
 
       await window.rendererProcessctrl.saveEditedImage({
         dataUrl: editedImgUrl,
         mode: "image",
-        name: this.mediaFiles[currentIdx].name,
+        name: this.mediaFileClones[currentIdx].name,
       });
     } catch (error) {
       console.log(error);
@@ -194,5 +212,16 @@ export class GalleryComponent implements OnInit, OnChanges {
   closeImageSpotlight() {
     this.exitEditor();
     this.spotlightImage = null;
+  }
+
+  async deleteSelectedItems() {
+    try {
+      const selectedItems = this.mediaFileClones.filter(
+        (f) => f.customData.selected === true
+      );
+      await window.rendererProcessctrl.deleteMediaFiles(
+        selectedItems.map((f) => f.name)
+      );
+    } catch (error) {}
   }
 }

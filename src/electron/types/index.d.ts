@@ -8,6 +8,7 @@ export interface MediaFile {
   name: string;
   type: "video" | "image";
   path: string;
+  customData?: any;
 }
 
 export interface RendererProcessCtx {
@@ -21,6 +22,7 @@ export interface RendererProcessCtx {
   getAllPreferences(): Promise<UserDataStore>;
   registerGlobalShortcuts(): Promise<void>;
   saveEditedImage(data: CaptureData): Promise<void>;
+  deleteMediaFiles(files: string[]): Promise<void>;
 }
 
 export type UserDataFields =

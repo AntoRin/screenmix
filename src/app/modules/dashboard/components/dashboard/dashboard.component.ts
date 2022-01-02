@@ -52,8 +52,7 @@ export class DashboardComponent implements OnInit {
           this.PREFERENCES.scResolution
         );
 
-      case "fromMain:NewItemInGallery":
-        console.log("newItem");
+      case "fromMain:refreshGallery":
         return this.getGallery();
 
       default:

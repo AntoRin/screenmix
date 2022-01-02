@@ -226,9 +226,9 @@ export class IpcHandler implements RendererProcessCtx {
     }
   }
 
-  private _notifiyOfNewGalleryItem() {
+  private _notifyRenderer(notification: string) {
     if (!this._mainWindow) return;
-    this._mainWindow.webContents.send("fromMain:NewItemInGallery");
+    this._mainWindow.webContents.send(notification);
   }
 
   async saveCapture(captureData: CaptureData, notify: boolean = true) {
@@ -246,7 +246,7 @@ export class IpcHandler implements RendererProcessCtx {
         encoding: "base64",
       });
 
-      if (notify) this._notifiyOfNewGalleryItem();
+      if (notify) this._notifyRenderer("fromMain:refreshGallery");
     } catch (error) {
       throw error;
     }
@@ -266,6 +266,18 @@ export class IpcHandler implements RendererProcessCtx {
 
   async deleteMediaFiles(files: string[]) {
     try {
+      const dir = this._store.read("baseDirectory");
+
+      if (!dir) return;
+
+      for (const file of files) {
+        try {
+          const filePath = path.join(dir, file);
+          await fsp.unlink(filePath);
+        } catch (error) {}
+      }
+
+      this._notifyRenderer("fromMain:refreshGallery");
     } catch (error) {
       throw error;
     }

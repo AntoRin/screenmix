@@ -1,4 +1,8 @@
-<p-menubar [model]="menuItems">
+<p-menubar
+  [baseZIndex]="10000000000000000"
+  [autoZIndex]="false"
+  [model]="menuItems"
+>
   <ng-template pTemplate="end">
     <input type="text" pInputText placeholder="Search" />
   </ng-template>

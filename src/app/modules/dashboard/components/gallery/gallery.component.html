@@ -17,17 +17,20 @@
     "
     *ngFor="let mediaFile of mediaFileClones; let mediaIdx = index"
   >
-    <div class="absolute top-1 right-1">
+    <div class="absolute top-1 right-1 z-[1]">
       <div class="p-field-checkbox">
         <p-checkbox
-          [value]="mediaFile.customData?.selected || false"
+          [value]="!!mediaFile.customData?.selected || false"
           (onChange)="
             mediaFile.customData &&
-              (mediaFile.customData.selected = !mediaFile.customData?.selected)
+              (mediaFile.customData.selected =
+                !!!mediaFile.customData?.selected)
           "
           [binary]="true"
-          inputId="binary"
+          [trueValue]="true"
+          [falseValue]="false"
         ></p-checkbox>
+        <h1>{{ mediaFile.customData?.selected }}</h1>
       </div>
     </div>
     <img

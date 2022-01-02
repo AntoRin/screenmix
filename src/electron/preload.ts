@@ -13,7 +13,7 @@ class Preload {
     const fromMainEvents: string[] = [
       "fromMain:takeScreenshot",
       "fromMain:captureScreen",
-      "fromMain:NewItemInGallery",
+      "fromMain:refreshGallery",
     ];
 
     fromMainEvents.forEach((eventName) =>

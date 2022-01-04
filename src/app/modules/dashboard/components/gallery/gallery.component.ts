@@ -17,17 +17,19 @@ import { Subject } from "rxjs";
   styleUrls: ["./gallery.component.css"],
 })
 export class GalleryComponent implements OnInit, OnChanges {
-  @Input() mediaFiles: MediaFile[] = [];
-  @Input() actions$: Subject<string> | undefined;
-  @ViewChild("spotlightImageElement") spotlightImgRef: ElementRef | undefined;
+  @Input() public mediaFiles: MediaFile[] = [];
+  @Input() public actions$: Subject<string> | undefined;
+  @ViewChild("spotlightImageElement") public spotlightImgRef:
+    | ElementRef
+    | undefined;
 
-  mediaFileClones: MediaFile[] = [];
+  public mediaFileClones: MediaFile[] = [];
 
-  imageEditor: Cropper | null = null;
+  public imageEditor: Cropper | null = null;
 
-  spotlightImage: MediaFile | null = null;
+  public spotlightImage: MediaFile | null = null;
 
-  imageOptions: MenuItem[] = [
+  public imageOptions: MenuItem[] = [
     {
       label: "Edit",
       icon: "pi pi-pencil",
@@ -35,7 +37,7 @@ export class GalleryComponent implements OnInit, OnChanges {
     },
   ];
 
-  saveOptions = [
+  public saveOptions = [
     {
       label: "Save",
       icon: "pi pi-save",
@@ -103,7 +105,7 @@ export class GalleryComponent implements OnInit, OnChanges {
       scalable: true,
       zoomable: true,
       background: false,
-      cropend: () => {},
+      crop: () => {},
     });
   }
 
@@ -152,11 +154,34 @@ export class GalleryComponent implements OnInit, OnChanges {
   rotateLeft() {
     if (!this.imageEditor) return;
     this.imageEditor.rotate(-90);
+    this.resetCropBoxToFitImage();
   }
 
   rotateRight() {
     if (!this.imageEditor) return;
     this.imageEditor.rotate(90);
+    this.resetCropBoxToFitImage();
+  }
+
+  resetCropBoxToFitImage() {
+    if (!this.imageEditor) return;
+
+    const cropData = this.imageEditor.getData();
+    const imageData = this.imageEditor.getImageData();
+    const canvasData = this.imageEditor.getCanvasData();
+
+    this.imageEditor.setCropBoxData({
+      height:
+        cropData.rotate === 90 || cropData.rotate === 270
+          ? imageData.width
+          : imageData.height,
+      width:
+        cropData.rotate === 90 || cropData.rotate === 270
+          ? imageData.height
+          : imageData.width,
+      left: canvasData.left,
+      top: canvasData.top,
+    });
   }
 
   cropPreview() {

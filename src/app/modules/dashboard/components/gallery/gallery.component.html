@@ -6,15 +6,7 @@
   "
 >
   <div
-    class="
-      relative
-      m-2
-      bg-black
-      flex
-      justify-center
-      items-center
-      overflow-hidden
-    "
+    class="relative m-2 bg-black flex justify-center items-center overflow-hidden"
     *ngFor="let mediaFile of mediaFileClones; let mediaIdx = index"
   >
     <div class="absolute top-1 right-1 z-[1]">
@@ -30,26 +22,17 @@
           [trueValue]="true"
           [falseValue]="false"
         ></p-checkbox>
-        <h1>{{ mediaFile.customData?.selected }}</h1>
       </div>
     </div>
     <img
       *ngIf="mediaFile.type === 'image'"
       (click)="showImageInSpotlight(mediaIdx)"
       [src]="mediaFile.path"
-      class="
-        object-scale-down
-        m-auto
-        h-full
-        w-full
-        cursor-pointer
-        hover:border-solid hover:border-2 hover:border-yellow-300
-        transition-all
-      "
+      class="object-contain h-full w-full cursor-pointer hover:border-solid hover:border-2 hover:border-yellow-300 hover:object-right transition-all duration-200"
       alt=""
     />
     <video
-      class="h-full w-full"
+      class="h-full w-full object-contain"
       *ngIf="mediaFile.type === 'video'"
       [src]="mediaFile.path"
       controls
@@ -102,7 +85,7 @@
     <img
       #spotlightImageElement
       [src]="spotlightImage.path"
-      class="h-[100%] w-auto"
+      class="h-[100%] w-[100%] max-w-[85%] object-contain"
       alt=""
     />
   </div>

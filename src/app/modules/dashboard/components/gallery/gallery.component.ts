@@ -1,9 +1,12 @@
 import {
   Component,
   ElementRef,
+  EventEmitter,
   Input,
   OnChanges,
   OnInit,
+  Output,
+  SimpleChanges,
   ViewChild,
 } from "@angular/core";
 import { MediaFile } from "../../../../../electron/types";
@@ -19,14 +22,15 @@ import { Subject } from "rxjs";
 export class GalleryComponent implements OnInit, OnChanges {
   @Input() public mediaFiles: MediaFile[] = [];
   @Input() public actions$: Subject<string> | undefined;
+  @Input() public selectMode: boolean = false;
+  @Output() public selectModeEvent: EventEmitter<void> =
+    new EventEmitter<void>();
   @ViewChild("spotlightImageElement") public spotlightImgRef:
     | ElementRef
     | undefined;
 
   public mediaFileClones: MediaFile[] = [];
-
   public imageEditor: Cropper | null = null;
-
   public spotlightImage: MediaFile | null = null;
 
   public imageOptions: MenuItem[] = [
@@ -64,24 +68,32 @@ export class GalleryComponent implements OnInit, OnChanges {
       });
   }
 
-  ngOnChanges() {
-    this.mediaFileClones = JSON.parse(JSON.stringify(this.mediaFiles));
+  ngOnChanges(changes: SimpleChanges) {
+    console.log(changes);
+    if (changes["mediaFiles"]) {
+      this.mediaFileClones = JSON.parse(JSON.stringify(this.mediaFiles));
 
-    this.mediaFileClones.forEach((f, i) => {
-      f.path = this.bustCache(f.path);
-      f.customData = {
-        idx: i,
-        selected: false,
-      };
+      this.mediaFileClones.forEach((f, i) => {
+        f.path = this.bustCache(f.path);
+        f.customData = {
+          idx: i,
+          selected: false,
+        };
 
-      if (f.name === this.spotlightImage?.name) {
-        this.spotlightImage = f;
-      }
-    });
+        if (f.name === this.spotlightImage?.name) {
+          this.spotlightImage = f;
+        }
+      });
+    }
   }
 
   bustCache(url: string) {
     return `${url}?nonce=${Date.now()}`;
+  }
+
+  turnSelectModeOn(idx: number) {
+    this.mediaFileClones[idx].customData.selected = true;
+    this.selectModeEvent.emit();
   }
 
   showImageInSpotlight(imageIdx: number) {

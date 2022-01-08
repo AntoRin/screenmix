@@ -12,13 +12,12 @@ import { MediaStreamService } from "../../services/media-stream.service";
   styleUrls: ["./dashboard.component.css"],
 })
 export class DashboardComponent implements OnInit {
-  currentTab: DashboardTab = "gallery";
-  PREFERENCES: UserDataStore = {};
-  mediaFiles: MediaFile[] = [];
-
-  showVideoCaptureMarker: boolean = false;
-
-  galleryActions$: Subject<string> = new Subject<string>();
+  public currentTab: DashboardTab = "gallery";
+  public PREFERENCES: UserDataStore = {};
+  public mediaFiles: MediaFile[] = [];
+  public showVideoCaptureMarker: boolean = false;
+  public galleryActions$: Subject<string> = new Subject<string>();
+  public gallerySelectMode: boolean = false;
 
   public menuItems: MenuItem[] = [
     {
@@ -43,6 +42,14 @@ export class DashboardComponent implements OnInit {
               icon: "pi pi-fw pi-video",
             },
           ],
+        },
+        {
+          label: "Select",
+          icon: "pi pi-paperclip",
+          command: this.toggleGallerySelectMode.bind(this),
+        },
+        {
+          separator: true,
         },
         {
           label: "Delete",
@@ -127,10 +134,6 @@ export class DashboardComponent implements OnInit {
         },
       ],
     },
-    {
-      label: "Quit",
-      icon: "pi pi-fw pi-power-off",
-    },
   ];
 
   constructor(
@@ -206,6 +209,25 @@ export class DashboardComponent implements OnInit {
     } catch (error) {
     } finally {
       this._progressBarService.toggleOff();
+    }
+  }
+
+  toggleGallerySelectMode() {
+    this.gallerySelectMode = !this.gallerySelectMode;
+    console.log("gSelectMode", this.gallerySelectMode);
+    if (this.gallerySelectMode) {
+      this.menuItems.push({
+        label: "Cancel Select",
+        icon: "pi pi-fw pi-power-off",
+        command: () => {
+          this.toggleGallerySelectMode();
+        },
+      });
+    } else {
+      const btnIdx = this.menuItems.findIndex(
+        (x) => x.label === "Cancel Select"
+      );
+      btnIdx !== -1 && this.menuItems.splice(btnIdx);
     }
   }
 

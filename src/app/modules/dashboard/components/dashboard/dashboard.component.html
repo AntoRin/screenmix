@@ -14,10 +14,11 @@
       ></p-tag>
     </div>
     <app-gallery
-      (newGalleryEvent)="getGallery()"
+      (selectModeEvent)="toggleGallerySelectMode()"
       *ngIf="currentTab === 'gallery'"
       [mediaFiles]="mediaFiles"
       [actions$]="galleryActions$"
+      [selectMode]="gallerySelectMode"
     ></app-gallery>
     <app-settings
       [PREFERENCES]="PREFERENCES"

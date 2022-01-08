@@ -8,8 +8,9 @@
   <div
     class="relative m-2 bg-black flex justify-center items-center overflow-hidden"
     *ngFor="let mediaFile of mediaFileClones; let mediaIdx = index"
+    (dblclick)="turnSelectModeOn(mediaIdx)"
   >
-    <div class="absolute top-1 right-1 z-[1]">
+    <div *ngIf="selectMode" class="absolute top-1 right-1 z-[1]">
       <div class="p-field-checkbox">
         <p-checkbox
           [value]="!!mediaFile.customData?.selected || false"
@@ -26,7 +27,7 @@
     </div>
     <img
       *ngIf="mediaFile.type === 'image'"
-      (click)="showImageInSpotlight(mediaIdx)"
+      (click)="!selectMode && showImageInSpotlight(mediaIdx)"
       [src]="mediaFile.path"
       class="object-contain h-full w-full cursor-pointer hover:border-solid hover:border-2 hover:border-yellow-300 hover:object-right transition-all duration-200"
       alt=""

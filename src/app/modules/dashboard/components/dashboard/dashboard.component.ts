@@ -18,6 +18,7 @@ export class DashboardComponent implements OnInit {
   public showVideoCaptureMarker: boolean = false;
   public galleryActions$: Subject<string> = new Subject<string>();
   public gallerySelectMode: boolean = false;
+  public totalSelectedItems: number = 0;
 
   public menuItems: MenuItem[] = [
     {
@@ -69,40 +70,6 @@ export class DashboardComponent implements OnInit {
       label: "Settings",
       icon: "pi pi-fw pi-cog",
       command: this.changeTab.bind(this, "settings"),
-    },
-    {
-      label: "Users",
-      icon: "pi pi-fw pi-user",
-      items: [
-        {
-          label: "New",
-          icon: "pi pi-fw pi-user-plus",
-        },
-        {
-          label: "Delete",
-          icon: "pi pi-fw pi-user-minus",
-        },
-        {
-          label: "Search",
-          icon: "pi pi-fw pi-users",
-          items: [
-            {
-              label: "Filter",
-              icon: "pi pi-fw pi-filter",
-              items: [
-                {
-                  label: "Print",
-                  icon: "pi pi-fw pi-print",
-                },
-              ],
-            },
-            {
-              icon: "pi pi-fw pi-bars",
-              label: "List",
-            },
-          ],
-        },
-      ],
     },
     {
       label: "Events",
@@ -212,22 +179,42 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+  updateSelectedItemsCount() {
+    let count = this.totalSelectedItems;
+    this.mediaFiles.forEach((f) => {
+      if (f.customData.selected) count++;
+    });
+
+    this.totalSelectedItems = count;
+
+    for (let idx = 0; idx < this.menuItems.length; idx++) {
+      if (this.menuItems[idx].id === "selectedItemsData") {
+        this.menuItems[idx] = {
+          ...this.menuItems[idx],
+          label: `${this.totalSelectedItems} Selected`,
+        };
+      }
+    }
+  }
+
   toggleGallerySelectMode() {
     this.gallerySelectMode = !this.gallerySelectMode;
-    console.log("gSelectMode", this.gallerySelectMode);
+
     if (this.gallerySelectMode) {
       this.menuItems.push({
-        label: "Cancel Select",
+        label: `${this.totalSelectedItems} Selected`,
         icon: "pi pi-fw pi-power-off",
+        id: "selectedItemsData",
         command: () => {
           this.toggleGallerySelectMode();
         },
       });
     } else {
       const btnIdx = this.menuItems.findIndex(
-        (x) => x.label === "Cancel Select"
+        (x) => x.id === "selectedItemsData"
       );
       btnIdx !== -1 && this.menuItems.splice(btnIdx);
+      this.totalSelectedItems = 0;
     }
   }
 

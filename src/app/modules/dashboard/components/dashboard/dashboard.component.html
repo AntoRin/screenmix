@@ -15,6 +15,7 @@
     </div>
     <app-gallery
       (selectModeEvent)="toggleGallerySelectMode()"
+      (itemSelectedEvent)="updateSelectedItemsCount()"
       *ngIf="currentTab === 'gallery'"
       [mediaFiles]="mediaFiles"
       [actions$]="galleryActions$"

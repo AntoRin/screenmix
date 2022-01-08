@@ -15,7 +15,6 @@ import { DialogModule } from "primeng/dialog";
 import { DropdownModule } from "primeng/dropdown";
 import { DividerModule } from "primeng/divider";
 import { SplitButtonModule } from "primeng/splitbutton";
-import { CheckboxModule } from "primeng/checkbox";
 
 @NgModule({
   declarations: [],
@@ -36,7 +35,6 @@ import { CheckboxModule } from "primeng/checkbox";
     DropdownModule,
     DividerModule,
     SplitButtonModule,
-    CheckboxModule,
   ],
 })
 export class PrimengModule {}

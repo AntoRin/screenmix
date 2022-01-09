@@ -60,6 +60,8 @@ export class GalleryComponent implements OnInit, OnChanges {
     },
   ];
 
+  private _editedImageRefs: string[] = [];
+
   constructor() {}
 
   ngOnInit(): void {
@@ -75,7 +77,9 @@ export class GalleryComponent implements OnInit, OnChanges {
     console.log(changes);
     if (changes["mediaFiles"]) {
       this.mediaFiles.forEach((f, i) => {
-        f.path = this.bustCache(f.path);
+        f.path = this._editedImageRefs.includes(f.name)
+          ? this.bustCache(f.path)
+          : f.path;
         f.customData = {
           idx: i,
           selected: false,
@@ -235,6 +239,8 @@ export class GalleryComponent implements OnInit, OnChanges {
         mode: "image",
         name: this.mediaFiles[currentIdx].name,
       });
+
+      this._editedImageRefs.push(this.spotlightImage.name);
     } catch (error) {
       console.log(error);
     }

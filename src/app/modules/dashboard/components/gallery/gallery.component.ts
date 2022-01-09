@@ -95,7 +95,7 @@ export class GalleryComponent implements OnInit, OnChanges {
   selectItem(idx: number) {
     this.mediaFiles[idx].customData = {
       ...(this.mediaFiles[idx].customData || {}),
-      selected: !!!this.mediaFiles[idx]?.customData?.selected,
+      selected: !!!this.mediaFiles[idx]?.customData?.["selected"],
     };
     this.itemSelectedEvent.emit();
   }
@@ -258,7 +258,7 @@ export class GalleryComponent implements OnInit, OnChanges {
   async deleteSelectedItems() {
     try {
       const selectedItems = this.mediaFiles.filter(
-        (f) => f.customData.selected === true
+        (f) => f.customData?.["selected"] === true
       );
       await window.rendererProcessctrl.deleteMediaFiles(
         selectedItems.map((f) => f.name)

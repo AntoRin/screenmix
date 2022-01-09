@@ -8,7 +8,7 @@ export interface MediaFile {
   name: string;
   type: "video" | "image";
   path: string;
-  customData?: any;
+  customData?: { [key: string]: string | boolean | number };
 }
 
 export interface RendererProcessCtx {

@@ -20,106 +20,9 @@ export class DashboardComponent implements OnInit {
   public gallerySelectMode: boolean = false;
   public totalSelectedItems: number = 0;
 
-  public menuItemsDefault: MenuItem[] = [
-    {
-      label: "Home",
-      icon: "pi pi-home",
-      command: this.changeTab.bind(this, "gallery"),
-    },
-    {
-      label: "File",
-      icon: "pi pi-fw pi-file",
-      items: [
-        {
-          label: "New",
-          icon: "pi pi-fw pi-plus",
-          items: [
-            {
-              label: "Bookmark",
-              icon: "pi pi-fw pi-bookmark",
-            },
-            {
-              label: "Video",
-              icon: "pi pi-fw pi-video",
-            },
-          ],
-        },
-        {
-          label: "Select",
-          icon: "pi pi-paperclip",
-          command: this.toggleGallerySelectMode.bind(this),
-        },
-        {
-          separator: true,
-        },
-        {
-          label: "Delete",
-          icon: "pi pi-fw pi-trash",
-          command: this.handleTopMenuSelection.bind(this, "delete"),
-        },
-        {
-          separator: true,
-        },
-        {
-          label: "Export",
-          icon: "pi pi-fw pi-external-link",
-        },
-      ],
-    },
-    {
-      label: "Settings",
-      icon: "pi pi-fw pi-cog",
-      command: this.changeTab.bind(this, "settings"),
-    },
-    {
-      label: "Events",
-      icon: "pi pi-fw pi-calendar",
-      items: [
-        {
-          label: "Edit",
-          icon: "pi pi-fw pi-pencil",
-          items: [
-            {
-              label: "Save",
-              icon: "pi pi-fw pi-calendar-plus",
-            },
-            {
-              label: "Delete",
-              icon: "pi pi-fw pi-calendar-minus",
-            },
-          ],
-        },
-        {
-          label: "Archieve",
-          icon: "pi pi-fw pi-calendar-times",
-          items: [
-            {
-              label: "Remove",
-              icon: "pi pi-fw pi-calendar-minus",
-            },
-          ],
-        },
-      ],
-    },
-  ];
+  public menuItemsDefault: MenuItem[] = this.getMenuItemsDefault();
 
-  public menuItemsSelect: MenuItem[] = [
-    {
-      label: `${this.totalSelectedItems} Selected`,
-      icon: "pi pi-info",
-      id: "selectedItemsData",
-    },
-    {
-      label: `Cancel`,
-      icon: "pi pi-times",
-      command: this.handleTopMenuSelection.bind(this, "selectToggle"),
-    },
-    {
-      label: "Delete",
-      icon: "pi pi-fw pi-trash",
-      command: this.handleTopMenuSelection.bind(this, "delete"),
-    },
-  ];
+  public menuItemsSelect: MenuItem[] = this.getMenuItemsSelect();
 
   constructor(
     private _mediaStreamService: MediaStreamService,
@@ -137,6 +40,112 @@ export class DashboardComponent implements OnInit {
           this.showVideoCaptureMarker = false;
         }
       });
+  }
+
+  getMenuItemsDefault() {
+    return [
+      {
+        label: "Home",
+        icon: "pi pi-home",
+        command: this.changeTab.bind(this, "gallery"),
+      },
+      {
+        label: "File",
+        icon: "pi pi-fw pi-file",
+        items: [
+          {
+            label: "New",
+            icon: "pi pi-fw pi-plus",
+            items: [
+              {
+                label: "Bookmark",
+                icon: "pi pi-fw pi-bookmark",
+              },
+              {
+                label: "Video",
+                icon: "pi pi-fw pi-video",
+              },
+            ],
+          },
+          {
+            label: "Select",
+            icon: "pi pi-paperclip",
+            command: this.toggleGallerySelectMode.bind(this),
+          },
+          {
+            separator: true,
+          },
+          {
+            label: "Delete",
+            icon: "pi pi-fw pi-trash",
+            command: this.handleTopMenuSelection.bind(this, "delete"),
+          },
+          {
+            separator: true,
+          },
+          {
+            label: "Export",
+            icon: "pi pi-fw pi-external-link",
+          },
+        ],
+      },
+      {
+        label: "Settings",
+        icon: "pi pi-fw pi-cog",
+        command: this.changeTab.bind(this, "settings"),
+      },
+      {
+        label: "Events",
+        icon: "pi pi-fw pi-calendar",
+        items: [
+          {
+            label: "Edit",
+            icon: "pi pi-fw pi-pencil",
+            items: [
+              {
+                label: "Save",
+                icon: "pi pi-fw pi-calendar-plus",
+              },
+              {
+                label: "Delete",
+                icon: "pi pi-fw pi-calendar-minus",
+              },
+            ],
+          },
+          {
+            label: "Archieve",
+            icon: "pi pi-fw pi-calendar-times",
+            items: [
+              {
+                label: "Remove",
+                icon: "pi pi-fw pi-calendar-minus",
+              },
+            ],
+          },
+        ],
+      },
+    ];
+  }
+
+  getMenuItemsSelect() {
+    return [
+      {
+        label: `${this.totalSelectedItems} Selected`,
+        icon: "pi pi-info",
+        id: "selectedItemsData",
+      },
+      {
+        label: `Cancel`,
+        icon: "pi pi-times",
+        command: this.handleTopMenuSelection.bind(this, "selectToggle"),
+      },
+      {
+        label: "Delete",
+        icon: "pi pi-fw pi-trash",
+        disabled: this.totalSelectedItems <= 0,
+        command: this.handleTopMenuSelection.bind(this, "delete"),
+      },
+    ];
   }
 
   @HostListener("window:message", ["$event"])
@@ -204,20 +213,11 @@ export class DashboardComponent implements OnInit {
     let count = 0;
 
     this.mediaFiles.forEach((f) => {
-      if (f.customData.selected) count++;
+      if (f.customData?.["selected"]) count++;
     });
 
     this.totalSelectedItems = count;
-
-    for (let idx = 0; idx < this.menuItemsSelect.length; idx++) {
-      if (this.menuItemsSelect[idx].id === "selectedItemsData") {
-        this.menuItemsSelect[idx] = {
-          ...this.menuItemsSelect[idx],
-          label: `${this.totalSelectedItems} Selected`,
-        };
-        break;
-      }
-    }
+    this.menuItemsSelect = this.getMenuItemsSelect();
   }
 
   toggleGallerySelectMode() {

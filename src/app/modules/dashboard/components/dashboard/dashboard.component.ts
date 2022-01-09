@@ -20,7 +20,7 @@ export class DashboardComponent implements OnInit {
   public gallerySelectMode: boolean = false;
   public totalSelectedItems: number = 0;
 
-  public menuItems: MenuItem[] = [
+  public menuItemsDefault: MenuItem[] = [
     {
       label: "Home",
       icon: "pi pi-home",
@@ -103,6 +103,24 @@ export class DashboardComponent implements OnInit {
     },
   ];
 
+  public menuItemsSelect: MenuItem[] = [
+    {
+      label: `${this.totalSelectedItems} Selected`,
+      icon: "pi pi-info",
+      id: "selectedItemsData",
+    },
+    {
+      label: `Cancel`,
+      icon: "pi pi-times",
+      command: this.handleTopMenuSelection.bind(this, "selectToggle"),
+    },
+    {
+      label: "Delete",
+      icon: "pi pi-fw pi-trash",
+      command: this.handleTopMenuSelection.bind(this, "delete"),
+    },
+  ];
+
   constructor(
     private _mediaStreamService: MediaStreamService,
     private _progressBarService: ProgressBarService
@@ -176,23 +194,28 @@ export class DashboardComponent implements OnInit {
     } catch (error) {
     } finally {
       this._progressBarService.toggleOff();
+      this.updateSelectedItemsCount();
     }
   }
 
   updateSelectedItemsCount() {
-    let count = this.totalSelectedItems;
+    if (!this.gallerySelectMode) return;
+
+    let count = 0;
+
     this.mediaFiles.forEach((f) => {
       if (f.customData.selected) count++;
     });
 
     this.totalSelectedItems = count;
 
-    for (let idx = 0; idx < this.menuItems.length; idx++) {
-      if (this.menuItems[idx].id === "selectedItemsData") {
-        this.menuItems[idx] = {
-          ...this.menuItems[idx],
+    for (let idx = 0; idx < this.menuItemsSelect.length; idx++) {
+      if (this.menuItemsSelect[idx].id === "selectedItemsData") {
+        this.menuItemsSelect[idx] = {
+          ...this.menuItemsSelect[idx],
           label: `${this.totalSelectedItems} Selected`,
         };
+        break;
       }
     }
   }
@@ -200,27 +223,26 @@ export class DashboardComponent implements OnInit {
   toggleGallerySelectMode() {
     this.gallerySelectMode = !this.gallerySelectMode;
 
-    if (this.gallerySelectMode) {
-      this.menuItems.push({
-        label: `${this.totalSelectedItems} Selected`,
-        icon: "pi pi-fw pi-power-off",
-        id: "selectedItemsData",
-        command: () => {
-          this.toggleGallerySelectMode();
-        },
-      });
+    if (!this.gallerySelectMode) {
+      for (let idx = 0; idx < this.mediaFiles.length; idx++) {
+        this.mediaFiles[idx].customData = {
+          ...(this.mediaFiles[idx].customData || {}),
+          selected: false,
+        };
+      }
     } else {
-      const btnIdx = this.menuItems.findIndex(
-        (x) => x.id === "selectedItemsData"
-      );
-      btnIdx !== -1 && this.menuItems.splice(btnIdx);
-      this.totalSelectedItems = 0;
+      this.updateSelectedItemsCount();
     }
   }
 
-  handleTopMenuSelection(event: TopMenuEvent) {
-    if (event === "delete") {
-      this.galleryActions$.next(event);
+  handleTopMenuSelection(event: TopMenuEvent): void {
+    switch (event) {
+      case "delete":
+        return this.galleryActions$.next(event);
+      case "selectToggle":
+        return this.toggleGallerySelectMode();
+      default:
+        return;
     }
   }
 }

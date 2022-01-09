@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   ElementRef,
   EventEmitter,
@@ -18,6 +19,7 @@ import { Subject } from "rxjs";
   selector: "app-gallery",
   templateUrl: "./gallery.component.html",
   styleUrls: ["./gallery.component.css"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GalleryComponent implements OnInit, OnChanges {
   @Input() public mediaFiles: MediaFile[] = [];

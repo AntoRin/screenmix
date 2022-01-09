@@ -1,5 +1,9 @@
 <div class="h-screen w-screen bg-gray-900 overflow-x-hidden">
-  <p-menubar [baseZIndex]="100000" [autoZIndex]="false" [model]="menuItems">
+  <p-menubar
+    [baseZIndex]="100000"
+    [autoZIndex]="false"
+    [model]="gallerySelectMode ? menuItemsSelect : menuItemsDefault"
+  >
     <ng-template pTemplate="end">
       <input type="text" pInputText placeholder="Search" />
     </ng-template>

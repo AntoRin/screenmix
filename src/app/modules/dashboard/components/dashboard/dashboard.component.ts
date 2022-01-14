@@ -2,7 +2,7 @@ import { Component, HostListener, OnInit } from "@angular/core";
 import { MenuItem } from "primeng/api";
 import { Subject } from "rxjs";
 import { MediaFile, UserDataStore } from "../../../../../electron/types";
-import { DashboardTab, TopMenuEvent } from "../../../../types";
+import { DashboardTab, GalleryEvent, TopMenuEvent } from "../../../../types";
 import { ProgressBarService } from "../../../shared/services/progress-bar.service";
 import { MediaStreamService } from "../../services/media-stream.service";
 
@@ -240,6 +240,17 @@ export class DashboardComponent implements OnInit {
       case "delete":
         return this.galleryActions$.next(event);
       case "selectToggle":
+        return this.toggleGallerySelectMode();
+      default:
+        return;
+    }
+  }
+
+  handleGalleryEvent(event: GalleryEvent) {
+    switch (event) {
+      case "itemSelected":
+        return this.updateSelectedItemsCount();
+      case "selectMode":
         return this.toggleGallerySelectMode();
       default:
         return;

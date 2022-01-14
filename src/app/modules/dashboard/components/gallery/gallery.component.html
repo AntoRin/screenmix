@@ -1,4 +1,7 @@
+<p-contextMenu [model]="contextMenuOptions" #contextMenuRef></p-contextMenu>
+<p-confirmDialog icon="pi pi-exclamation-triangle"></p-confirmDialog>
 <div
+  #mediaItems
   class="grid m-2 gap-2"
   style="
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -7,6 +10,7 @@
 >
   <div
     *ngFor="let mediaFile of mediaFiles; let mediaIdx = index"
+    (contextmenu)="showContextMenu($event, mediaIdx)"
     class="relative m-2 bg-black flex justify-center items-center overflow-hidden"
     [ngClass]="[
       selectMode

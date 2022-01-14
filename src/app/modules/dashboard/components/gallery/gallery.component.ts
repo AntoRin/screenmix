@@ -12,8 +12,10 @@ import {
 } from "@angular/core";
 import { MediaFile } from "../../../../../electron/types";
 import Cropper from "cropperjs";
-import { MenuItem } from "primeng/api";
+import { ConfirmationService, MenuItem } from "primeng/api";
 import { Subject } from "rxjs";
+import { ContextMenu } from "primeng/contextmenu";
+import { GalleryEvent } from "../../../../types";
 
 @Component({
   selector: "app-gallery",
@@ -25,13 +27,16 @@ export class GalleryComponent implements OnInit, OnChanges {
   @Input() public mediaFiles: MediaFile[] = [];
   @Input() public actions$: Subject<string> | undefined;
   @Input() public selectMode: boolean = false;
-  @Output() public selectModeEvent: EventEmitter<void> =
-    new EventEmitter<void>();
+
   @Output() public itemSelectedEvent: EventEmitter<void> =
     new EventEmitter<void>();
+  @Output() galleryEvent: EventEmitter<GalleryEvent> =
+    new EventEmitter<GalleryEvent>();
+
   @ViewChild("spotlightImageElement") public spotlightImgRef:
     | ElementRef
     | undefined;
+  @ViewChild("contextMenuRef") public contextMenuRef: ContextMenu | undefined;
 
   public imageEditor: Cropper | null = null;
   public spotlightImage: MediaFile | null = null;
@@ -60,9 +65,11 @@ export class GalleryComponent implements OnInit, OnChanges {
     },
   ];
 
+  public contextMenuOptions: MenuItem[] = [];
+
   private _editedImageRefs: string[] = [];
 
-  constructor() {}
+  constructor(private _confirmationServ: ConfirmationService) {}
 
   ngOnInit(): void {
     if (this.actions$)
@@ -74,7 +81,6 @@ export class GalleryComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    console.log(changes);
     if (changes["mediaFiles"]) {
       this.mediaFiles.forEach((f, i) => {
         f.path = this._editedImageRefs.includes(f.name)
@@ -96,12 +102,46 @@ export class GalleryComponent implements OnInit, OnChanges {
     return `${url}?nonce=${Date.now()}`;
   }
 
+  showContextMenu(event: MouseEvent, mediaItemIdx: number) {
+    if (!this.contextMenuRef) return;
+
+    const selectMediaItem = () => {
+      this.mediaFiles[mediaItemIdx].customData = {
+        ...(this.mediaFiles[mediaItemIdx].customData || {}),
+        selected: true,
+      };
+    };
+
+    this.contextMenuOptions = [
+      {
+        label: "Select",
+        disabled: this.selectMode,
+        command: (e) => {
+          selectMediaItem();
+          this.galleryEvent.emit("selectMode");
+        },
+      },
+      {
+        separator: true,
+      },
+      {
+        label: "Delete",
+        command: (e) => {
+          selectMediaItem();
+          this.deleteSelectedItems();
+        },
+      },
+    ];
+
+    this.contextMenuRef.show(event);
+  }
+
   selectItem(idx: number) {
     this.mediaFiles[idx].customData = {
       ...(this.mediaFiles[idx].customData || {}),
       selected: !!!this.mediaFiles[idx]?.customData?.["selected"],
     };
-    this.itemSelectedEvent.emit();
+    this.galleryEvent.emit("itemSelected");
   }
 
   showImageInSpotlight(imageIdx: number) {
@@ -266,9 +306,15 @@ export class GalleryComponent implements OnInit, OnChanges {
       const selectedItems = this.mediaFiles.filter(
         (f) => f.customData?.["selected"] === true
       );
-      await window.rendererProcessctrl.deleteMediaFiles(
-        selectedItems.map((f) => f.name)
-      );
+      this._confirmationServ.confirm({
+        header: "Confirm Delete",
+        message: `Are you sure you want to delete ${selectedItems.length} items?`,
+        accept: async () => {
+          await window.rendererProcessctrl.deleteMediaFiles(
+            selectedItems.map((f) => f.name)
+          );
+        },
+      });
     } catch (error) {}
   }
 }

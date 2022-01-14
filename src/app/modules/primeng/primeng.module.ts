@@ -15,6 +15,9 @@ import { DialogModule } from "primeng/dialog";
 import { DropdownModule } from "primeng/dropdown";
 import { DividerModule } from "primeng/divider";
 import { SplitButtonModule } from "primeng/splitbutton";
+import { ContextMenuModule } from "primeng/contextmenu";
+import { ConfirmDialogModule } from "primeng/confirmdialog";
+import { ConfirmationService } from "primeng/api";
 
 @NgModule({
   declarations: [],
@@ -35,6 +38,9 @@ import { SplitButtonModule } from "primeng/splitbutton";
     DropdownModule,
     DividerModule,
     SplitButtonModule,
+    ContextMenuModule,
+    ConfirmDialogModule,
   ],
+  providers: [ConfirmationService],
 })
 export class PrimengModule {}

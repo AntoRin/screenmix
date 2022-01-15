@@ -220,8 +220,8 @@ export class DashboardComponent implements OnInit {
     this.menuItemsSelect = this.getMenuItemsSelect();
   }
 
-  toggleGallerySelectMode() {
-    this.gallerySelectMode = !this.gallerySelectMode;
+  toggleGallerySelectMode(mode?: boolean) {
+    this.gallerySelectMode = mode || !this.gallerySelectMode;
 
     if (!this.gallerySelectMode) {
       for (let idx = 0; idx < this.mediaFiles.length; idx++) {
@@ -250,8 +250,10 @@ export class DashboardComponent implements OnInit {
     switch (event) {
       case "itemSelected":
         return this.updateSelectedItemsCount();
-      case "selectMode":
-        return this.toggleGallerySelectMode();
+      case "selectModeOn":
+        return this.toggleGallerySelectMode(true);
+      case "selectModeOff":
+        return this.toggleGallerySelectMode(false);
       default:
         return;
     }

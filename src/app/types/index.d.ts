@@ -6,7 +6,7 @@ export type DashboardTab = "gallery" | "settings";
 
 export type TopMenuEvent = "delete" | "selectToggle";
 
-export type GalleryEvent = "selectMode" | "itemSelected";
+export type GalleryEvent = "selectModeOn" | "selectModeOff" | "itemSelected";
 
 export interface EditState {
   previousImageIdx?: number;

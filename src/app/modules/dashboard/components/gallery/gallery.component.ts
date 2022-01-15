@@ -118,7 +118,7 @@ export class GalleryComponent implements OnInit, OnChanges {
         disabled: this.selectMode,
         command: (e) => {
           selectMediaItem();
-          this.galleryEvent.emit("selectMode");
+          this.galleryEvent.emit("selectModeOn");
         },
       },
       {

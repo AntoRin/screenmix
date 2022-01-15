@@ -1,5 +1,20 @@
-<p-contextMenu [model]="contextMenuOptions" #contextMenuRef></p-contextMenu>
-<p-confirmDialog icon="pi pi-exclamation-triangle"></p-confirmDialog>
+<p-contextMenu
+  [model]="contextMenuOptions"
+  [baseZIndex]="10000"
+  #contextMenuRef
+></p-contextMenu>
+<p-confirmDialog
+  [baseZIndex]="10000"
+  styleClass="w-[50vw]"
+  icon="pi pi-exclamation-triangle"
+  acceptButtonStyleClass="p-button-sm"
+  rejectButtonStyleClass="p-button-sm"
+></p-confirmDialog>
+<p-toast
+  styleClass="opacity-100"
+  [baseZIndex]="10000"
+  position="bottom-center"
+></p-toast>
 <div
   #mediaItems
   class="grid m-2 gap-2"
@@ -10,7 +25,7 @@
 >
   <div
     *ngFor="let mediaFile of mediaFiles; let mediaIdx = index"
-    (contextmenu)="showContextMenu($event, mediaIdx)"
+    (contextmenu)="showContextMenu($event, mediaFile)"
     class="relative m-2 bg-black flex justify-center items-center overflow-hidden"
     [ngClass]="[
       selectMode

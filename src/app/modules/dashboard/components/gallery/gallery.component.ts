@@ -1,10 +1,12 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   EventEmitter,
   Input,
   OnChanges,
+  OnDestroy,
   OnInit,
   Output,
   SimpleChanges,
@@ -16,6 +18,7 @@ import { ConfirmationService, MenuItem } from "primeng/api";
 import { Subject } from "rxjs";
 import { ContextMenu } from "primeng/contextmenu";
 import { GalleryEvent } from "../../../../types";
+import { MessageService } from "primeng/api";
 
 @Component({
   selector: "app-gallery",
@@ -23,7 +26,7 @@ import { GalleryEvent } from "../../../../types";
   styleUrls: ["./gallery.component.css"],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GalleryComponent implements OnInit, OnChanges {
+export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
   @Input() public mediaFiles: MediaFile[] = [];
   @Input() public actions$: Subject<string> | undefined;
   @Input() public selectMode: boolean = false;
@@ -65,19 +68,31 @@ export class GalleryComponent implements OnInit, OnChanges {
     },
   ];
 
-  public contextMenuOptions: MenuItem[] = [];
+  public contextMenuOptions: MenuItem[] =
+    this.generateContextMenuOptionsForMediaFile();
 
   private _editedImageRefs: string[] = [];
+  private _unsubscribe$: Subject<void> = new Subject<void>();
 
-  constructor(private _confirmationServ: ConfirmationService) {}
+  constructor(
+    private _cd: ChangeDetectorRef,
+    private _confirmationServ: ConfirmationService,
+    private _messageServ: MessageService
+  ) {}
 
   ngOnInit(): void {
-    if (this.actions$)
-      this.actions$.asObservable().subscribe((action) => {
-        if (action === "delete") {
-          this.deleteSelectedItems();
-        }
+    if (this.actions$) {
+      const actionsSubscription = this.actions$
+        .asObservable()
+        .subscribe((action) => {
+          if (action === "delete") {
+            this.deleteSelectedItems();
+          }
+        });
+      this._unsubscribe$.asObservable().subscribe(() => {
+        actionsSubscription.unsubscribe();
       });
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -102,17 +117,39 @@ export class GalleryComponent implements OnInit, OnChanges {
     return `${url}?nonce=${Date.now()}`;
   }
 
-  showContextMenu(event: MouseEvent, mediaItemIdx: number) {
-    if (!this.contextMenuRef) return;
+  generateContextMenuOptionsForMediaFile(mediaFile?: MediaFile): MenuItem[] {
+    if (!mediaFile) return [];
 
     const selectMediaItem = () => {
-      this.mediaFiles[mediaItemIdx].customData = {
-        ...(this.mediaFiles[mediaItemIdx].customData || {}),
+      mediaFile.customData = {
+        ...(mediaFile.customData || {}),
         selected: true,
       };
     };
 
-    this.contextMenuOptions = [
+    const getMediaFileIdx = () =>
+      (mediaFile.customData?.["idx"] as number | undefined) ||
+      this.mediaFiles.findIndex((f) => f.name === mediaFile.name);
+
+    return [
+      {
+        label: "Open",
+        command: () => this.showImageInSpotlight(getMediaFileIdx()),
+      },
+      {
+        separator: true,
+      },
+      {
+        label: "Edit",
+        command: () => {
+          this.showImageInSpotlight(getMediaFileIdx());
+          this._cd.detectChanges();
+          this.enableImageEditing();
+        },
+      },
+      {
+        separator: true,
+      },
       {
         label: "Select",
         disabled: this.selectMode,
@@ -132,7 +169,13 @@ export class GalleryComponent implements OnInit, OnChanges {
         },
       },
     ];
+  }
 
+  showContextMenu(event: MouseEvent, mediaFile: MediaFile) {
+    if (!this.contextMenuRef) return;
+
+    this.contextMenuOptions =
+      this.generateContextMenuOptionsForMediaFile(mediaFile);
     this.contextMenuRef.show(event);
   }
 
@@ -145,6 +188,8 @@ export class GalleryComponent implements OnInit, OnChanges {
   }
 
   showImageInSpotlight(imageIdx: number) {
+    if (!this.mediaFiles[imageIdx]) return;
+
     this.spotlightImage =
       this.mediaFiles[imageIdx].type === "image"
         ? this.mediaFiles[imageIdx]
@@ -308,13 +353,31 @@ export class GalleryComponent implements OnInit, OnChanges {
       );
       this._confirmationServ.confirm({
         header: "Confirm Delete",
-        message: `Are you sure you want to delete ${selectedItems.length} items?`,
+        message: `Are you sure you want to delete ${selectedItems.length} selected file(s)?`,
         accept: async () => {
-          await window.rendererProcessctrl.deleteMediaFiles(
-            selectedItems.map((f) => f.name)
-          );
+          try {
+            await window.rendererProcessctrl.deleteMediaFiles(
+              selectedItems.map((f) => f.name)
+            );
+            this._messageServ.add({
+              severity: "info",
+              summary: "Deleted",
+              detail: `Successfully deleted ${selectedItems.length} file(s)`,
+            });
+            this.galleryEvent.emit("selectModeOff");
+          } catch (error) {
+            this._messageServ.add({
+              severity: "error",
+              summary: "Error",
+              detail: "There was an error deleting the file(s)",
+            });
+          }
         },
       });
     } catch (error) {}
+  }
+
+  ngOnDestroy(): void {
+    this._unsubscribe$.next();
   }
 }

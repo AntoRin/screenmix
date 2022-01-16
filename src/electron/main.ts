@@ -2,6 +2,10 @@ import path from "path";
 import { app, BrowserWindow } from "electron";
 import { IpcHandler } from "./services/IpcHandler";
 
+import ess from "electron-squirrel-startup";
+
+if (ess) app.quit();
+
 class Screenmix {
   private _mainWindow: BrowserWindow | undefined;
   private _ipcHandler: IpcHandler;

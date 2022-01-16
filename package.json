@@ -1,17 +1,26 @@
 {
   "name": "screenmix",
+  "productName": "Screenmix",
+  "author": {
+    "name": "Screenmix",
+    "email": "antorinish@gmail.com"
+  },
+  "description": "A desktop app for taking screenshots and capturing screen",
   "version": "0.0.0",
   "main": "dist/screenmix/electron/main.js",
   "scripts": {
     "ng": "ng",
-    "start": "npm run build:dev && electron .",
+    "start": "electron-forge start",
     "electron": "electron .",
     "dev": "nodemon -e ts,html,css,js --ignore dist/ --exec \"npm run build:dev\"",
     "serve": "ng serve -o",
     "build:dev": "ng build --configuration development && tsc -p tsconfig.electron.json && npm run electron",
     "build": "ng build --configuration production && tsc -p tsconfig.electron.json",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "make-appx": "electron-windows-store --input-directory .\\out\\Screenmix-win32-x64  --output-directory .\\out\\Screenmix-appx --package-version 0.0.0.0 --package-name screenmix"
   },
   "private": true,
   "dependencies": {
@@ -25,6 +34,7 @@
     "@angular/platform-browser-dynamic": "~13.0.0",
     "@angular/router": "~13.0.0",
     "cropperjs": "^1.5.12",
+    "electron-squirrel-startup": "^1.0.0",
     "exiftool-vendored": "^15.9.1",
     "primeflex": "^3.1.0",
     "primeicons": "^5.0.0",
@@ -37,9 +47,15 @@
     "@angular-devkit/build-angular": "~13.0.3",
     "@angular/cli": "~13.0.3",
     "@angular/compiler-cli": "~13.0.0",
+    "@electron-forge/cli": "^6.0.0-beta.63",
+    "@electron-forge/maker-deb": "^6.0.0-beta.63",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.63",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.63",
+    "@electron-forge/maker-zip": "^6.0.0-beta.63",
     "@types/jasmine": "~3.10.0",
     "@types/node": "^12.20.37",
     "electron": "^16.0.2",
+    "electron-windows-store": "^2.1.0",
     "jasmine-core": "~3.10.0",
     "karma": "~6.3.0",
     "karma-chrome-launcher": "~3.1.0",
@@ -49,5 +65,32 @@
     "nodemon": "^2.0.15",
     "tailwindcss": "^2.2.19",
     "typescript": "~4.4.3"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "screenmix"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
   }
 }

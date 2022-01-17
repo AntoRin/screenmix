@@ -61,36 +61,13 @@
                 pInputText
                 [value]="configSettings.ssHotKey"
               />
-              <p-dialog
-                (onHide)="removeListenerAndUpdateKeybind('ss')"
-                (onShow)="listenForKeybinds()"
-                [focusTrap]="true"
-                [focusOnShow]="true"
-                [modal]="true"
-                [resizable]="true"
-                header="Listening for new Keybind"
-                [closable]="false"
-                [visible]="keybindSelectionActive === 'ss'"
-                [style]="{
-                  width: '50vw',
-                  height: '50vh'
-                }"
+              <ng-container
+                *ngTemplateOutlet="
+                  keybindRecordDialogTemplate;
+                  context: { keybindFor: 'ss' }
+                "
               >
-                <div class="flex flex-col justify-center items-center">
-                  <div *ngIf="keybindError">{{ keybindError }}</div>
-                  <div class="text-2xl text-green-300 flex justify-center">
-                    {{ recordedKeybind }}
-                  </div>
-                </div>
-                <ng-template pTemplate="footer">
-                  <p-button
-                    icon="pi pi-check"
-                    (click)="keybindSelectionActive = null"
-                    label="Okay"
-                    styleClass="p-button-text"
-                  ></p-button>
-                </ng-template>
-              </p-dialog>
+              </ng-container>
             </div>
           </div>
         </div>
@@ -147,36 +124,13 @@
                 pInputText
                 [value]="configSettings.scHotKey"
               />
-              <p-dialog
-                (onHide)="removeListenerAndUpdateKeybind('sc')"
-                (onShow)="listenForKeybinds()"
-                [focusTrap]="true"
-                [focusOnShow]="true"
-                [modal]="true"
-                [resizable]="true"
-                header="Listening for new Keybind"
-                [closable]="false"
-                [visible]="keybindSelectionActive === 'sc'"
-                [style]="{
-                  width: '50vw',
-                  height: '50vh'
-                }"
+              <ng-container
+                *ngTemplateOutlet="
+                  keybindRecordDialogTemplate;
+                  context: { keybindFor: 'sc' }
+                "
               >
-                <div class="flex flex-col justify-center items-center">
-                  <div *ngIf="keybindError">{{ keybindError }}</div>
-                  <div class="text-2xl text-green-300 flex justify-center">
-                    {{ recordedKeybind }}
-                  </div>
-                </div>
-                <ng-template pTemplate="footer">
-                  <p-button
-                    icon="pi pi-check"
-                    (click)="keybindSelectionActive = null"
-                    label="Okay"
-                    styleClass="p-button-text"
-                  ></p-button>
-                </ng-template>
-              </p-dialog>
+              </ng-container>
             </div>
           </div>
         </div>
@@ -235,4 +189,37 @@
       (click)="cancelSettings()"
     ></button>
   </div>
+</ng-template>
+
+<ng-template #keybindRecordDialogTemplate let-keybindFor="keybindFor">
+  <p-dialog
+    (onHide)="removeListenerAndUpdateKeybind(keybindFor)"
+    (onShow)="listenForKeybinds()"
+    [focusTrap]="true"
+    [focusOnShow]="true"
+    [modal]="true"
+    [resizable]="true"
+    header="Listening for new Keybind"
+    [closable]="false"
+    [visible]="keybindSelectionActive === keybindFor"
+    [style]="{
+      width: '50vw',
+      height: '50vh'
+    }"
+  >
+    <div class="flex flex-col justify-center items-center">
+      <div *ngIf="keybindError">{{ keybindError }}</div>
+      <div class="text-2xl text-green-300 flex justify-center">
+        {{ recordedKeybind }}
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <p-button
+        icon="pi pi-check"
+        (click)="keybindSelectionActive = null"
+        label="Okay"
+        styleClass="p-button-text"
+      ></p-button>
+    </ng-template>
+  </p-dialog>
 </ng-template>

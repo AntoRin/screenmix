@@ -82,23 +82,24 @@ export class SettingsComponent implements OnInit, OnDestroy {
       return false;
     });
 
-    if (!modifierUsed) {
-      this.keybindError = `Required at least 1 modifier.`;
-    } else {
-      this.keybindError = null;
-    }
+    this.keybindError =
+      !modifierUsed || pressedKeys.length <= 1
+        ? `Required two keys with at least 1 modifier.`
+        : null;
   }
 
   removeListenerAndUpdateKeybind(captureType: "ss" | "sc") {
+    window.removeAllListeners!("keydown");
+
     if (this.keybindError) {
       this._messageServ.add({
         severity: "error",
-        detail: "There should be at least 1 modifier",
+        detail: this.keybindError,
       });
+      this.recordedKeybind = "";
+      this.keybindError = null;
       return;
     }
-
-    window.removeAllListeners!("keydown");
 
     if (!this.recordedKeybind) return;
 

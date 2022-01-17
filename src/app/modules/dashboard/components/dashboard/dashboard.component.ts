@@ -221,7 +221,8 @@ export class DashboardComponent implements OnInit {
   }
 
   toggleGallerySelectMode(mode?: boolean) {
-    this.gallerySelectMode = mode || !this.gallerySelectMode;
+    this.gallerySelectMode =
+      mode !== undefined ? mode : !this.gallerySelectMode;
 
     if (!this.gallerySelectMode) {
       for (let idx = 0; idx < this.mediaFiles.length; idx++) {

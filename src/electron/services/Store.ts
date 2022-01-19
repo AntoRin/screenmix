@@ -1,7 +1,7 @@
 import path from "path";
 import { readFileSync, promises as fsp } from "fs";
 import { app } from "electron";
-import { UserDataFields, UserDataStore } from "../types";
+import { UserDataField, UserDataStore } from "../types";
 
 export class Store {
   private _userDataPath: string;
@@ -54,7 +54,7 @@ export class Store {
     }
   }
 
-  read(key: UserDataFields | undefined): any {
+  read(key: UserDataField | undefined): any {
     if (!key) return this._userData;
     return this._userData[key];
   }

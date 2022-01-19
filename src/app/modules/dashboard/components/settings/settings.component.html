@@ -207,7 +207,10 @@
       height: '50vh'
     }"
   >
-    <div class="flex flex-col justify-center items-center">
+    <div
+      class="flex flex-col justify-center items-center"
+      style="height: fit-content"
+    >
       <div *ngIf="keybindError">{{ keybindError }}</div>
       <div class="text-2xl text-green-300 flex justify-center">
         {{ recordedKeybind }}

@@ -1,7 +1,7 @@
 import { OnDestroy } from "@angular/core";
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { MessageService } from "primeng/api";
-import { UserDataStore } from "../../../../../electron/types";
+import { ConfirmationService, MessageService } from "primeng/api";
+import { UserDataStore, UserDataField } from "../../../../../electron/types";
 import { DashboardTab } from "../../../../types";
 
 @Component({
@@ -34,23 +34,34 @@ export class SettingsComponent implements OnInit, OnDestroy {
   public keybindSelectionActive: "ss" | "sc" | null = null;
   public keybindError: string | null = null;
 
-  constructor(private _messageServ: MessageService) {}
+  constructor(
+    private _confirmationServ: ConfirmationService,
+    private _messageServ: MessageService
+  ) {
+    // For passing method reference
+    this.handleNewKeybind = this.handleNewKeybind.bind(this);
+  }
 
   ngOnInit(): void {
     this.configSettings = JSON.parse(JSON.stringify(this.PREFERENCES));
   }
 
-  updateDirectory() {
-    window.rendererProcessctrl
-      .getDirectorySelection()
-      .then((value) => {
-        if (value) this.configSettings.baseDirectory = value;
-      })
-      .catch((e) => {});
+  async updateDirectory() {
+    try {
+      const newDirectory =
+        await window.rendererProcessctrl.getDirectorySelection();
+
+      if (newDirectory) this.configSettings.baseDirectory = newDirectory;
+    } catch (error) {
+      this._messageServ.add({
+        severity: "error",
+        detail: "There was an error updating directory",
+      });
+    }
   }
 
   listenForKeybinds() {
-    window.addEventListener("keydown", this.handleNewKeybind.bind(this));
+    window.addEventListener("keydown", this.handleNewKeybind);
   }
 
   handleNewKeybind(ev: KeyboardEvent) {
@@ -89,7 +100,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   removeListenerAndUpdateKeybind(captureType: "ss" | "sc") {
-    window.removeAllListeners!("keydown");
+    window.removeEventListener("keydown", this.handleNewKeybind);
 
     if (this.keybindError) {
       this._messageServ.add({
@@ -129,11 +140,33 @@ export class SettingsComponent implements OnInit, OnDestroy {
     }
   }
 
+  private _settingsUpdated(): boolean {
+    for (const prop of Object.getOwnPropertyNames(this.PREFERENCES)) {
+      if (
+        this.PREFERENCES[prop as UserDataField] !==
+        this.configSettings[prop as UserDataField]
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   cancelSettings() {
-    this.tabChangeEvent.emit("gallery");
+    if (this._settingsUpdated()) {
+      this._confirmationServ.confirm({
+        header: "Your changes will be discarded",
+        message: `Are you sure you want to discard your settings?`,
+        accept: () => {
+          this.tabChangeEvent.emit("gallery");
+        },
+      });
+    } else {
+      this.tabChangeEvent.emit("gallery");
+    }
   }
 
   ngOnDestroy(): void {
-    window.removeAllListeners!("keydown");
+    window.removeEventListener("keydown", this.handleNewKeybind);
   }
 }

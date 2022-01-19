@@ -25,14 +25,14 @@ export interface RendererProcessCtx {
   deleteMediaFiles(files: string[]): Promise<void>;
 }
 
-export type UserDataFields =
+export type UserDataField =
   | "baseDirectory"
   | "ssHotKey"
   | "scHotKey"
   | "ssResolution"
   | "scResolution";
 
-export type UserDataStore = Partial<Record<UserDataFields, any>>;
+export type UserDataStore = Partial<Record<UserDataField, any>>;
 
 export interface CaptureData {
   dataUrl: string;

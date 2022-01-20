@@ -38,6 +38,7 @@ export interface RendererProcessCtx {
   registerGlobalShortcuts(): Promise<void>;
   saveEditedImage(data: CaptureData): Promise<void>;
   deleteMediaFiles(files: string[]): Promise<void>;
+  copyImageToClipboard(file: MediaFile): Promise<void>;
 }
 
 export type UserDataField =

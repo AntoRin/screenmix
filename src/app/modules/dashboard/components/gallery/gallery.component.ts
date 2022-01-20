@@ -135,9 +135,33 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
       {
         label: "Open",
         command: () => this.showImageInSpotlight(getMediaFileIdx()),
+        visible: mediaFile.type === "image",
       },
       {
         separator: true,
+        visible: mediaFile.type === "image",
+      },
+      {
+        label: "Copy",
+        command: async () => {
+          await window.rendererProcessctrl
+            .copyImageToClipboard(mediaFile)
+            .catch((e) => {
+              this._messageServ.add({
+                severity: "error",
+                detail: "There was an error copying the image to clipboard.",
+              });
+            });
+          this._messageServ.add({
+            severity: "info",
+            detail: "Copied to clipboard.",
+          });
+        },
+        visible: mediaFile.type === "image",
+      },
+      {
+        separator: true,
+        visible: mediaFile.type === "image",
       },
       {
         label: "Edit",
@@ -146,9 +170,11 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
           this._cd.detectChanges();
           this.enableImageEditing();
         },
+        visible: mediaFile.type === "image",
       },
       {
         separator: true,
+        visible: mediaFile.type === "image",
       },
       {
         label: "Select",
@@ -164,8 +190,7 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
       {
         label: "Delete",
         command: (e) => {
-          selectMediaItem();
-          this.deleteSelectedItems();
+          this.deleteSelectedItems(mediaFile);
         },
       },
     ];
@@ -346,11 +371,12 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
     this.spotlightImage = null;
   }
 
-  async deleteSelectedItems() {
+  async deleteSelectedItems(mediaFiles?: MediaFile | MediaFile[]) {
     try {
-      const selectedItems = this.mediaFiles.filter(
-        (f) => f.customData?.["selected"] === true
-      );
+      const selectedItems: MediaFile[] = mediaFiles
+        ? ([] as MediaFile[]).concat(mediaFiles)
+        : this.mediaFiles.filter((f) => f.customData?.["selected"] === true);
+
       this._confirmationServ.confirm({
         header: "Confirm Delete",
         message: `Are you sure you want to delete ${selectedItems.length} selected file(s)?`,

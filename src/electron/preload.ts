@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { CaptureData, RendererProcessCtx } from "../common/types";
+import { CaptureData, MediaFile, RendererProcessCtx } from "../common/types";
 
 class Preload {
   constructor() {
@@ -40,6 +40,8 @@ class Preload {
         ipcRenderer.invoke("ipc:saveEditedImage", data),
       deleteMediaFiles: (files: string[]) =>
         ipcRenderer.invoke("ipc:deleteMediaFiles", files),
+      copyImageToClipboard: (file: MediaFile) =>
+        ipcRenderer.invoke("ipc:copyImageToClipboard", file),
     };
   }
 }

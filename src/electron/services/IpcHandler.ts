@@ -1,10 +1,13 @@
 import path from "path";
+import { fileURLToPath } from "url";
 import {
   BrowserWindow,
   dialog,
   desktopCapturer,
   globalShortcut,
   ipcMain,
+  nativeImage,
+  clipboard,
 } from "electron";
 import {
   CaptureData,
@@ -70,6 +73,10 @@ export class IpcHandler implements RendererProcessCtx {
 
     ipcMain.handle("ipc:deleteMediaFiles", (_, files: string[]) =>
       this.deleteMediaFiles(files)
+    );
+
+    ipcMain.handle("ipc:copyImageToClipboard", (_, file: MediaFile) =>
+      this.copyImageToClipboard(file)
     );
   }
 
@@ -278,6 +285,15 @@ export class IpcHandler implements RendererProcessCtx {
       }
 
       this._notifyRenderer("fromMain:refreshGallery");
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async copyImageToClipboard(file: MediaFile) {
+    try {
+      const image = nativeImage.createFromPath(fileURLToPath(file.path));
+      clipboard.writeImage(image);
     } catch (error) {
       throw error;
     }

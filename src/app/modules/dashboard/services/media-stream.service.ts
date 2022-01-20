@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Subject } from "rxjs";
-import { CaptureMode, ProcessNotification } from "../../../types";
+import { CaptureMode, ProcessNotification } from "../../../../common/types";
 
 @Injectable({
   providedIn: "root",

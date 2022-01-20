@@ -12,12 +12,12 @@ import {
   SimpleChanges,
   ViewChild,
 } from "@angular/core";
-import { MediaFile } from "../../../../../electron/types";
+import { MediaFile } from "../../../../../common/types";
 import Cropper from "cropperjs";
 import { ConfirmationService, MenuItem } from "primeng/api";
 import { Subject } from "rxjs";
 import { ContextMenu } from "primeng/contextmenu";
-import { GalleryEvent } from "../../../../types";
+import { GalleryEvent } from "../../../../../common/types";
 import { MessageService } from "primeng/api";
 
 @Component({

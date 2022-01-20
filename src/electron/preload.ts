@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { CaptureData, RendererProcessCtx } from "./types";
+import { CaptureData, RendererProcessCtx } from "../common/types";
 
 class Preload {
   constructor() {

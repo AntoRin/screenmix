@@ -11,7 +11,7 @@ import {
   MediaFile,
   RendererProcessCtx,
   UserDataStore,
-} from "../types";
+} from "../../common/types";
 import { Store } from "./Store";
 import { Dirent, promises as fsp, statSync } from "fs";
 

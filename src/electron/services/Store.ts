@@ -1,7 +1,7 @@
 import path from "path";
 import { readFileSync, promises as fsp } from "fs";
 import { app } from "electron";
-import { UserDataField, UserDataStore } from "../types";
+import { UserDataField, UserDataStore } from "../../common/types";
 
 export class Store {
   private _userDataPath: string;

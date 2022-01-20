@@ -1,8 +1,8 @@
 import { OnDestroy } from "@angular/core";
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { ConfirmationService, MessageService } from "primeng/api";
-import { UserDataStore, UserDataField } from "../../../../../electron/types";
-import { DashboardTab } from "../../../../types";
+import { UserDataStore, UserDataField } from "../../../../../common/types";
+import { DashboardTab } from "../../../../../common/types";
 
 @Component({
   selector: "app-settings",

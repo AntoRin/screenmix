@@ -14,6 +14,8 @@ class Preload {
       "fromMain:takeScreenshot",
       "fromMain:captureScreen",
       "fromMain:refreshGallery",
+      "fromMain:takeScreenshotOfCurrentWindow",
+      "fromMain:captureCurrentScreen",
     ];
 
     fromMainEvents.forEach((eventName) =>
@@ -29,7 +31,8 @@ class Preload {
       getBaseDirectory: () => ipcRenderer.invoke("ipc:getBaseDirectory"),
       listMediaPaths: (baseDirectory: string) =>
         ipcRenderer.invoke("ipc:listMediaPaths", baseDirectory),
-      getDesktopSourceId: () => ipcRenderer.invoke("ipc:getDesktopSourceId"),
+      getDesktopSourceId: (currentWindow?: boolean) =>
+        ipcRenderer.invoke("ipc:getDesktopSourceId", currentWindow),
       saveCapture: (captureData: CaptureData) =>
         ipcRenderer.invoke("ipc:saveCapturedScreenshot", captureData),
       saveChanges: (data) => ipcRenderer.invoke("ipc:saveChanges", data),

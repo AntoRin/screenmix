@@ -8,16 +8,19 @@ if (ess) app.quit();
 
 class Screenmix {
   private _mainWindow: BrowserWindow | undefined;
-  private _ipcHandler: IpcHandler;
+  private _ipcHandler: IpcHandler | undefined;
 
-  constructor() {
-    this._ipcHandler = new IpcHandler();
-  }
+  constructor() {}
 
   public async init(): Promise<void> {
     try {
       await app.whenReady();
+
       this._createMainWindow();
+
+      if (!this._mainWindow) throw new Error("Error creating window");
+
+      this._ipcHandler = new IpcHandler(this._mainWindow);
 
       app.on("activate", () => {
         if (BrowserWindow.getAllWindows().length === 0) {
@@ -25,16 +28,16 @@ class Screenmix {
         }
       });
 
-      await this._ipcHandler.registerGlobalShortcuts(this._mainWindow);
+      await this._ipcHandler.registerGlobalShortcuts();
 
-      this._ipcHandler.initializeIpcListeners(this._mainWindow);
+      this._ipcHandler.initializeIpcListeners();
 
       app.on("window-all-closed", () => {
         if (process.platform !== "darwin") app.quit();
       });
 
       app.on("will-quit", () => {
-        this._ipcHandler.unregisterGlobalShortcuts();
+        if (this._ipcHandler) this._ipcHandler.unregisterGlobalShortcuts();
       });
     } catch (error) {
       throw error;

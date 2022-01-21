@@ -20,23 +20,21 @@ import { Dirent, promises as fsp, statSync } from "fs";
 
 export class IpcHandler implements RendererProcessCtx {
   private _store: Store;
-  private _mainWindow: BrowserWindow | undefined;
+  private _mainWindow: BrowserWindow;
   private _imageExtensions: string[];
   private _videoExtensions: string[];
 
-  constructor() {
+  constructor(mainWindow: BrowserWindow) {
     this._store = new Store();
+    this._mainWindow = mainWindow;
     this._imageExtensions = [".jpg", ".png"];
     this._videoExtensions = [".mp4"];
   }
 
-  public initializeIpcListeners(mainWindow?: BrowserWindow) {
-    if (!mainWindow) throw new Error("NO_WINDOW");
-
-    this._mainWindow = mainWindow;
-
-    ipcMain.handle("ipc:selectBaseDirectory", () =>
-      this.selectBaseDirectory(mainWindow)
+  public initializeIpcListeners() {
+    ipcMain.handle(
+      "ipc:selectBaseDirectory",
+      this.selectBaseDirectory.bind(this)
     );
 
     ipcMain.handle("ipc:getBaseDirectory", this.getBaseDirectory.bind(this));
@@ -45,9 +43,8 @@ export class IpcHandler implements RendererProcessCtx {
       this.listMediaPaths(baseDir)
     );
 
-    ipcMain.handle(
-      "ipc:getDesktopSourceId",
-      this.getDesktopSourceId.bind(this)
+    ipcMain.handle("ipc:getDesktopSourceId", (_, currentWindow?: boolean) =>
+      this.getDesktopSourceId(currentWindow)
     );
 
     ipcMain.handle("ipc:saveCapturedScreenshot", (_, data: CaptureData) =>
@@ -58,13 +55,14 @@ export class IpcHandler implements RendererProcessCtx {
 
     ipcMain.handle(
       "ipc:getDirectorySelection",
-      this.getDirectorySelection.bind(this, mainWindow)
+      this.getDirectorySelection.bind(this)
     );
 
     ipcMain.handle("ipc:saveChanges", (_, data) => this.saveChanges(data));
 
-    ipcMain.handle("ipc:registerGlobalShortcuts", () =>
-      this.registerGlobalShortcuts(mainWindow)
+    ipcMain.handle(
+      "ipc:registerGlobalShortcuts",
+      this.registerGlobalShortcuts.bind(this)
     );
 
     ipcMain.handle("ipc:saveEditedImage", (_, data) =>
@@ -80,20 +78,30 @@ export class IpcHandler implements RendererProcessCtx {
     );
   }
 
-  async registerGlobalShortcuts(window?: BrowserWindow) {
+  async registerGlobalShortcuts() {
     try {
-      if (!window) throw new Error("NO_WINDOW");
-
       this.unregisterGlobalShortcuts();
 
       const ssHotKey: string = await this._store.read("ssHotKey");
       const scHotKey: string = await this._store.read("scHotKey");
+      const ssHotKeyCurrentWindow: string = await this._store.read(
+        "ssHotKeyCurrentWindow"
+      );
+      const scHotKeyCurrentWindow: string = await this._store.read(
+        "scHotKeyCurrentWindow"
+      );
 
       globalShortcut.registerAll([ssHotKey], () => {
-        this.takeScreenshot(window);
+        this.takeScreenshot();
       });
       globalShortcut.registerAll([scHotKey], () => {
-        this.captureScreen(window);
+        this.captureScreen();
+      });
+      globalShortcut.registerAll([ssHotKeyCurrentWindow], () => {
+        this.takeScreenshotOfCurrentWindow();
+      });
+      globalShortcut.registerAll([scHotKeyCurrentWindow], () => {
+        this.captureCurrentScreen();
       });
     } catch (error) {
       throw error;
@@ -104,12 +112,12 @@ export class IpcHandler implements RendererProcessCtx {
     globalShortcut.unregisterAll();
   }
 
-  async getDirectorySelection(window: BrowserWindow) {
-    return (await this._selectDirectories(window))[0];
+  async getDirectorySelection() {
+    return (await this._selectDirectories())[0];
   }
 
-  async selectBaseDirectory(window: BrowserWindow) {
-    const [selectedDir] = await this._selectDirectories(window);
+  async selectBaseDirectory() {
+    const [selectedDir] = await this._selectDirectories();
 
     await this._store.write({
       baseDirectory: selectedDir,
@@ -194,20 +202,30 @@ export class IpcHandler implements RendererProcessCtx {
 
         return file1Time > file2Time ? -1 : file2Time > file1Time ? 1 : 0;
       });
-    } catch (error) {}
+    } catch (error) {
+      throw error;
+    }
   }
 
-  public takeScreenshot(window: BrowserWindow) {
-    window.webContents.send("fromMain:takeScreenshot");
+  public takeScreenshot() {
+    this._mainWindow.webContents.send("fromMain:takeScreenshot");
   }
 
-  public captureScreen(window: BrowserWindow) {
-    window.webContents.send("fromMain:captureScreen");
+  public takeScreenshotOfCurrentWindow() {
+    this._mainWindow.webContents.send("fromMain:takeScreenshotOfCurrentWindow");
   }
 
-  private async _selectDirectories(window: BrowserWindow): Promise<string[]> {
+  public captureScreen() {
+    this._mainWindow.webContents.send("fromMain:captureScreen");
+  }
+
+  public captureCurrentScreen() {
+    this._mainWindow.webContents.send("fromMain:captureCurrentScreen");
+  }
+
+  private async _selectDirectories(): Promise<string[]> {
     try {
-      const dialogResponse = await dialog.showOpenDialog(window, {
+      const dialogResponse = await dialog.showOpenDialog(this._mainWindow, {
         properties: ["openDirectory"],
       });
 
@@ -219,13 +237,15 @@ export class IpcHandler implements RendererProcessCtx {
     }
   }
 
-  async getDesktopSourceId() {
+  async getDesktopSourceId(currentWindow: boolean = false) {
     try {
       const sources = await desktopCapturer.getSources({
         types: ["window", "screen"],
       });
 
-      const requiredSource = sources.find((s) => s.name === "Entire Screen");
+      const requiredSource = currentWindow
+        ? sources[1]
+        : sources.find((s) => s.name === "Entire Screen");
 
       return requiredSource?.id;
     } catch (error) {

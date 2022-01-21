@@ -35,6 +35,8 @@
       <!-- - Screenshot Tab -->
 
       <p-fieldset styleClass="my-5" legend="Screenshot" [toggleable]="true">
+        <!-- ssHotKey -->
+
         <div class="container-grid">
           <ng-container
             *ngTemplateOutlet="
@@ -53,7 +55,7 @@
                 pButton
                 pRipple
                 icon="pi pi-camera"
-                (click)="keybindSelectionActive = 'ss'"
+                (click)="keybindSelectionActive = 'ssHotKey'"
               ></button>
               <input
                 type="text"
@@ -64,7 +66,7 @@
               <ng-container
                 *ngTemplateOutlet="
                   keybindRecordDialogTemplate;
-                  context: { keybindFor: 'ss' }
+                  context: { keybindFor: 'ssHotKey' }
                 "
               >
               </ng-container>
@@ -72,6 +74,50 @@
           </div>
         </div>
         <p-divider></p-divider>
+
+        <!-- ssHotKeyCurrentWindow -->
+
+        <div class="container-grid">
+          <ng-container
+            *ngTemplateOutlet="
+              settingsDetails;
+              context: {
+                title: 'Current Window Screenshot Hot-Key',
+                description:
+                  'Set up key combinations for taking screenshots of the currently focused window.'
+              }
+            "
+          >
+          </ng-container>
+          <div class="m-2">
+            <div class="p-inputgroup">
+              <button
+                type="button"
+                pButton
+                pRipple
+                icon="pi pi-camera"
+                (click)="keybindSelectionActive = 'ssHotKeyCurrentWindow'"
+              ></button>
+              <input
+                type="text"
+                disabled
+                pInputText
+                [value]="configSettings.ssHotKeyCurrentWindow"
+              />
+              <ng-container
+                *ngTemplateOutlet="
+                  keybindRecordDialogTemplate;
+                  context: { keybindFor: 'ssHotKeyCurrentWindow' }
+                "
+              >
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        <p-divider></p-divider>
+
+        <!-- ssScreenResolution -->
+
         <div class="container-grid">
           <ng-container
             *ngTemplateOutlet="
@@ -97,6 +143,8 @@
       <!-- - Screen Recorder Tab -->
 
       <p-fieldset styleClass="my-5" legend="Screen Capture" [toggleable]="true">
+        <!-- scHotKey -->
+
         <div class="container-grid">
           <ng-container
             *ngTemplateOutlet="
@@ -116,7 +164,7 @@
                 pButton
                 pRipple
                 icon="pi pi-video"
-                (click)="keybindSelectionActive = 'sc'"
+                (click)="keybindSelectionActive = 'scHotKey'"
               ></button>
               <input
                 type="text"
@@ -127,7 +175,7 @@
               <ng-container
                 *ngTemplateOutlet="
                   keybindRecordDialogTemplate;
-                  context: { keybindFor: 'sc' }
+                  context: { keybindFor: 'scHotKey' }
                 "
               >
               </ng-container>
@@ -135,6 +183,50 @@
           </div>
         </div>
         <p-divider></p-divider>
+
+        <!-- scHotKeyCurrentWindow -->
+
+        <div class="container-grid">
+          <ng-container
+            *ngTemplateOutlet="
+              settingsDetails;
+              context: {
+                title: 'Screen Capture Hot-Key (current window)',
+                description:
+                  'Set up key combinations for enabling Screen Capture for the currently focused window'
+              }
+            "
+          >
+          </ng-container>
+          <div class="m-2">
+            <div class="p-inputgroup">
+              <button
+                type="button"
+                pButton
+                pRipple
+                icon="pi pi-video"
+                (click)="keybindSelectionActive = 'scHotKeyCurrentWindow'"
+              ></button>
+              <input
+                type="text"
+                disabled
+                pInputText
+                [value]="configSettings.scHotKeyCurrentWindow"
+              />
+              <ng-container
+                *ngTemplateOutlet="
+                  keybindRecordDialogTemplate;
+                  context: { keybindFor: 'scHotKeyCurrentWindow' }
+                "
+              >
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        <p-divider></p-divider>
+
+        <!-- scResolution -->
+
         <div class="container-grid">
           <ng-container
             *ngTemplateOutlet="

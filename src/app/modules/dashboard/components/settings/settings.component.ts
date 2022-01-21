@@ -1,7 +1,11 @@
 import { OnDestroy } from "@angular/core";
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { ConfirmationService, MessageService } from "primeng/api";
-import { UserDataStore, UserDataField } from "../../../../../common/types";
+import {
+  UserDataStore,
+  UserDataField,
+  KeybindType,
+} from "../../../../../common/types";
 import { DashboardTab } from "../../../../../common/types";
 
 @Component({
@@ -31,7 +35,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
     "800x600",
   ];
 
-  public keybindSelectionActive: "ss" | "sc" | null = null;
+  public keybindSelectionActive: KeybindType | null = null;
   public keybindError: string | null = null;
 
   constructor(
@@ -99,7 +103,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
         : null;
   }
 
-  removeListenerAndUpdateKeybind(captureType: "ss" | "sc") {
+  removeListenerAndUpdateKeybind(captureType: KeybindType) {
     window.removeEventListener("keydown", this.handleNewKeybind);
 
     if (this.keybindError) {
@@ -114,10 +118,19 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
     if (!this.recordedKeybind) return;
 
-    if (captureType === "ss") {
-      this.configSettings.ssHotKey = this.recordedKeybind;
-    } else if (captureType === "sc") {
-      this.configSettings.scHotKey = this.recordedKeybind;
+    switch (captureType) {
+      case "ssHotKey":
+        this.configSettings.ssHotKey = this.recordedKeybind;
+        break;
+      case "scHotKey":
+        this.configSettings.scHotKey = this.recordedKeybind;
+        break;
+      case "ssHotKeyCurrentWindow":
+        this.configSettings.ssHotKeyCurrentWindow = this.recordedKeybind;
+        break;
+      case "scHotKeyCurrentWindow":
+        this.configSettings.scHotKeyCurrentWindow = this.recordedKeybind;
+        break;
     }
 
     this.recordedKeybind = "";

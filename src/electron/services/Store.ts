@@ -28,8 +28,10 @@ export class Store {
   private get defaults(): UserDataStore {
     return {
       baseDirectory: app.getPath("home"),
-      scHotKey: "Home",
-      ssHotKey: "Insert",
+      scHotKey: "Alt+Home",
+      scHotKeyCurrentWindow: "Alt+Delete",
+      ssHotKey: "Alt+Insert",
+      ssHotKeyCurrentWindow: "Alt+End",
       ssResolution: "800x600",
       scResolution: "800x600",
     };

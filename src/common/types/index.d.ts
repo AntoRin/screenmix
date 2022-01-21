@@ -31,7 +31,7 @@ export interface RendererProcessCtx {
   getDirectorySelection(...args: any[]): Promise<string>;
   getBaseDirectory(...args: any[]): Promise<string | undefined>;
   listMediaPaths(...args: any[]): Promise<MediaFile[]>;
-  getDesktopSourceId(...args: any[]): Promise<string | undefined>;
+  getDesktopSourceId(currentWindow?: boolean): Promise<string | undefined>;
   saveCapture(data: CaptureData): Promise<any>;
   saveChanges(data: UserDataStore): Promise<void>;
   getAllPreferences(): Promise<UserDataStore>;
@@ -41,10 +41,18 @@ export interface RendererProcessCtx {
   copyImageToClipboard(file: MediaFile): Promise<void>;
 }
 
+export type KeybindType =
+  | "ssHotKey"
+  | "scHotKey"
+  | "ssHotKeyCurrentWindow"
+  | "scHotKeyCurrentWindow";
+
 export type UserDataField =
   | "baseDirectory"
   | "ssHotKey"
+  | "ssHotKeyCurrentWindow"
   | "scHotKey"
+  | "scHotKeyCurrentWindow"
   | "ssResolution"
   | "scResolution";
 

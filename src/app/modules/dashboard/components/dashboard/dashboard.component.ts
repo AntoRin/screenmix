@@ -158,13 +158,29 @@ export class DashboardComponent implements OnInit {
       case "fromMain:takeScreenshot":
         return this._mediaStreamService.captureScreen(
           "image",
-          this.PREFERENCES.ssResolution
+          this.PREFERENCES.ssResolution,
+          false
+        );
+
+      case "fromMain:takeScreenshotOfCurrentWindow":
+        return this._mediaStreamService.captureScreen(
+          "image",
+          this.PREFERENCES.ssResolution,
+          true
         );
 
       case "fromMain:captureScreen":
         return this._mediaStreamService.captureScreen(
           "video",
-          this.PREFERENCES.scResolution
+          this.PREFERENCES.scResolution,
+          false
+        );
+
+      case "fromMain:captureCurrentScreen":
+        return this._mediaStreamService.captureScreen(
+          "video",
+          this.PREFERENCES.scResolution,
+          true
         );
 
       case "fromMain:refreshGallery":

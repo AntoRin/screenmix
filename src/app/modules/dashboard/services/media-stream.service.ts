@@ -9,7 +9,6 @@ export class MediaStreamService {
   private _videoCaptureInProgress: boolean = false;
   private _processNotificationSubject: Subject<ProcessNotification> =
     new Subject<ProcessNotification>();
-  private _streamRef: MediaStream | undefined;
 
   streamNotifications$ = new Subject<"videoCaptureStart" | "videoCaptureEnd">();
 
@@ -28,42 +27,38 @@ export class MediaStreamService {
     this._videoCaptureInProgress = status;
   }
 
-  async captureScreen(mode: CaptureMode, resolution: string): Promise<void> {
+  async captureScreen(
+    mode: CaptureMode,
+    resolution: string,
+    currentWindow: boolean = false
+  ): Promise<void> {
     try {
       if (this.videoCaptureInProgress && mode === "video")
         return this._processNotificationSubject.next("stopVideoCapture");
 
-      let stream: MediaStream;
-
       const [width, height] = resolution.split(/[^0-9]/g);
-
-      console.log(width, height);
 
       if (isNaN(Number(width)) || isNaN(Number(height))) {
         throw new Error("INVALID_RESOLUTION");
       }
 
-      if (this._streamRef?.active) {
-        stream = this._streamRef.clone();
-      } else {
-        const srcId = await window.rendererProcessctrl.getDesktopSourceId();
+      const srcId = await window.rendererProcessctrl.getDesktopSourceId(
+        currentWindow
+      );
 
-        stream = await navigator.mediaDevices.getUserMedia({
-          audio: false,
-          video: {
-            mandatory: {
-              chromeMediaSource: "desktop",
-              chromeMediaSourceId: srcId,
-              minWidth: width,
-              maxWidth: width,
-              minHeight: height,
-              maxHeight: height,
-            },
-          } as any,
-        });
-
-        this._streamRef = stream;
-      }
+      const stream: MediaStream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: {
+          mandatory: {
+            chromeMediaSource: "desktop",
+            chromeMediaSourceId: srcId,
+            minWidth: width,
+            maxWidth: width,
+            minHeight: height,
+            maxHeight: height,
+          },
+        } as any,
+      });
 
       if (mode === "image")
         return this.handleImageCapture(stream, [+width, +height]);

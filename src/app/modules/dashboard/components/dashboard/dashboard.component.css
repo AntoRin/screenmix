@@ -4,6 +4,6 @@
 }
 
 ::ng-deep .priority-menu-bar {
-  z-index: 100000000;
+  z-index: 40;
   width: calc(100vw - 7px);
 }

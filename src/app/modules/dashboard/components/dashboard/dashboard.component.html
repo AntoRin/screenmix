@@ -12,15 +12,14 @@
 ></p-confirmDialog>
 <div class="h-screen w-screen bg-gray-900 overflow-x-hidden">
   <p-menubar
-    [baseZIndex]="100000"
-    [autoZIndex]="false"
     [model]="gallerySelectMode ? menuItemsSelect : menuItemsDefault"
+    styleClass="fixed top-0 priority-menu-bar"
   >
     <ng-template pTemplate="end">
       <input type="text" pInputText placeholder="Search" />
     </ng-template>
   </p-menubar>
-  <div>
+  <div [ngStyle]="{ marginTop: '90px' }">
     <div class="m-2 flex justify-end">
       <p-tag
         *ngIf="showVideoCaptureMarker"

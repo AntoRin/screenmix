@@ -55,7 +55,6 @@ export class Store {
   }
 
   read(key: UserDataField | undefined): any {
-    if (!key) return this._userData;
-    return this._userData[key];
+    return key ? this._userData[key] : this._userData;
   }
 }

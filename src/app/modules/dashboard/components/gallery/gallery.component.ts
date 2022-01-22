@@ -204,7 +204,9 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
     this.contextMenuRef.show(event);
   }
 
-  selectItem(idx: number) {
+  selectItem(idx: number, event?: MouseEvent) {
+    if (event) event.preventDefault();
+
     this.mediaFiles[idx].customData = {
       ...(this.mediaFiles[idx].customData || {}),
       selected: !!!this.mediaFiles[idx]?.customData?.["selected"],

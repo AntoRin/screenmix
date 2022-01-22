@@ -146,7 +146,7 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
         command: async () => {
           await window.rendererProcessctrl
             .copyImageToClipboard(mediaFile)
-            .catch((e) => {
+            .catch((e: any) => {
               this._messageServ.add({
                 severity: "error",
                 detail: "There was an error copying the image to clipboard.",

@@ -152,6 +152,22 @@ export class DashboardComponent implements OnInit {
     ];
   }
 
+  addStatusItemsToMenu(currentItems: MenuItem[]): MenuItem[] {
+    return this.showVideoCaptureMarker
+      ? currentItems.concat(
+          {
+            separator: true,
+          },
+          {
+            label: "Recording",
+            icon: "pi pi-video",
+            styleClass: "bg-indigo-800",
+            title: "Recording in progress",
+          }
+        )
+      : currentItems;
+  }
+
   @HostListener("window:message", ["$event"])
   handleScreenEvents(event: MessageEvent) {
     switch (event.data) {

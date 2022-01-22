@@ -40,7 +40,7 @@
       *ngIf="mediaFile.type === 'video'"
       [src]="mediaFile.path"
       controls
-      (click)="selectMode && selectItem(mediaIdx, $event)"
+      (click)="selectMode ? selectItem(mediaIdx, $event) : true"
     ></video>
   </div>
 </div>

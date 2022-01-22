@@ -12,7 +12,11 @@
 ></p-confirmDialog>
 <div class="h-screen w-screen bg-gray-900 overflow-x-hidden">
   <p-menubar
-    [model]="gallerySelectMode ? menuItemsSelect : menuItemsDefault"
+    [model]="
+      gallerySelectMode
+        ? addStatusItemsToMenu(menuItemsSelect)
+        : addStatusItemsToMenu(menuItemsDefault)
+    "
     styleClass="fixed top-0 priority-menu-bar"
   >
     <ng-template pTemplate="end">
@@ -20,14 +24,6 @@
     </ng-template>
   </p-menubar>
   <div [ngStyle]="{ marginTop: '90px' }">
-    <div class="m-2 flex justify-end">
-      <p-tag
-        *ngIf="showVideoCaptureMarker"
-        icon="pi pi-times"
-        severity="danger"
-        value="Recording"
-      ></p-tag>
-    </div>
     <app-gallery
       (galleryEvent)="handleGalleryEvent($event)"
       *ngIf="currentTab === 'gallery'"

@@ -30,6 +30,7 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
   @Input() public mediaFiles: MediaFile[] = [];
   @Input() public actions$: Subject<string> | undefined;
   @Input() public selectMode: boolean = false;
+  @Input() public mediaFileFilter: MediaFile["type"] = "image";
 
   @Output() public itemSelectedEvent: EventEmitter<void> =
     new EventEmitter<void>();

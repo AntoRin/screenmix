@@ -25,6 +25,11 @@
         ? 'hover:border-solid hover:border-2 hover:border-blue-500 hover:object-right transition-all duration-200'
         : ''
     ]"
+    [style]="
+      mediaFileFilter === mediaFile.type
+        ? 'display: block'
+        : 'display: none !important'
+    "
   >
     <img
       *ngIf="mediaFile.type === 'image'"

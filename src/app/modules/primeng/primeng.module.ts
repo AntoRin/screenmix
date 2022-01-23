@@ -19,6 +19,7 @@ import { ContextMenuModule } from "primeng/contextmenu";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { ToastModule } from "primeng/toast";
 import { ConfirmationService, MessageService } from "primeng/api";
+import { SelectButtonModule } from "primeng/selectbutton";
 
 @NgModule({
   declarations: [],
@@ -42,6 +43,7 @@ import { ConfirmationService, MessageService } from "primeng/api";
     ContextMenuModule,
     ConfirmDialogModule,
     ToastModule,
+    SelectButtonModule,
   ],
   providers: [MessageService, ConfirmationService],
 })

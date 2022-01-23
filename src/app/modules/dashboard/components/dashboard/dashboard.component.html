@@ -20,13 +20,21 @@
     styleClass="fixed top-0 priority-menu-bar"
   >
     <ng-template pTemplate="end">
-      <input type="text" pInputText placeholder="Search" />
+      <p-selectButton
+        [options]="filterTypeOptions"
+        [(ngModel)]="mediaFileFilter"
+        optionLabel="label"
+        optionValue="value"
+        styleClass="p-button-sm text-sm p-0"
+        (onChange)="handleFilterTypeChange($event)"
+      ></p-selectButton>
     </ng-template>
   </p-menubar>
   <div [ngStyle]="{ marginTop: '90px' }">
     <app-gallery
       (galleryEvent)="handleGalleryEvent($event)"
       *ngIf="currentTab === 'gallery'"
+      [mediaFileFilter]="mediaFileFilter"
       [mediaFiles]="mediaFiles"
       [actions$]="galleryActions$"
       [selectMode]="gallerySelectMode"

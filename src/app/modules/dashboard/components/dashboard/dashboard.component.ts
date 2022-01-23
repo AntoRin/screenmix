@@ -25,8 +25,20 @@ export class DashboardComponent implements OnInit {
   public totalSelectedItems: number = 0;
 
   public menuItemsDefault: MenuItem[] = this.getMenuItemsDefault();
-
   public menuItemsSelect: MenuItem[] = this.getMenuItemsSelect();
+
+  public mediaFileFilter: MediaFile["type"] = "image";
+
+  public filterTypeOptions = [
+    {
+      label: "Images",
+      value: "image",
+    },
+    {
+      label: "Videos",
+      value: "video",
+    },
+  ];
 
   constructor(
     private _mediaStreamService: MediaStreamService,
@@ -166,6 +178,10 @@ export class DashboardComponent implements OnInit {
           }
         )
       : currentItems;
+  }
+
+  handleFilterTypeChange(event: any) {
+    this.mediaFileFilter = event.value;
   }
 
   @HostListener("window:message", ["$event"])

@@ -20,6 +20,7 @@ import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { ToastModule } from "primeng/toast";
 import { ConfirmationService, MessageService } from "primeng/api";
 import { SelectButtonModule } from "primeng/selectbutton";
+import { TooltipModule } from "primeng/tooltip";
 
 @NgModule({
   declarations: [],
@@ -44,6 +45,7 @@ import { SelectButtonModule } from "primeng/selectbutton";
     ConfirmDialogModule,
     ToastModule,
     SelectButtonModule,
+    TooltipModule,
   ],
   providers: [MessageService, ConfirmationService],
 })

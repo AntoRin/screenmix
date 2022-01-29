@@ -9,16 +9,31 @@
       class="p-button-sm"
     ></button>
   </div>
-  <div class="flex justify-around items-center flex-wrap">
-    <div *ngFor="let dir of screenmixDirectories; let dirIdx = index">
-      <div (click)="navigateToWorkspace(dirIdx)">
-        <p-card [style]="{ width: '300px' }" styleClass="p-card-shadow">
+  <div
+    class="grid m-2 gap-4"
+    style="
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      grid-auto-rows: 150px;
+    "
+  >
+    <div
+      *ngFor="let dir of screenmixDirectories; let dirIdx = index"
+      (click)="navigateToWorkspace(dirIdx)"
+      class="cursor-pointer"
+    >
+      <p-card
+        [style]="{ width: '100%', height: '100%' }"
+        styleClass="p-card-shadow"
+      >
+        <ng-template pTemplate="header">
           <span class="pi pi-folder text-4xl"></span>
-          <ng-template pTemplate="footer">
-            <div class="break-words bg-black">{{ dir }}</div>
-          </ng-template>
-        </p-card>
-      </div>
+        </ng-template>
+        <ng-template pTemplate="subheader">
+          <h1 class="text-xl" [pTooltip]="dir" tooltipPosition="top">
+            {{ baseName(dir) }}
+          </h1>
+        </ng-template>
+      </p-card>
     </div>
   </div>
 </div>

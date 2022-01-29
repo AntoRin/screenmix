@@ -64,4 +64,9 @@ export class StartupComponent implements OnInit {
       this._router.navigate(["dashboard"]);
     } catch (error) {}
   }
+
+  baseName(path: string) {
+    const splits = (path || "").split("\\");
+    return splits[splits.length - 1];
+  }
 }

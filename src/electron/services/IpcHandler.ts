@@ -138,12 +138,14 @@ export class IpcHandler implements RendererProcessCtx {
   async selectBaseDirectory() {
     const [selectedDir] = await this._selectDirectories();
 
-    await this._store.write({
-      screenmixDirectories: [
-        selectedDir,
-        ...(await this._store.read("screenmixDirectories")),
-      ],
-    });
+    if (selectedDir) {
+      await this._store.write({
+        screenmixDirectories: [
+          selectedDir,
+          ...(await this._store.read("screenmixDirectories")),
+        ],
+      });
+    }
 
     return selectedDir;
   }

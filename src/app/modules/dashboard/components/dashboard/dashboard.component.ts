@@ -1,4 +1,5 @@
 import { Component, HostListener, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
 import { MenuItem } from "primeng/api";
 import { Subject } from "rxjs";
 import { MediaFile, UserDataStore } from "../../../../../common/types";
@@ -41,6 +42,7 @@ export class DashboardComponent implements OnInit {
   ];
 
   constructor(
+    private _router: Router,
     private _mediaStreamService: MediaStreamService,
     private _progressBarService: ProgressBarService
   ) {}
@@ -102,6 +104,15 @@ export class DashboardComponent implements OnInit {
           {
             label: "Export",
             icon: "pi pi-fw pi-external-link",
+          },
+          {
+            separator: true,
+          },
+          {
+            label: "Folders",
+            command: () => {
+              this._router.navigate([""], { queryParams: { redirect: false } });
+            },
           },
         ],
       },

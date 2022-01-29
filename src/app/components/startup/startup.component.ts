@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { ProgressBarService } from "../../modules/shared/services/progress-bar.service";
 
 @Component({
@@ -12,18 +12,26 @@ export class StartupComponent implements OnInit {
 
   constructor(
     private _router: Router,
+    private _route: ActivatedRoute,
     private _progressBarService: ProgressBarService
   ) {}
 
   ngOnInit(): void {
-    this._progressBarService.toggleOn();
-    window.rendererProcessctrl
-      .getBaseDirectory()
-      .then((baseDir) => {
-        this._progressBarService.toggleOff();
-        if (baseDir) this._router.navigate(["dashboard"]);
-      })
-      .catch((e) => {});
+    this.getBaseDirectory();
+    this._route.queryParams.subscribe((q) => {
+      console.log(q);
+    });
+  }
+
+  async getBaseDirectory() {
+    try {
+      this._progressBarService.toggleOn();
+      const baseDir = await window.rendererProcessctrl.getBaseDirectory();
+      if (baseDir) this._router.navigate(["dashboard"]);
+    } catch (error) {
+    } finally {
+      this._progressBarService.toggleOff();
+    }
   }
 
   async selectDirectory(): Promise<void> {

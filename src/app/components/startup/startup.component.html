@@ -1,44 +1,24 @@
-<div class="h-screen flex flex-col justify-center items-center bg-gray-900">
-  <p-card
-    header="Welcome to Screenmix"
-    subheader="Basic Settings"
-    [style]="{
-      width: '600px',
-      height: '400px',
-      maxWidth: '80vw',
-      maxHeight: '75vh',
-      position: 'relative'
-    }"
-    styleClass="p-card-shadow"
-  >
-    <div class="flex flex-col items-center justify-center">
-      <h5 class="font-semibold">
-        Where do you want to save your screen shots?
-      </h5>
-      <button
-        pButton
-        styleClass="p-button-sm"
-        pRipple
-        type="button"
-        icon="pi pi-file-o"
-        class="p-button-outlined m-4 w-full"
-        (click)="selectDirectory()"
-      >
-        Choose Directory
-      </button>
-      <h3 class="caret-blue-800">{{ selectedDirectory }}</h3>
-    </div>
-    <ng-template pTemplate="footer">
-      <div class="flex justify-end absolute bottom-2 right-2">
-        <button
-          pButton
-          label="Save"
-          icon="pi pi-check"
-          iconPos="right"
-          class="p-button-sm"
-          (click)="handleConfigSubmit()"
-        ></button>
+<div class="h-screen bg-gray-900 text-white">
+  <div class="flex justify-end">
+    <button
+      (click)="selectDirectory()"
+      pButton
+      pRipple
+      type="button"
+      label="Add"
+      class="p-button-sm"
+    ></button>
+  </div>
+  <div class="flex justify-around items-center flex-wrap">
+    <div *ngFor="let dir of screenmixDirectories; let dirIdx = index">
+      <div (click)="navigateToWorkspace(dirIdx)">
+        <p-card [style]="{ width: '300px' }" styleClass="p-card-shadow">
+          <span class="pi pi-folder text-4xl"></span>
+          <ng-template pTemplate="footer">
+            <div class="break-words bg-black">{{ dir }}</div>
+          </ng-template>
+        </p-card>
       </div>
-    </ng-template>
-  </p-card>
+    </div>
+  </div>
 </div>

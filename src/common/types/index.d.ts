@@ -30,6 +30,8 @@ export interface RendererProcessCtx {
   selectBaseDirectory(...args: any[]): Promise<string | undefined>;
   getDirectorySelection(...args: any[]): Promise<string>;
   getBaseDirectory(...args: any[]): Promise<string | undefined>;
+  setBaseDirectory(dir: string): Promise<void>;
+  getScreenmixDirectories(): Promise<string[]>;
   listMediaPaths(...args: any[]): Promise<MediaFile[]>;
   getDesktopSourceId(currentWindow?: boolean): Promise<string | undefined>;
   saveCapture(data: CaptureData): Promise<any>;
@@ -54,7 +56,8 @@ export type UserDataField =
   | "scHotKey"
   | "scHotKeyCurrentWindow"
   | "ssResolution"
-  | "scResolution";
+  | "scResolution"
+  | "screenmixDirectories";
 
 export type UserDataStore = Partial<Record<UserDataField, any>>;
 

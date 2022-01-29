@@ -29,6 +29,10 @@ class Preload {
       getDirectorySelection: () =>
         ipcRenderer.invoke("ipc:getDirectorySelection"),
       getBaseDirectory: () => ipcRenderer.invoke("ipc:getBaseDirectory"),
+      setBaseDirectory: (dir: string) =>
+        ipcRenderer.invoke("ipc:setBaseDirectory", dir),
+      getScreenmixDirectories: () =>
+        ipcRenderer.invoke("ipc:getScreenmixDirectories"),
       listMediaPaths: (baseDirectory: string) =>
         ipcRenderer.invoke("ipc:listMediaPaths", baseDirectory),
       getDesktopSourceId: (currentWindow?: boolean) =>

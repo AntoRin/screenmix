@@ -39,6 +39,15 @@ export class IpcHandler implements RendererProcessCtx {
 
     ipcMain.handle("ipc:getBaseDirectory", this.getBaseDirectory.bind(this));
 
+    ipcMain.handle("ipc:setBaseDirectory", (_, dir: string) =>
+      this.setBaseDirectory(dir)
+    );
+
+    ipcMain.handle(
+      "ipc:getScreenmixDirectories",
+      this.getScreenmixDirectories.bind(this)
+    );
+
     ipcMain.handle("ipc:listMediaPaths", (_, baseDir: string | undefined) =>
       this.listMediaPaths(baseDir)
     );
@@ -116,11 +125,24 @@ export class IpcHandler implements RendererProcessCtx {
     return (await this._selectDirectories())[0];
   }
 
+  async setBaseDirectory(dir: string) {
+    try {
+      this._store.write({
+        baseDirectory: dir,
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async selectBaseDirectory() {
     const [selectedDir] = await this._selectDirectories();
 
     await this._store.write({
-      baseDirectory: selectedDir,
+      screenmixDirectories: [
+        selectedDir,
+        ...(await this._store.read("screenmixDirectories")),
+      ],
     });
 
     return selectedDir;
@@ -129,6 +151,14 @@ export class IpcHandler implements RendererProcessCtx {
   async getBaseDirectory() {
     try {
       return await this._store.read("baseDirectory");
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getScreenmixDirectories() {
+    try {
+      return await this._store.read("screenmixDirectories");
     } catch (error) {
       throw error;
     }

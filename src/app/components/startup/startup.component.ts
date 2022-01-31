@@ -8,7 +8,8 @@ import { ProgressBarService } from "../../modules/shared/services/progress-bar.s
   styleUrls: ["./startup.component.css"],
 })
 export class StartupComponent implements OnInit {
-  public screenmixDirectories: string[] = [];
+  public mediaDirectories: string[] = [];
+  public baseDirectory: string | undefined;
 
   constructor(
     private _router: Router,
@@ -21,26 +22,26 @@ export class StartupComponent implements OnInit {
       const redirect =
         q?.["redirect"] === true || q?.["redirect"] === undefined;
       this.getBaseDirectory(redirect);
-      if (!redirect) this.getScreenmixDirectories();
+      if (!redirect) this.getMediaDirectories();
     });
   }
 
   async getBaseDirectory(redirect: boolean = true) {
     try {
       this._progressBarService.toggleOn();
-      const baseDir = await window.rendererProcessctrl.getBaseDirectory();
-      if (baseDir && redirect) this._router.navigate(["dashboard"]);
+      this.baseDirectory = await window.rendererProcessctrl.getBaseDirectory();
+      if (this.baseDirectory && redirect) this._router.navigate(["dashboard"]);
     } catch (error) {
     } finally {
       this._progressBarService.toggleOff();
     }
   }
 
-  async getScreenmixDirectories() {
+  async getMediaDirectories() {
     try {
       this._progressBarService.toggleOn();
-      this.screenmixDirectories =
-        await window.rendererProcessctrl.getScreenmixDirectories();
+      this.mediaDirectories =
+        await window.rendererProcessctrl.getMediaDirectories();
     } catch (error) {
     } finally {
       this._progressBarService.toggleOff();
@@ -49,8 +50,8 @@ export class StartupComponent implements OnInit {
 
   async selectDirectory(): Promise<void> {
     try {
-      await window.rendererProcessctrl.selectBaseDirectory();
-      this.getScreenmixDirectories();
+      await window.rendererProcessctrl.addMediaDirectory();
+      this.getMediaDirectories();
     } catch (error) {
       console.log(error);
     }
@@ -59,9 +60,16 @@ export class StartupComponent implements OnInit {
   async navigateToWorkspace(idx: number) {
     try {
       await window.rendererProcessctrl.setBaseDirectory(
-        this.screenmixDirectories[idx]
+        this.mediaDirectories[idx]
       );
       this._router.navigate(["dashboard"]);
+    } catch (error) {}
+  }
+
+  async removeMediaDir(dir: string) {
+    try {
+      await window.rendererProcessctrl.removeMediaDirectory(dir);
+      this.getMediaDirectories();
     } catch (error) {}
   }
 

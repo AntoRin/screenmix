@@ -32,10 +32,7 @@ export class IpcHandler implements RendererProcessCtx {
   }
 
   public initializeIpcListeners() {
-    ipcMain.handle(
-      "ipc:selectBaseDirectory",
-      this.selectBaseDirectory.bind(this)
-    );
+    ipcMain.handle("ipc:addMediaDirectory", this.addMediaDirectory.bind(this));
 
     ipcMain.handle("ipc:getBaseDirectory", this.getBaseDirectory.bind(this));
 
@@ -44,8 +41,12 @@ export class IpcHandler implements RendererProcessCtx {
     );
 
     ipcMain.handle(
-      "ipc:getScreenmixDirectories",
-      this.getScreenmixDirectories.bind(this)
+      "ipc:getMediaDirectories",
+      this.getMediaDirectories.bind(this)
+    );
+
+    ipcMain.handle("ipc:removeMediaDirectory", (_, path: string) =>
+      this.removeMediaDirectory(path)
     );
 
     ipcMain.handle("ipc:listMediaPaths", (_, baseDir: string | undefined) =>
@@ -87,16 +88,16 @@ export class IpcHandler implements RendererProcessCtx {
     );
   }
 
-  async registerGlobalShortcuts() {
+  registerGlobalShortcuts() {
     try {
       this.unregisterGlobalShortcuts();
 
-      const ssHotKey: string = await this._store.read("ssHotKey");
-      const scHotKey: string = await this._store.read("scHotKey");
-      const ssHotKeyCurrentWindow: string = await this._store.read(
+      const ssHotKey: string = this._store.read("ssHotKey");
+      const scHotKey: string = this._store.read("scHotKey");
+      const ssHotKeyCurrentWindow: string = this._store.read(
         "ssHotKeyCurrentWindow"
       );
-      const scHotKeyCurrentWindow: string = await this._store.read(
+      const scHotKeyCurrentWindow: string = this._store.read(
         "scHotKeyCurrentWindow"
       );
 
@@ -135,32 +136,51 @@ export class IpcHandler implements RendererProcessCtx {
     }
   }
 
-  async selectBaseDirectory() {
+  async addMediaDirectory() {
     const [selectedDir] = await this._selectDirectories();
 
     if (selectedDir) {
-      await this._store.write({
-        screenmixDirectories: [
-          selectedDir,
-          ...(await this._store.read("screenmixDirectories")),
-        ],
-      });
+      const prevDirs: string[] = this._store.read("mediaDirectories");
+
+      if (!prevDirs.includes(selectedDir)) {
+        await this._store.write({
+          mediaDirectories: [selectedDir, ...prevDirs],
+        });
+      }
     }
 
     return selectedDir;
   }
 
-  async getBaseDirectory() {
+  async removeMediaDirectory(path: string) {
     try {
-      return await this._store.read("baseDirectory");
+      await this._store.write({
+        mediaDirectories: (
+          this._store.read("mediaDirectories") as string[]
+        ).filter((p) => p !== path),
+      });
+
+      if (this._store.read("baseDirectory") === "path") {
+        await this._store.write({
+          baseDirectory: null,
+        });
+      }
     } catch (error) {
       throw error;
     }
   }
 
-  async getScreenmixDirectories() {
+  async getBaseDirectory() {
     try {
-      return await this._store.read("screenmixDirectories");
+      return this._store.read("baseDirectory");
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getMediaDirectories() {
+    try {
+      return this._store.read("mediaDirectories");
     } catch (error) {
       throw error;
     }
@@ -181,7 +201,7 @@ export class IpcHandler implements RendererProcessCtx {
   async listMediaPaths(baseDirectory?: string): Promise<MediaFile[]> {
     try {
       if (!baseDirectory) {
-        baseDirectory = await this._store.read("baseDirectory");
+        baseDirectory = this._store.read("baseDirectory");
       }
 
       if (!baseDirectory) return [];
@@ -294,7 +314,7 @@ export class IpcHandler implements RendererProcessCtx {
     try {
       const base64Data = captureData.dataUrl.split(";base64,")[1];
 
-      const baseDir = await this._store.read("baseDirectory");
+      const baseDir = this._store.read("baseDirectory");
 
       const fileName =
         captureData.mode === "image"

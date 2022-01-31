@@ -25,14 +25,15 @@ class Preload {
 
   get exposedApis(): RendererProcessCtx {
     return {
-      selectBaseDirectory: () => ipcRenderer.invoke("ipc:selectBaseDirectory"),
+      addMediaDirectory: () => ipcRenderer.invoke("ipc:addMediaDirectory"),
+      removeMediaDirectory: (path: string) =>
+        ipcRenderer.invoke("ipc:removeMediaDirectory", path),
       getDirectorySelection: () =>
         ipcRenderer.invoke("ipc:getDirectorySelection"),
       getBaseDirectory: () => ipcRenderer.invoke("ipc:getBaseDirectory"),
       setBaseDirectory: (dir: string) =>
         ipcRenderer.invoke("ipc:setBaseDirectory", dir),
-      getScreenmixDirectories: () =>
-        ipcRenderer.invoke("ipc:getScreenmixDirectories"),
+      getMediaDirectories: () => ipcRenderer.invoke("ipc:getMediaDirectories"),
       listMediaPaths: (baseDirectory: string) =>
         ipcRenderer.invoke("ipc:listMediaPaths", baseDirectory),
       getDesktopSourceId: (currentWindow?: boolean) =>

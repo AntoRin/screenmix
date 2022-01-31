@@ -27,8 +27,8 @@ export class Store {
 
   private get defaults(): UserDataStore {
     return {
-      baseDirectory: app.getPath("home"),
-      screenmixDirectories: [],
+      baseDirectory: null,
+      mediaDirectories: [],
       scHotKey: "Alt+Home",
       scHotKeyCurrentWindow: "Alt+Delete",
       ssHotKey: "Alt+Insert",

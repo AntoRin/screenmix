@@ -27,17 +27,18 @@ export interface MediaFile {
 }
 
 export interface RendererProcessCtx {
-  selectBaseDirectory(...args: any[]): Promise<string | undefined>;
+  addMediaDirectory(...args: any[]): Promise<string | undefined>;
+  removeMediaDirectory(path: string): Promise<void>;
   getDirectorySelection(...args: any[]): Promise<string>;
   getBaseDirectory(...args: any[]): Promise<string | undefined>;
   setBaseDirectory(dir: string): Promise<void>;
-  getScreenmixDirectories(): Promise<string[]>;
+  getMediaDirectories(): Promise<string[]>;
   listMediaPaths(...args: any[]): Promise<MediaFile[]>;
   getDesktopSourceId(currentWindow?: boolean): Promise<string | undefined>;
   saveCapture(data: CaptureData): Promise<any>;
   saveChanges(data: UserDataStore): Promise<void>;
   getAllPreferences(): Promise<UserDataStore>;
-  registerGlobalShortcuts(): Promise<void>;
+  registerGlobalShortcuts(): void | Promise<void>;
   saveEditedImage(data: CaptureData): Promise<void>;
   deleteMediaFiles(files: string[]): Promise<void>;
   copyImageToClipboard(file: MediaFile): Promise<void>;
@@ -57,7 +58,7 @@ export type UserDataField =
   | "scHotKeyCurrentWindow"
   | "ssResolution"
   | "scResolution"
-  | "screenmixDirectories";
+  | "mediaDirectories";
 
 export type UserDataStore = Partial<Record<UserDataField, any>>;
 

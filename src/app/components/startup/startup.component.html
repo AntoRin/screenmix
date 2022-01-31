@@ -1,39 +1,71 @@
-<div class="h-screen bg-gray-900 text-white">
-  <div class="flex justify-end">
+<div class="min-h-screen bg-gray-900 text-white">
+  <div class="flex justify-start">
     <button
       (click)="selectDirectory()"
       pButton
       pRipple
       type="button"
       label="Add"
-      class="p-button-sm"
+      icon="pi pi-plus"
+      iconPos="right"
+      class="p-button-sm p-button-outlined m-3"
     ></button>
   </div>
-  <div
-    class="grid m-2 gap-4"
-    style="
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      grid-auto-rows: 150px;
-    "
-  >
+  <div class="mx-auto container py-20 px-6">
     <div
-      *ngFor="let dir of screenmixDirectories; let dirIdx = index"
-      (click)="navigateToWorkspace(dirIdx)"
-      class="cursor-pointer"
+      class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
     >
-      <p-card
-        [style]="{ width: '100%', height: '100%' }"
-        styleClass="p-card-shadow"
+      <div
+        class="rounded"
+        *ngFor="let dir of mediaDirectories; let dirIdx = index"
       >
-        <ng-template pTemplate="header">
-          <span class="pi pi-folder text-4xl"></span>
-        </ng-template>
-        <ng-template pTemplate="subheader">
-          <h1 class="text-xl" [pTooltip]="dir" tooltipPosition="top">
-            {{ baseName(dir) }}
-          </h1>
-        </ng-template>
-      </p-card>
+        <div
+          class="w-full h-56 flex flex-col justify-between items-start bg-gray-900 rounded-lg border mb-6 py-5 px-2"
+          [ngClass]="
+            baseDirectory === dir ? 'border-blue-300' : 'border-[#34475e]'
+          "
+        >
+          <div (click)="navigateToWorkspace(dirIdx)" class="cursor-pointer">
+            <h4 class="text-white font-bold mb-3">{{ baseName(dir) }}</h4>
+          </div>
+          <div
+            class="w-full flex flex-col items-start cursor-pointer"
+            (click)="navigateToWorkspace(dirIdx)"
+          >
+            <div
+              class="mb-3 border border-gray-800 rounded-full px-3 py-1 text-white text-xs flex items-center w-[75%]"
+              [pTooltip]="dir"
+              tooltipPosition="top"
+            >
+              <button
+                pButton
+                pRipple
+                type="button"
+                icon="pi pi-folder-open"
+                class="p-button-rounded p-button-secondary p-button-text"
+              ></button>
+              <p
+                class="ml-2 overflow-ellipsis overflow-hidden whitespace-nowrap"
+              >
+                {{ dir }}
+              </p>
+            </div>
+          </div>
+          <p-divider></p-divider>
+          <div
+            class="flex items-center justify-end text-gray-800 w-full p-[5px]"
+          >
+            <button
+              pButton
+              pRipple
+              type="button"
+              icon="pi pi-trash"
+              class="p-button-rounded p-button-danger p-button-outlined"
+              (click)="removeMediaDir(dir)"
+            ></button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

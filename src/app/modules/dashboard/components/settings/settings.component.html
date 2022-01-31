@@ -7,8 +7,8 @@
             *ngTemplateOutlet="
               settingsDetails;
               context: {
-                title: 'Directory',
-                description: 'Choose a directory to work with'
+                title: 'Current Directory',
+                description: 'Here\'s where your files are saved'
               }
             "
           >
@@ -20,10 +20,11 @@
                 pButton
                 pRipple
                 icon="pi pi-folder"
-                (click)="updateDirectory()"
+                disabled
               ></button>
               <input
                 type="text"
+                disabled
                 pInputText
                 [(ngModel)]="configSettings.baseDirectory"
               />

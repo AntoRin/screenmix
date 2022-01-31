@@ -68,6 +68,13 @@ export class DashboardComponent implements OnInit {
         command: this.changeTab.bind(this, "gallery"),
       },
       {
+        label: "Folders",
+        icon: "pi pi-folder",
+        command: () => {
+          this._router.navigate([""], { queryParams: { redirect: false } });
+        },
+      },
+      {
         label: "File",
         icon: "pi pi-fw pi-file",
         items: [
@@ -108,48 +115,12 @@ export class DashboardComponent implements OnInit {
           {
             separator: true,
           },
-          {
-            label: "Folders",
-            command: () => {
-              this._router.navigate([""], { queryParams: { redirect: false } });
-            },
-          },
         ],
       },
       {
         label: "Settings",
         icon: "pi pi-fw pi-cog",
         command: this.changeTab.bind(this, "settings"),
-      },
-      {
-        label: "Events",
-        icon: "pi pi-fw pi-calendar",
-        items: [
-          {
-            label: "Edit",
-            icon: "pi pi-fw pi-pencil",
-            items: [
-              {
-                label: "Save",
-                icon: "pi pi-fw pi-calendar-plus",
-              },
-              {
-                label: "Delete",
-                icon: "pi pi-fw pi-calendar-minus",
-              },
-            ],
-          },
-          {
-            label: "Archieve",
-            icon: "pi pi-fw pi-calendar-times",
-            items: [
-              {
-                label: "Remove",
-                icon: "pi pi-fw pi-calendar-minus",
-              },
-            ],
-          },
-        ],
       },
     ];
   }

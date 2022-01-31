@@ -50,20 +50,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.configSettings = JSON.parse(JSON.stringify(this.PREFERENCES));
   }
 
-  async updateDirectory() {
-    try {
-      const newDirectory =
-        await window.rendererProcessctrl.getDirectorySelection();
-
-      if (newDirectory) this.configSettings.baseDirectory = newDirectory;
-    } catch (error) {
-      this._messageServ.add({
-        severity: "error",
-        detail: "There was an error updating directory",
-      });
-    }
-  }
-
   listenForKeybinds() {
     window.addEventListener("keydown", this.handleNewKeybind);
   }
@@ -145,6 +131,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
         severity: "success",
         detail: "Settings updated successfully",
       });
+      this.tabChangeEvent.emit("gallery");
     } catch (error) {
       this._messageServ.add({
         severity: "error",
@@ -155,6 +142,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   private _settingsUpdated(): boolean {
     for (const prop of Object.getOwnPropertyNames(this.PREFERENCES)) {
+      if (prop === "mediaDirectories") continue;
+
       if (
         this.PREFERENCES[prop as UserDataField] !==
         this.configSettings[prop as UserDataField]

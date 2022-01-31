@@ -28,7 +28,7 @@ class Screenmix {
         }
       });
 
-      await this._ipcHandler.registerGlobalShortcuts();
+      this._ipcHandler.registerGlobalShortcuts();
 
       this._ipcHandler.initializeIpcListeners();
 
@@ -37,7 +37,9 @@ class Screenmix {
       });
 
       app.on("will-quit", () => {
-        if (this._ipcHandler) this._ipcHandler.unregisterGlobalShortcuts();
+        if (this._ipcHandler) {
+          this._ipcHandler.unregisterGlobalShortcuts();
+        }
       });
     } catch (error) {
       throw error;

@@ -101,14 +101,6 @@ export class DashboardComponent implements OnInit {
             separator: true,
           },
           {
-            label: "Delete",
-            icon: "pi pi-fw pi-trash",
-            command: this.handleTopMenuSelection.bind(this, "delete"),
-          },
-          {
-            separator: true,
-          },
-          {
             label: "Export",
             icon: "pi pi-fw pi-external-link",
           },

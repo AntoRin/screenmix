@@ -11,6 +11,8 @@ import {
 } from "electron";
 import {
   CaptureData,
+  IpcApi,
+  IpcChannel,
   MediaFile,
   RendererProcessCtx,
   UserDataStore,
@@ -18,6 +20,7 @@ import {
 import { Store } from "./Store";
 import { Dirent, promises as fsp, statSync } from "fs";
 import activeWin from "active-win";
+import { Channels } from "../constants";
 
 export class IpcHandler implements RendererProcessCtx {
   private _store: Store;
@@ -28,65 +31,22 @@ export class IpcHandler implements RendererProcessCtx {
   constructor(mainWindow: BrowserWindow) {
     this._store = new Store();
     this._mainWindow = mainWindow;
-    this._imageExtensions = [".jpg", ".png"];
+    this._imageExtensions = [".jpg", ".jpeg", ".png"];
     this._videoExtensions = [".mp4"];
   }
 
   public initializeIpcListeners() {
-    ipcMain.handle("ipc:addMediaDirectory", this.addMediaDirectory.bind(this));
+    Channels.forEach((channel: IpcChannel) => {
+      ipcMain.handle(channel, (e, ...args: any[]) => {
+        const method: IpcApi = channel.split(":")[1] as IpcApi;
 
-    ipcMain.handle("ipc:getBaseDirectory", this.getBaseDirectory.bind(this));
+        if (!this[method] || typeof this[method] !== "function") {
+          throw new Error("Handler not registered");
+        }
 
-    ipcMain.handle("ipc:setBaseDirectory", (_, dir: string) =>
-      this.setBaseDirectory(dir)
-    );
-
-    ipcMain.handle(
-      "ipc:getMediaDirectories",
-      this.getMediaDirectories.bind(this)
-    );
-
-    ipcMain.handle("ipc:removeMediaDirectory", (_, path: string) =>
-      this.removeMediaDirectory(path)
-    );
-
-    ipcMain.handle("ipc:listMediaPaths", (_, baseDir: string | undefined) =>
-      this.listMediaPaths(baseDir)
-    );
-
-    ipcMain.handle("ipc:getDesktopSourceId", (_, currentWindow?: boolean) =>
-      this.getDesktopSourceId(currentWindow)
-    );
-
-    ipcMain.handle("ipc:saveCapturedScreenshot", (_, data: CaptureData) =>
-      this.saveCapture(data)
-    );
-
-    ipcMain.handle("ipc:getAllPreferences", this.getAllPreferences.bind(this));
-
-    ipcMain.handle(
-      "ipc:getDirectorySelection",
-      this.getDirectorySelection.bind(this)
-    );
-
-    ipcMain.handle("ipc:saveChanges", (_, data) => this.saveChanges(data));
-
-    ipcMain.handle(
-      "ipc:registerGlobalShortcuts",
-      this.registerGlobalShortcuts.bind(this)
-    );
-
-    ipcMain.handle("ipc:saveEditedImage", (_, data) =>
-      this.saveEditedImage(data)
-    );
-
-    ipcMain.handle("ipc:deleteMediaFiles", (_, files: string[]) =>
-      this.deleteMediaFiles(files)
-    );
-
-    ipcMain.handle("ipc:copyImageToClipboard", (_, file: MediaFile) =>
-      this.copyImageToClipboard(file)
-    );
+        return (this[method] as Function).apply(this, args);
+      });
+    });
   }
 
   registerGlobalShortcuts() {

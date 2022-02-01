@@ -1,7 +1,11 @@
 declare global {
   interface Window {
-    rendererProcessctrl: RendererProcessCtx;
+    rendererProcessCtrl: RendererExposedApi;
   }
+}
+
+export interface RendererExposedApi {
+  invoke(channel: IpcChannel, data?: any): Promise<any> | undefined;
 }
 
 export type CaptureMode = "image" | "video";
@@ -43,6 +47,10 @@ export interface RendererProcessCtx {
   deleteMediaFiles(files: string[]): Promise<void>;
   copyImageToClipboard(file: MediaFile): Promise<void>;
 }
+
+export type IpcApi = Required<keyof RendererProcessCtx>;
+
+export type IpcChannel = `ipc:${IpcApi}`;
 
 export type KeybindType =
   | "ssHotKey"

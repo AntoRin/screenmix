@@ -29,7 +29,9 @@ export class StartupComponent implements OnInit {
   async getBaseDirectory(redirect: boolean = true) {
     try {
       this._progressBarService.toggleOn();
-      this.baseDirectory = await window.rendererProcessctrl.getBaseDirectory();
+      this.baseDirectory = await window.rendererProcessCtrl.invoke(
+        "ipc:getBaseDirectory"
+      );
       if (this.baseDirectory && redirect) this._router.navigate(["dashboard"]);
     } catch (error) {
     } finally {
@@ -40,8 +42,9 @@ export class StartupComponent implements OnInit {
   async getMediaDirectories() {
     try {
       this._progressBarService.toggleOn();
-      this.mediaDirectories =
-        await window.rendererProcessctrl.getMediaDirectories();
+      this.mediaDirectories = await window.rendererProcessCtrl.invoke(
+        "ipc:getMediaDirectories"
+      );
     } catch (error) {
     } finally {
       this._progressBarService.toggleOff();
@@ -50,7 +53,7 @@ export class StartupComponent implements OnInit {
 
   async selectDirectory(): Promise<void> {
     try {
-      await window.rendererProcessctrl.addMediaDirectory();
+      await window.rendererProcessCtrl.invoke("ipc:addMediaDirectory");
       this.getMediaDirectories();
     } catch (error) {
       console.log(error);
@@ -59,7 +62,8 @@ export class StartupComponent implements OnInit {
 
   async navigateToWorkspace(idx: number) {
     try {
-      await window.rendererProcessctrl.setBaseDirectory(
+      await window.rendererProcessCtrl.invoke(
+        "ipc:setBaseDirectory",
         this.mediaDirectories[idx]
       );
       this._router.navigate(["dashboard"]);
@@ -68,7 +72,7 @@ export class StartupComponent implements OnInit {
 
   async removeMediaDir(dir: string) {
     try {
-      await window.rendererProcessctrl.removeMediaDirectory(dir);
+      await window.rendererProcessCtrl.invoke("ipc:removeMediaDirectory", dir);
       this.getMediaDirectories();
     } catch (error) {}
   }

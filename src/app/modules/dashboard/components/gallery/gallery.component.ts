@@ -145,9 +145,9 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
       {
         label: "Copy",
         command: async () => {
-          await window.rendererProcessctrl
-            .copyImageToClipboard(mediaFile)
-            .catch((e: any) => {
+          await window.rendererProcessCtrl
+            .invoke("ipc:copyImageToClipboard", mediaFile)
+            ?.catch((e: any) => {
               this._messageServ.add({
                 severity: "error",
                 detail: "There was an error copying the image to clipboard.",
@@ -347,7 +347,7 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
         (f) => f.name === this.spotlightImage?.name
       );
 
-      await window.rendererProcessctrl.saveEditedImage({
+      await window.rendererProcessCtrl.invoke("ipc:saveEditedImage", {
         dataUrl: editedImgUrl,
         mode: "image",
         name: this.mediaFiles[currentIdx].name,
@@ -385,7 +385,8 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
         message: `Are you sure you want to delete ${selectedItems.length} selected file(s)?`,
         accept: async () => {
           try {
-            await window.rendererProcessctrl.deleteMediaFiles(
+            await window.rendererProcessCtrl.invoke(
+              "ipc:deleteMediaFiles",
               selectedItems.map((f) => f.name)
             );
             this._messageServ.add({

@@ -42,7 +42,8 @@ export class MediaStreamService {
         throw new Error("INVALID_RESOLUTION");
       }
 
-      const srcId = await window.rendererProcessctrl.getDesktopSourceId(
+      const srcId = await window.rendererProcessCtrl.invoke(
+        "ipc:getDesktopSourceId",
         currentWindow
       );
 
@@ -124,7 +125,7 @@ export class MediaStreamService {
 
       this.videoCaptureInProgress = false;
 
-      await window.rendererProcessctrl.saveCapture({
+      await window.rendererProcessCtrl.invoke("ipc:saveCapture", {
         dataUrl,
         mode: "video",
       });
@@ -161,7 +162,7 @@ export class MediaStreamService {
         videoElement.remove();
         canvas.remove();
 
-        await window.rendererProcessctrl.saveCapture({
+        await window.rendererProcessCtrl.invoke("ipc:saveCapture", {
           dataUrl: imageDataUrl,
           mode: "image",
         });

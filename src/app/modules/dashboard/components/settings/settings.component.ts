@@ -124,8 +124,12 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   async saveSettings() {
     try {
-      await window.rendererProcessctrl.saveChanges(this.configSettings);
-      await window.rendererProcessctrl.registerGlobalShortcuts();
+      await window.rendererProcessCtrl.invoke(
+        "ipc:saveChanges",
+        this.configSettings
+      );
+      await window.rendererProcessCtrl.invoke("ipc:registerGlobalShortcuts");
+
       this.settingsUpdateEvent.emit();
       this._messageServ.add({
         severity: "success",

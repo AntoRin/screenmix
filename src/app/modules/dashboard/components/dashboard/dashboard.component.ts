@@ -223,7 +223,9 @@ export class DashboardComponent implements OnInit {
   async getAllPreferences() {
     try {
       this._progressBarService.toggleOn();
-      this.PREFERENCES = await window.rendererProcessctrl.getAllPreferences();
+      this.PREFERENCES = await window.rendererProcessCtrl.invoke(
+        "ipc:getAllPreferences"
+      );
     } catch (error) {
     } finally {
       this._progressBarService.toggleOff();
@@ -233,7 +235,8 @@ export class DashboardComponent implements OnInit {
   async getGallery() {
     try {
       this._progressBarService.toggleOn();
-      this.mediaFiles = await window.rendererProcessctrl.listMediaPaths(
+      this.mediaFiles = await window.rendererProcessCtrl.invoke(
+        "ipc:listMediaPaths",
         this.PREFERENCES.baseDirectory
       );
     } catch (error) {

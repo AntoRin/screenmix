@@ -17,6 +17,7 @@ import {
 } from "../../common/types";
 import { Store } from "./Store";
 import { Dirent, promises as fsp, statSync } from "fs";
+import activeWin from "active-win";
 
 export class IpcHandler implements RendererProcessCtx {
   private _store: Store;
@@ -296,7 +297,17 @@ export class IpcHandler implements RendererProcessCtx {
       });
 
       const requiredSource = currentWindow
-        ? sources[1]
+        ? await (async () => {
+            try {
+              const activeSource = await activeWin();
+              if (!activeSource) return undefined;
+              return sources.find(
+                (s) => s.id.indexOf(String(activeSource.id)) !== -1
+              );
+            } catch (error) {
+              return undefined;
+            }
+          })()
         : sources.find((s) => s.name === "Entire Screen");
 
       return requiredSource?.id;

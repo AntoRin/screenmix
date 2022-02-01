@@ -33,6 +33,7 @@
     "@angular/platform-browser": "~13.0.0",
     "@angular/platform-browser-dynamic": "~13.0.0",
     "@angular/router": "~13.0.0",
+    "active-win": "^7.7.1",
     "cropperjs": "^1.5.12",
     "electron-squirrel-startup": "^1.0.0",
     "exiftool-vendored": "^15.9.1",

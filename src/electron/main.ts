@@ -9,7 +9,7 @@ if (ess) app.quit();
 class Screenmix {
   private _mainWindow: BrowserWindow | undefined;
   private _ipcHandler: IpcHandler | undefined;
-  private _tray: Tray | undefined;
+  private _tray: Tray | null = null;
   private _isQuitting: boolean = false;
 
   constructor() {}
@@ -105,6 +105,7 @@ class Screenmix {
     ]);
 
     this._tray.setContextMenu(ctxMenu);
+    this._tray.setToolTip("screenmix");
     this._tray.on("click", this._mainWindow.show.bind(this._mainWindow));
   }
 }

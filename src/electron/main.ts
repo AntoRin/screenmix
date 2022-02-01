@@ -1,5 +1,5 @@
 import path from "path";
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, Menu, Tray } from "electron";
 import { IpcHandler } from "./services/IpcHandler";
 
 import ess from "electron-squirrel-startup";
@@ -9,6 +9,8 @@ if (ess) app.quit();
 class Screenmix {
   private _mainWindow: BrowserWindow | undefined;
   private _ipcHandler: IpcHandler | undefined;
+  private _tray: Tray | undefined;
+  private _isQuitting: boolean = false;
 
   constructor() {}
 
@@ -31,6 +33,8 @@ class Screenmix {
       this._ipcHandler.registerGlobalShortcuts();
 
       this._ipcHandler.initializeIpcListeners();
+
+      this._createTray();
 
       app.on("window-all-closed", () => {
         if (process.platform !== "darwin") app.quit();
@@ -59,6 +63,49 @@ class Screenmix {
     });
 
     this._mainWindow.loadFile(path.join(__dirname, "../index.html"));
+
+    this._mainWindow.on("close", (event) => {
+      if (this._isQuitting) return true;
+
+      event.preventDefault();
+      this._mainWindow?.hide();
+      return false;
+    });
+  }
+
+  private _createTray() {
+    if (!this._ipcHandler || !this._mainWindow) return;
+
+    this._tray = new Tray(
+      path.join(__dirname, "../assets", "logo", "logo_jpeg.jpeg")
+    );
+
+    const ctxMenu = Menu.buildFromTemplate([
+      {
+        label: "Take Screenshot",
+        type: "normal",
+        click: this._ipcHandler.takeScreenshot.bind(this._ipcHandler),
+      },
+      {
+        label: "Start Recording",
+        type: "normal",
+        click: this._ipcHandler.captureScreen.bind(this._ipcHandler),
+      },
+      {
+        type: "separator",
+      },
+      {
+        label: "Exit",
+        type: "normal",
+        click: () => {
+          this._isQuitting = true;
+          app.quit();
+        },
+      },
+    ]);
+
+    this._tray.setContextMenu(ctxMenu);
+    this._tray.on("click", this._mainWindow.show.bind(this._mainWindow));
   }
 }
 

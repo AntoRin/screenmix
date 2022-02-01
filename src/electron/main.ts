@@ -55,12 +55,7 @@ class Screenmix {
         preload: path.join(__dirname, "preload"),
         contextIsolation: true,
       },
-      icon: path.join(
-        __dirname,
-        "../assets",
-        "logo",
-        "logo_transparent_png.png"
-      ),
+      icon: path.join(__dirname, "../assets", "logo", "logo_jpeg.jpeg"),
     });
 
     this._mainWindow.loadFile(path.join(__dirname, "../index.html"));

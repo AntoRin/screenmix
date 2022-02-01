@@ -189,6 +189,16 @@ export class DashboardComponent implements OnInit {
           true
         );
 
+      case "fromMain:newImage":
+        this.getGallery();
+        this.mediaFileFilter = "image";
+        return;
+
+      case "fromMain:newVideo":
+        this.getGallery();
+        this.mediaFileFilter = "video";
+        return;
+
       case "fromMain:refreshGallery":
         return this.getGallery();
 

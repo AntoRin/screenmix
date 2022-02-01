@@ -14,6 +14,8 @@ class Preload {
       "fromMain:takeScreenshot",
       "fromMain:captureScreen",
       "fromMain:refreshGallery",
+      "fromMain:newImage",
+      "fromMain:newVideo",
       "fromMain:takeScreenshotOfCurrentWindow",
       "fromMain:captureCurrentScreen",
     ];

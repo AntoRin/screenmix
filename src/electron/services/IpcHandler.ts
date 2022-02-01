@@ -336,7 +336,12 @@ export class IpcHandler implements RendererProcessCtx {
         encoding: "base64",
       });
 
-      if (notify) this._notifyRenderer("fromMain:refreshGallery");
+      const notification =
+        captureData.mode === "image"
+          ? "fromMain:newImage"
+          : "fromMain:newVideo";
+
+      if (notify) this._notifyRenderer(notification);
     } catch (error) {
       throw error;
     }

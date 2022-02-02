@@ -13,26 +13,43 @@ import {
   CaptureData,
   IpcApi,
   IpcChannel,
+  MainProcessInternalEvent,
   MediaFile,
   RendererProcessCtx,
   UserDataStore,
+  VideoCaptureStatus,
 } from "../../common/types";
 import { Store } from "./Store";
 import { Dirent, promises as fsp, statSync } from "fs";
 import activeWin from "active-win";
 import { Channels } from "../constants";
+import EventEmitter from "events";
+import electronIsDev from "electron-is-dev";
 
-export class IpcHandler implements RendererProcessCtx {
+export class IpcHandler extends EventEmitter implements RendererProcessCtx {
   private _store: Store;
   private _mainWindow: BrowserWindow;
   private _imageExtensions: string[];
   private _videoExtensions: string[];
 
   constructor(mainWindow: BrowserWindow) {
+    super();
     this._store = new Store();
     this._mainWindow = mainWindow;
     this._imageExtensions = [".jpg", ".jpeg", ".png"];
     this._videoExtensions = [".mp4"];
+  }
+
+  override emit(event: MainProcessInternalEvent, ...args: any[]) {
+    return super.emit.apply(this, [event, ...args]);
+  }
+
+  override on(
+    event: MainProcessInternalEvent,
+    callback: (...args: any[]) => void
+  ) {
+    super.on.apply(this, [event, callback]);
+    return this;
   }
 
   public initializeIpcListeners() {
@@ -351,5 +368,14 @@ export class IpcHandler implements RendererProcessCtx {
     } catch (error) {
       throw error;
     }
+  }
+
+  async handleVideoCaptureStatusChange(status: VideoCaptureStatus) {
+    this.emit("videoCaptureStatusChange", status);
+  }
+
+  exitApplication() {
+    this.emit("exitApplication");
+    this.eventNames();
   }
 }

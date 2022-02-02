@@ -74,6 +74,12 @@ export class IpcHandler implements RendererProcessCtx {
       globalShortcut.registerAll([scHotKeyCurrentWindow], () => {
         this.captureCurrentScreen();
       });
+
+      if (electronIsDev) {
+        globalShortcut.register("Ctrl+Shift+I", () => {
+          this._mainWindow.webContents.openDevTools();
+        });
+      }
     } catch (error) {
       throw error;
     }

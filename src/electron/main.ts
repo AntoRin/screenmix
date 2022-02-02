@@ -1,8 +1,16 @@
-import path from "path";
-import { app, BrowserWindow, Menu, Tray } from "electron";
+import {
+  app,
+  BrowserWindow,
+  Menu,
+  MenuItemConstructorOptions,
+  Tray,
+} from "electron";
 import { IpcHandler } from "./services/IpcHandler";
 
 import ess from "electron-squirrel-startup";
+import { Paths } from "./constants";
+import { VideoCaptureStatus } from "../common/types";
+import electronIsDev from "electron-is-dev";
 
 if (ess) app.quit();
 
@@ -55,14 +63,18 @@ class Screenmix {
       width: 1280,
       height: 720,
       webPreferences: {
-        devTools: true,
-        preload: path.join(__dirname, "preload"),
+        devTools: electronIsDev,
+        preload: Paths.preload,
         contextIsolation: true,
       },
-      icon: path.join(__dirname, "../assets", "logo", "logo_jpeg.jpeg"),
+      icon: Paths.icons.jpeg,
+      title: "screenmix",
+      backgroundColor: "#000",
     });
 
-    this._mainWindow.loadFile(path.join(__dirname, "../index.html"));
+    this._mainWindow.loadFile(Paths.targetHtml);
+
+    this._mainWindow.removeMenu();
 
     this._mainWindow.on("close", (event) => {
       if (this._isQuitting) return true;

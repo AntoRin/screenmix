@@ -28,9 +28,13 @@ class Screenmix {
 
       this._createMainWindow();
 
-      if (!this._mainWindow) throw new Error("Error creating window");
+      if (!this._mainWindow) {
+        throw new Error("Error creating window");
+      }
 
       this._ipcHandler = new IpcHandler(this._mainWindow);
+
+      this._ipcHandler.on("exitApplication", this._setFlagAndExit.bind(this));
 
       app.on("activate", () => {
         if (BrowserWindow.getAllWindows().length === 0) {
@@ -88,18 +92,42 @@ class Screenmix {
   private _createTray() {
     if (!this._ipcHandler || !this._mainWindow) return;
 
-    this._tray = new Tray(
-      path.join(__dirname, "../assets", "logo", "logo_jpeg.jpeg")
+    this._tray = new Tray(Paths.icons.jpeg);
+
+    this._tray.setToolTip("screenmix");
+
+    this._tray.on("click", this._mainWindow.show.bind(this._mainWindow));
+
+    this._tray.setContextMenu(
+      Menu.buildFromTemplate(this._generateTrayCtxMenu())
     );
 
-    const ctxMenu = Menu.buildFromTemplate([
+    this._ipcHandler.on(
+      "videoCaptureStatusChange",
+      (status: VideoCaptureStatus) => {
+        this._tray?.setContextMenu(
+          Menu.buildFromTemplate(this._generateTrayCtxMenu(status))
+        );
+      }
+    );
+  }
+
+  private _generateTrayCtxMenu(
+    videoCaptureStatus?: VideoCaptureStatus
+  ): MenuItemConstructorOptions[] {
+    if (!this._ipcHandler) return [];
+
+    return [
       {
         label: "Take Screenshot",
         type: "normal",
         click: this._ipcHandler.takeScreenshot.bind(this._ipcHandler),
       },
       {
-        label: "Start Recording",
+        label:
+          !videoCaptureStatus || videoCaptureStatus === "videoCaptureEnd"
+            ? "Start Recording"
+            : "Stop Recording",
         type: "normal",
         click: this._ipcHandler.captureScreen.bind(this._ipcHandler),
       },
@@ -109,16 +137,14 @@ class Screenmix {
       {
         label: "Exit",
         type: "normal",
-        click: () => {
-          this._isQuitting = true;
-          app.quit();
-        },
+        click: this._setFlagAndExit.bind(this),
       },
-    ]);
+    ];
+  }
 
-    this._tray.setContextMenu(ctxMenu);
-    this._tray.setToolTip("screenmix");
-    this._tray.on("click", this._mainWindow.show.bind(this._mainWindow));
+  private _setFlagAndExit() {
+    this._isQuitting = true;
+    app.quit();
   }
 }
 

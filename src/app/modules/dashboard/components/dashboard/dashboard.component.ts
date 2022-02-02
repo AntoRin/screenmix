@@ -63,18 +63,6 @@ export class DashboardComponent implements OnInit {
   getMenuItemsDefault() {
     return [
       {
-        label: "Home",
-        icon: "pi pi-home",
-        command: this.changeTab.bind(this, "gallery"),
-      },
-      {
-        label: "Folders",
-        icon: "pi pi-folder",
-        command: () => {
-          this._router.navigate([""], { queryParams: { redirect: false } });
-        },
-      },
-      {
         label: "File",
         icon: "pi pi-fw pi-file",
         items: [
@@ -107,7 +95,24 @@ export class DashboardComponent implements OnInit {
           {
             separator: true,
           },
+          {
+            label: "Exit",
+            icon: "pi pi-power-off",
+            command: this.exitApp.bind(this),
+          },
         ],
+      },
+      {
+        label: "Home",
+        icon: "pi pi-home",
+        command: this.changeTab.bind(this, "gallery"),
+      },
+      {
+        label: "Folders",
+        icon: "pi pi-folder",
+        command: () => {
+          this._router.navigate([""], { queryParams: { redirect: false } });
+        },
       },
       {
         label: "Settings",
@@ -297,5 +302,11 @@ export class DashboardComponent implements OnInit {
       default:
         return;
     }
+  }
+
+  exitApp() {
+    try {
+      window.rendererProcessCtrl.invoke("ipc:exitApplication");
+    } catch (error) {}
   }
 }

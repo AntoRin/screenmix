@@ -18,6 +18,8 @@ export type TopMenuEvent = "delete" | "selectToggle";
 
 export type GalleryEvent = "selectModeOn" | "selectModeOff" | "itemSelected";
 
+export type VideoCaptureStatus = "videoCaptureStart" | "videoCaptureEnd";
+
 export interface EditState {
   previousImageIdx?: number;
   previousImageSrc: string;
@@ -46,6 +48,8 @@ export interface RendererProcessCtx {
   saveEditedImage(data: CaptureData): Promise<void>;
   deleteMediaFiles(files: string[]): Promise<void>;
   copyImageToClipboard(file: MediaFile): Promise<void>;
+  handleVideoCaptureStatusChange(status: VideoCaptureStatus): Promise<void>;
+  exitApplication(): void;
 }
 
 export type IpcApi = Required<keyof RendererProcessCtx>;
@@ -75,3 +79,7 @@ export interface CaptureData {
   mode: "image" | "video";
   name?: string;
 }
+
+export type MainProcessInternalEvent =
+  | "videoCaptureStatusChange"
+  | "exitApplication";

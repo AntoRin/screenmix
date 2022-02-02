@@ -1,6 +1,10 @@
 import { Injectable } from "@angular/core";
 import { Subject } from "rxjs";
-import { CaptureMode, ProcessNotification } from "../../../../common/types";
+import {
+  CaptureMode,
+  ProcessNotification,
+  VideoCaptureStatus,
+} from "../../../../common/types";
 
 @Injectable({
   providedIn: "root",
@@ -10,7 +14,7 @@ export class MediaStreamService {
   private _processNotificationSubject: Subject<ProcessNotification> =
     new Subject<ProcessNotification>();
 
-  streamNotifications$ = new Subject<"videoCaptureStart" | "videoCaptureEnd">();
+  streamNotifications$ = new Subject<VideoCaptureStatus>();
 
   constructor() {}
 
@@ -21,8 +25,16 @@ export class MediaStreamService {
   set videoCaptureInProgress(status) {
     if (status) {
       this.streamNotifications$.next("videoCaptureStart");
+      window.rendererProcessCtrl.invoke(
+        "ipc:handleVideoCaptureStatusChange",
+        "videoCaptureStart"
+      );
     } else {
       this.streamNotifications$.next("videoCaptureEnd");
+      window.rendererProcessCtrl.invoke(
+        "ipc:handleVideoCaptureStatusChange",
+        "videoCaptureEnd"
+      );
     }
     this._videoCaptureInProgress = status;
   }

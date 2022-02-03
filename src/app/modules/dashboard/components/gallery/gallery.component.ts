@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -19,6 +20,7 @@ import { Subject } from "rxjs";
 import { ContextMenu } from "primeng/contextmenu";
 import { GalleryEvent } from "../../../../../common/types";
 import { MessageService } from "primeng/api";
+import ImageViewer from "viewerjs";
 
 @Component({
   selector: "app-gallery",
@@ -26,7 +28,9 @@ import { MessageService } from "primeng/api";
   styleUrls: ["./gallery.component.css"],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
+export class GalleryComponent
+  implements OnInit, OnChanges, OnDestroy, AfterViewInit
+{
   @Input() public mediaFiles: MediaFile[] = [];
   @Input() public actions$: Subject<string> | undefined;
   @Input() public selectMode: boolean = false;
@@ -41,6 +45,7 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
     | ElementRef
     | undefined;
   @ViewChild("contextMenuRef") public contextMenuRef: ContextMenu | undefined;
+  @ViewChild("mediaItems") public mediaContainerRef: ElementRef | undefined;
 
   public imageEditor: Cropper | null = null;
   public spotlightImage: MediaFile | null = null;
@@ -74,6 +79,7 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
 
   private _editedImageRefs: string[] = [];
   private _unsubscribe$: Subject<void> = new Subject<void>();
+  private _imageViewer: ImageViewer | undefined;
 
   constructor(
     private _cd: ChangeDetectorRef,
@@ -112,6 +118,46 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
         }
       });
     }
+  }
+
+  ngAfterViewInit() {
+    if (!this.mediaContainerRef) return;
+
+    const container: HTMLDivElement = this.mediaContainerRef.nativeElement;
+
+    this.initializeImageViewer(container);
+
+    const observer = new MutationObserver(
+      this.initializeImageViewer.bind(this, container)
+    );
+
+    observer.observe(container, {
+      childList: true,
+    });
+
+    this._unsubscribe$.asObservable().subscribe(() => {
+      observer.disconnect();
+    });
+  }
+
+  initializeImageViewer(container: HTMLDivElement) {
+    if (this._imageViewer) {
+      console.log("updating");
+      this._imageViewer.update();
+      return;
+    }
+
+    console.log("creating new");
+
+    this._imageViewer = new ImageViewer(container, {
+      inline: false,
+      zIndex: 1000,
+      view: () => {},
+      show: (event) => {
+        if (this.selectMode) event.preventDefault();
+      },
+      viewed: () => {},
+    });
   }
 
   bustCache(url: string) {

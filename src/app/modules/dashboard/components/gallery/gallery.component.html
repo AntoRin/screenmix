@@ -33,9 +33,7 @@
   >
     <img
       *ngIf="mediaFile.type === 'image'"
-      (click)="
-        selectMode ? selectItem(mediaIdx) : showImageInSpotlight(mediaIdx)
-      "
+      (click)="selectMode ? selectItem(mediaIdx) : false"
       [src]="mediaFile.path"
       class="object-contain h-full w-full cursor-pointer"
       alt=""

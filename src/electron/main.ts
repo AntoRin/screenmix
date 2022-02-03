@@ -78,7 +78,7 @@ class Screenmix {
 
     this._mainWindow.loadFile(Paths.targetHtml);
 
-    this._mainWindow.removeMenu();
+    if (!electronIsDev) this._mainWindow.removeMenu();
 
     this._mainWindow.on("close", (event) => {
       if (this._isQuitting) return true;

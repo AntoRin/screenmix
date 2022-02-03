@@ -24,7 +24,6 @@ import { Dirent, promises as fsp, statSync } from "fs";
 import activeWin from "active-win";
 import { Channels } from "../constants";
 import EventEmitter from "events";
-import electronIsDev from "electron-is-dev";
 
 export class IpcHandler extends EventEmitter implements RendererProcessCtx {
   private _store: Store;
@@ -91,12 +90,6 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
       globalShortcut.registerAll([scHotKeyCurrentWindow], () => {
         this.captureCurrentScreen();
       });
-
-      if (electronIsDev) {
-        globalShortcut.register("Ctrl+Shift+I", () => {
-          this._mainWindow.webContents.openDevTools();
-        });
-      }
     } catch (error) {
       throw error;
     }

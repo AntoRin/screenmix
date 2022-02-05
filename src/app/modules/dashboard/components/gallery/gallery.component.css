@@ -10,3 +10,16 @@
 .image-toolbar *:hover {
   background-color: rgb(0, 128, 128, 0.2);
 }
+
+.viewer-options {
+  color: blue;
+  font-family: serif, sans-serif;
+  font-size: 0.75rem;
+  line-height: 1.5rem;
+  text-align: center;
+  background-color: #fff;
+}
+
+.viewer-options::before {
+  content: "";
+}

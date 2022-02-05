@@ -142,12 +142,9 @@ export class GalleryComponent
 
   initializeImageViewer(container: HTMLDivElement) {
     if (this._imageViewer) {
-      console.log("updating");
       this._imageViewer.update();
       return;
     }
-
-    console.log("creating new");
 
     this._imageViewer = new ImageViewer(container, {
       inline: false,
@@ -157,6 +154,23 @@ export class GalleryComponent
         if (this.selectMode) event.preventDefault();
       },
       viewed: () => {},
+      toolbar: {
+        zoomIn: true,
+        zoomOut: true,
+        oneToOne: true,
+        reset: true,
+        prev: true,
+        play: true,
+        next: true,
+        rotateLeft: true,
+        rotateRight: true,
+        flipHorizontal: true,
+        flipVertical: true,
+        options: {
+          size: "large",
+          show: true,
+        },
+      },
     });
   }
 

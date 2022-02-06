@@ -24,3 +24,17 @@ body {
   background: #333;
   border-radius: 2px;
 }
+
+/* Image viewer custom button */
+.viewer-options {
+  color: #fff !important;
+  font-family: FontAwesome, serif, sans-serif !important;
+  font-size: 0.75rem !important;
+  line-height: 1.5rem !important;
+  text-align: center !important;
+  background-color: #000 !important;
+}
+
+.viewer-options:before {
+  content: "🎞" !important;
+}

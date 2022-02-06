@@ -21,6 +21,7 @@ import { ContextMenu } from "primeng/contextmenu";
 import { GalleryEvent } from "../../../../../common/types";
 import { MessageService } from "primeng/api";
 import ImageViewer from "viewerjs";
+import { Menu } from "primeng/menu";
 
 @Component({
   selector: "app-gallery",
@@ -44,9 +45,12 @@ export class GalleryComponent
   @ViewChild("spotlightImageElement") public spotlightImgRef:
     | ElementRef
     | undefined;
+  @ViewChild("imageViewerContainer") public imageViewerContainerRef:
+    | ElementRef
+    | undefined;
   @ViewChild("contextMenuRef") public contextMenuRef: ContextMenu | undefined;
   @ViewChild("mediaItems") public mediaContainerRef: ElementRef | undefined;
-
+  @ViewChild("imageMenu") public imageMenu: Menu | undefined;
   public imageEditor: Cropper | null = null;
   public spotlightImage: MediaFile | null = null;
 
@@ -146,8 +150,11 @@ export class GalleryComponent
       return;
     }
 
+    if (!this.imageViewerContainerRef) return;
+
     this._imageViewer = new ImageViewer(container, {
       inline: false,
+      container: this.imageViewerContainerRef.nativeElement as HTMLDivElement,
       zIndex: 1000,
       view: () => {},
       show: (event) => {
@@ -167,8 +174,10 @@ export class GalleryComponent
         flipHorizontal: true,
         flipVertical: true,
         options: {
-          size: "large",
           show: true,
+          click: (event: PointerEvent) => {
+            this.imageMenu?.show(event);
+          },
         },
       },
     });

@@ -33,7 +33,9 @@
   >
     <img
       *ngIf="mediaFile.type === 'image'"
-      (click)="selectMode ? selectItem(mediaIdx) : false"
+      (click)="
+        selectMode ? selectItem(mediaIdx) : showImageInSpotlight(mediaIdx)
+      "
       [src]="mediaFile.path"
       class="object-contain h-full w-full cursor-pointer"
       alt=""
@@ -49,7 +51,14 @@
 </div>
 
 <!-- - Spotlight Image -->
-
+<div #imageViewerContainer>
+  <p-menu
+    #imageMenu
+    [popup]="true"
+    [baseZIndex]="2"
+    [model]="imageOptions"
+  ></p-menu>
+</div>
 <div
   *ngIf="spotlightImage"
   class="top-0 bottom-0 left-0 right-0 fixed z-50 bg-black bg-opacity-75"
@@ -79,10 +88,8 @@
       styleClass="p-button-sm"
     ></button>
     <span
-      (click)="imageMenu.toggle($event)"
       class="pi pi-ellipsis-v text-xl text-white mx-4 cursor-pointer"
     ></span>
-    <p-menu #imageMenu [popup]="true" [model]="imageOptions"></p-menu>
   </div>
 
   <!-- - Image -->

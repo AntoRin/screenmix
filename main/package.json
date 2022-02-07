@@ -1,5 +1,5 @@
 {
-   "name": "screenmix",
+   "name": "screenmix-main",
    "productName": "screenmix",
    "author": {
       "name": "screenmix",
@@ -11,9 +11,9 @@
    "scripts": {
       "start": "electron-forge start",
       "electron": "electron .",
-      "dev": "nodemon -e ts,html,css,js --ignore dist/ --exec \"npm run watch\"",
+      "watch": "nodemon -e ts,html,css,js --ignore dist/ --exec \"npm run dev\"",
       "build": "rm -rf dist && tsc && cp -r assets dist/",
-      "watch": "rm -rf dist && tsc && cp -r assets dist/ && npm run electron",
+      "dev": "rm -rf dist && tsc && cp -r assets dist/ && npm run electron",
       "package": "electron-forge package",
       "make": "electron-forge make",
       "make-appx": "electron-windows-store --input-directory .\\out\\Screenmix-win32-x64  --output-directory .\\out\\Screenmix-appx --package-version 0.0.0.0 --package-name screenmix"

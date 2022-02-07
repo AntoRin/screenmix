@@ -1,5 +1,5 @@
 {
-  "name": "screenmix",
+  "name": "screenmix-renderer",
   "productName": "screenmix",
   "author": {
     "name": "screenmix",
@@ -9,7 +9,6 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "dev": "nodemon -e ts,html,css,js --ignore dist/ --exec \"npm run build:dev\"",
     "serve": "ng serve -o",
     "build:dev": "ng build --configuration development",
     "build": "ng build --configuration production",

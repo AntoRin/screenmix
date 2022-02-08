@@ -16,6 +16,7 @@ import { Dirent, promises as fsp, statSync } from "fs";
 import activeWin from "active-win";
 import { Channels } from "../constants";
 import EventEmitter from "events";
+import { ChildProcess, spawn } from "child_process";
 
 export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    private _store: Store;
@@ -337,6 +338,37 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
 
    async handleVideoCaptureStatusChange(status: VideoCaptureStatus) {
       this.emit("videoCaptureStatusChange", status);
+   }
+
+   async openBaseDirectory() {
+      try {
+         await new Promise<void>((resolve, reject) => {
+            const proc: ChildProcess = spawn("explorer", [this._store.read("baseDirectory")], {
+               stdio: ["pipe", "pipe", "pipe"],
+               detached: false,
+               windowsHide: true,
+               shell: true,
+            });
+
+            let promiseEnded: boolean = false;
+
+            proc
+               .on("error", (error: Error) => {
+                  if (!promiseEnded) {
+                     reject(error);
+                     promiseEnded = true;
+                  }
+               })
+               .on("close", () => {
+                  if (!promiseEnded) {
+                     resolve();
+                     promiseEnded = true;
+                  }
+               });
+         });
+      } catch (error) {
+         throw error;
+      }
    }
 
    exitApplication() {

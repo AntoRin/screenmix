@@ -50,6 +50,7 @@ export interface RendererProcessCtx {
    copyImageToClipboard(file: MediaFile): Promise<void>;
    handleVideoCaptureStatusChange(status: VideoCaptureStatus): Promise<void>;
    exitApplication(): void;
+   openBaseDirectory(): Promise<void>;
 }
 
 export type IpcApi = Required<keyof RendererProcessCtx>;

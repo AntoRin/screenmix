@@ -1,6 +1,12 @@
 import { Component, HostListener, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
-import { DashboardTab, GalleryEvent, MediaFile, TopMenuEvent, UserDataStore } from "common-types";
+import {
+  DashboardTab,
+  GalleryEvent,
+  MediaFile,
+  TopMenuEvent,
+  UserDataStore,
+} from "common-types";
 import { MenuItem } from "primeng/api";
 import { Subject } from "rxjs";
 import { ProgressBarService } from "../../../shared/services/progress-bar.service";
@@ -76,8 +82,11 @@ export class DashboardComponent implements OnInit {
             ],
           },
           {
+            separator: true,
+          },
+          {
             label: "Select",
-            icon: "pi pi-paperclip",
+            icon: "pi pi-star",
             command: this.toggleGallerySelectMode.bind(this),
           },
           {
@@ -91,11 +100,19 @@ export class DashboardComponent implements OnInit {
             separator: true,
           },
           {
+            label: "Open Folder",
+            icon: "pi pi-folder-open",
+            command: this.openBaseDirectory.bind(this),
+          },
+          {
+            separator: true,
+          },
+          {
             label: "Exit",
             icon: "pi pi-power-off",
             command: this.exitApp.bind(this),
           },
-        ],
+        ] as MenuItem[],
       },
       {
         label: "Home",
@@ -297,6 +314,12 @@ export class DashboardComponent implements OnInit {
       default:
         return;
     }
+  }
+
+  async openBaseDirectory() {
+    try {
+      await window.rendererProcessCtrl.invoke("ipc:openBaseDirectory");
+    } catch (error) {}
   }
 
   exitApp() {

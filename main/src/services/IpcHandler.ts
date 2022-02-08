@@ -120,7 +120,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
             mediaDirectories: (this._store.read("mediaDirectories") as string[]).filter(p => p !== path),
          });
 
-         if (this._store.read("baseDirectory") === "path") {
+         if (this._store.read("baseDirectory") === path) {
             await this._store.write({
                baseDirectory: null,
             });

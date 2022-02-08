@@ -36,7 +36,10 @@
       "allowUnusedLabels": false,
       "exactOptionalPropertyTypes": true,
       "resolveJsonModule": true,
-      "skipLibCheck": true
+      "skipLibCheck": true,
+      "paths": {
+         "common-types": ["../common/types"]
+      }
    },
    "include": ["src/**/*"]
 }

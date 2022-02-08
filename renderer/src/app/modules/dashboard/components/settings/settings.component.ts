@@ -5,8 +5,8 @@ import {
   UserDataStore,
   UserDataField,
   KeybindType,
-} from "../../../../../common/types";
-import { DashboardTab } from "../../../../../common/types";
+  DashboardTab
+} from "common-types";
 
 @Component({
   selector: "app-settings",

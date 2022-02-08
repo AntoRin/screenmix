@@ -3,7 +3,7 @@ import { IpcHandler } from "./services/IpcHandler";
 
 import ess from "electron-squirrel-startup";
 import { Paths } from "./constants";
-import { VideoCaptureStatus } from "./types";
+import { VideoCaptureStatus } from "common-types";
 import electronIsDev from "electron-is-dev";
 
 if (ess) app.quit();

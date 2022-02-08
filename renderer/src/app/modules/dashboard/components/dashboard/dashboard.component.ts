@@ -1,13 +1,8 @@
 import { Component, HostListener, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
+import { DashboardTab, GalleryEvent, MediaFile, TopMenuEvent, UserDataStore } from "common-types";
 import { MenuItem } from "primeng/api";
 import { Subject } from "rxjs";
-import { MediaFile, UserDataStore } from "../../../../../common/types";
-import {
-  DashboardTab,
-  GalleryEvent,
-  TopMenuEvent,
-} from "../../../../../common/types";
 import { ProgressBarService } from "../../../shared/services/progress-bar.service";
 import { MediaStreamService } from "../../services/media-stream.service";
 

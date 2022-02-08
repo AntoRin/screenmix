@@ -10,7 +10,7 @@ import {
    RendererProcessCtx,
    UserDataStore,
    VideoCaptureStatus,
-} from "../types";
+} from "common-types";
 import { Store } from "./Store";
 import { Dirent, promises as fsp, statSync } from "fs";
 import activeWin from "active-win";
@@ -81,7 +81,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    }
 
    unregisterGlobalShortcuts() {
-      globalShortcut.unregisterAll();
+      return globalShortcut.unregisterAll();
    }
 
    async getDirectorySelection() {

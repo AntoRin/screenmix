@@ -35,7 +35,10 @@
     "allowUnusedLabels": false,
     "exactOptionalPropertyTypes": true,
     "resolveJsonModule": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "common-types": ["../common/types"]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

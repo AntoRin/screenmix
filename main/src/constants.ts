@@ -1,5 +1,5 @@
 import path from "path";
-import { IpcApi, IpcChannel } from "./types";
+import { IpcApi, IpcChannel } from "common-types";
 
 export const Channels: IpcChannel[] = (
    [

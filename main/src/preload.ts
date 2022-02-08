@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { IpcChannel, RendererExposedApi } from "./types";
+import { IpcChannel, RendererExposedApi } from "common-types";
 import { Channels } from "./constants";
 
 class Preload {

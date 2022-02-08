@@ -11,17 +11,15 @@ import {
   OnInit,
   Output,
   SimpleChanges,
-  ViewChild,
+  ViewChild
 } from "@angular/core";
-import { MediaFile } from "../../../../../common/types";
+import { GalleryEvent, MediaFile } from "common-types";
 import Cropper from "cropperjs";
-import { ConfirmationService, MenuItem } from "primeng/api";
-import { Subject } from "rxjs";
+import { ConfirmationService, MenuItem, MessageService } from "primeng/api";
 import { ContextMenu } from "primeng/contextmenu";
-import { GalleryEvent } from "../../../../../common/types";
-import { MessageService } from "primeng/api";
-import ImageViewer from "viewerjs";
 import { Menu } from "primeng/menu";
+import { Subject } from "rxjs";
+import ImageViewer from "viewerjs";
 
 @Component({
   selector: "app-gallery",

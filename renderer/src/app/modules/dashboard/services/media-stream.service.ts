@@ -4,7 +4,7 @@ import {
   CaptureMode,
   ProcessNotification,
   VideoCaptureStatus,
-} from "../../../../common/types";
+} from "common-types";
 
 @Injectable({
   providedIn: "root",

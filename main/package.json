@@ -12,8 +12,8 @@
       "start": "electron-forge start",
       "electron": "electron .",
       "watch": "nodemon -e ts,html,css,js --ignore dist/ --exec \"npm run dev\"",
-      "build": "rm -rf dist && tsc && cp -r assets dist/",
-      "dev": "rm -rf dist && tsc && cp -r assets dist/ && npm run electron",
+      "build": "rm -rf dist && tsc && cp -r src/assets dist/",
+      "dev": "rm -rf dist && tsc && cp -r src/assets dist/ && npm run electron",
       "package": "electron-forge package",
       "make": "electron-forge make",
       "make-appx": "electron-windows-store --input-directory .\\out\\Screenmix-win32-x64  --output-directory .\\out\\Screenmix-appx --package-version 0.0.0.0 --package-name screenmix"

@@ -91,7 +91,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
 
    async setBaseDirectory(dir: string) {
       try {
-         this._store.write({
+         await this._store.write({
             baseDirectory: dir,
          });
       } catch (error) {
@@ -131,7 +131,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
       }
    }
 
-   async getBaseDirectory() {
+   getBaseDirectory(): string | undefined {
       try {
          return this._store.read("baseDirectory");
       } catch (error) {
@@ -139,9 +139,9 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
       }
    }
 
-   async getMediaDirectories() {
+   getMediaDirectories(): string[] {
       try {
-         return this._store.read("mediaDirectories");
+         return this._store.read("mediaDirectories") || [];
       } catch (error) {
          throw error;
       }
@@ -372,6 +372,6 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    }
 
    exitApplication() {
-      this.emit("exitApplication");      
+      this.emit("exitApplication");
    }
 }

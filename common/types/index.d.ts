@@ -36,9 +36,9 @@ export interface RendererProcessCtx {
    addMediaDirectory(...args: any[]): Promise<string | undefined>;
    removeMediaDirectory(path: string): Promise<void>;
    getDirectorySelection(...args: any[]): Promise<string>;
-   getBaseDirectory(...args: any[]): Promise<string | undefined>;
+   getBaseDirectory(...args: any[]): string | undefined;
    setBaseDirectory(dir: string): Promise<void>;
-   getMediaDirectories(): Promise<string[]>;
+   getMediaDirectories(): string[];
    listMediaPaths(...args: any[]): Promise<MediaFile[]>;
    getDesktopSourceId(currentWindow?: boolean): Promise<string | undefined>;
    saveCapture(data: CaptureData): Promise<any>;

@@ -37,7 +37,9 @@ export class Store {
    private async backupData() {
       try {
          await fsp.writeFile(this._userDataPath, JSON.stringify(this._userData, null, 3), { encoding: "utf-8" });
-      } catch (error) {}
+      } catch (error) {
+         throw error;
+      }
    }
 
    async write(data: UserDataStore): Promise<void> {

@@ -13,4 +13,14 @@
   background-color: #000;
 }
 
+.image-item {
+  -webkit-transform: scale(1);
+  transform: scale(1);
+  -webkit-transition: 0.5s ease-in-out;
+  transition: 0.5s ease-in-out;
+}
 
+.image-item:hover {
+  -webkit-transform: scale(1.15);
+  transform: scale(1.15);
+}

@@ -20,9 +20,6 @@
         ? mediaFile.customData?.['selected']
           ? 'border-4 border-solid border-blue-500'
           : ''
-        : '',
-      !mediaFile.customData?.['selected']
-        ? 'hover:border-solid hover:border-2 hover:border-blue-500 hover:object-right transition-all duration-200'
         : ''
     ]"
     [style]="
@@ -37,7 +34,7 @@
         selectMode ? selectItem(mediaIdx) : showImageInSpotlight(mediaIdx)
       "
       [src]="mediaFile.path"
-      class="object-contain h-full w-full cursor-pointer"
+      class="object-contain h-full w-full cursor-pointer image-item"
       alt=""
     />
     <video

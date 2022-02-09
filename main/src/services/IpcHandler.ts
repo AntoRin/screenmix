@@ -372,7 +372,6 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    }
 
    exitApplication() {
-      this.emit("exitApplication");
-      this.eventNames();
+      this.emit("exitApplication");      
    }
 }

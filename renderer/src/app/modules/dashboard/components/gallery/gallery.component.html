@@ -70,8 +70,9 @@
       pRipple
       icon="pi pi-angle-down"
       iconPos="right"
-      class="p-button-raised p-button-sm p-button-text"
+      class="p-button-raised p-button-sm"
       styleClass="p-button-sm"
+      style="margin-right: 10px"
     ></button>
     <p-menu #saveOptionsMenu [popup]="true" [model]="saveOptions"></p-menu>
     <button
@@ -81,7 +82,7 @@
       pRipple
       icon="pi pi-times"
       iconPos="right"
-      class="p-button-raised p-button-danger p-button-sm p-button-text"
+      class="p-button-outlined p-button-secondary p-button-sm"
       styleClass="p-button-sm"
     ></button>
     <span
@@ -110,7 +111,14 @@
   </div>
 
   <!-- - Bottom Toolbar -->
-  <div class="h-[60px] flex justify-center items-center">
+  <div class="h-[60px] flex justify-center items-center relative">
+    <div class="absolute left-0">
+      <h3 class="text-white">
+        {{ spotlightImage.name }}|{{ spotlightImageElement.naturalWidth }}x{{
+          spotlightImageElement.naturalHeight
+        }}
+      </h3>
+    </div>
     <!-- - If not in edit mode -->
     <div
       *ngIf="!imageEditor"

@@ -11,7 +11,7 @@ import {
   OnInit,
   Output,
   SimpleChanges,
-  ViewChild
+  ViewChild,
 } from "@angular/core";
 import { GalleryEvent, MediaFile } from "common-types";
 import Cropper from "cropperjs";
@@ -70,7 +70,7 @@ export class GalleryComponent
       separator: true,
     },
     {
-      label: "Save as a new file",
+      label: "Save a copy",
       icon: "pi pi-plus",
       command: this.applyChanges.bind(this),
     },

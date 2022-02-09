@@ -11,8 +11,8 @@
       "start": "cd main && npm run electron",
       "build": "npx concurrently \"cd renderer && npm run build\" \"cd main && npm run build\"",
       "watch": "npx concurrently \"cd renderer && npm run watch\" \"cd main && npm run watch\"",
-      "package-exe": "cd main && npm run make",
-      "package-appx": "cd main && npm run make-appx" 
+      "package-exe": "npm run build && cd main && npm run make",
+      "package-appx": "npm run build && cd main && npm run make-appx"
    },
    "private": true
 }

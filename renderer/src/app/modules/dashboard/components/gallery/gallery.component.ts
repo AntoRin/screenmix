@@ -62,14 +62,6 @@ export class GalleryComponent
 
   public saveOptions = [
     {
-      label: "Save",
-      icon: "pi pi-save",
-      command: this.applyChanges.bind(this),
-    },
-    {
-      separator: true,
-    },
-    {
       label: "Save a copy",
       icon: "pi pi-plus",
       command: this.applyChanges.bind(this),

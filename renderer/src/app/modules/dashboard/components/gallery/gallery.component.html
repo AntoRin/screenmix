@@ -61,7 +61,51 @@
   class="top-0 bottom-0 left-0 right-0 fixed z-50 bg-black bg-opacity-75"
 >
   <!-- - Top Menu -->
-  <div class="bg-black h-[60px] flex justify-end items-center p-1">
+  <p-toolbar styleClass="h-[60px]">
+    <div
+      class="p-toolbar-group-left h-full w-full flex justify-between items-center"
+    >
+      <div>
+        <p-button
+          *ngIf="!imageEditor"
+          (onClick)="enableImageEditing()"
+          label="Edit"
+          icon="pi pi-pencil"
+          styleClass="p-button-sm p-button-text"
+        ></p-button>
+        <p-splitButton
+          *ngIf="imageEditor"
+          (onClick)="applyChanges()"
+          label="Save"
+          icon="pi pi-save"
+          styleClass="p-button-sm p-button-info"
+          style="padding: 0; margin: 0"
+          [model]="saveOptions"
+        ></p-splitButton>
+      </div>
+      <div>
+        <button
+          pButton
+          pRipple
+          type="button"
+          icon="pi pi-trash"
+          class="p-button-rounded p-button-text p-button-danger"
+        ></button>
+      </div>
+      <div>
+        <button
+          (click)="imageEditor ? exitEditor() : closeImageSpotlight()"
+          pButton
+          pRipple
+          type="button"
+          icon="pi pi-times"
+          class="p-button-rounded p-button-text p-button-secondary"
+        ></button>
+      </div>
+    </div>
+  </p-toolbar>
+
+  <!-- <div class="bg-black h-[60px] flex justify-end items-center p-1">
     <button
       *ngIf="imageEditor"
       (click)="saveOptionsMenu.toggle($event)"
@@ -95,7 +139,7 @@
       [baseZIndex]="2"
       [model]="imageOptions"
     ></p-menu>
-  </div>
+  </div> -->
 
   <!-- - Image -->
   <div

@@ -24,3 +24,14 @@
   -webkit-transform: scale(1.15);
   transform: scale(1.15);
 }
+
+.toolbar-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+}
+
+.toolbar-grid * {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

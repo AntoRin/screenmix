@@ -65,6 +65,7 @@
     <div
       class="p-toolbar-group-left h-full w-full flex justify-between items-center"
     >
+      <div></div>
       <div>
         <p-button
           *ngIf="!imageEditor"
@@ -73,17 +74,35 @@
           icon="pi pi-pencil"
           styleClass="p-button-sm p-button-text"
         ></p-button>
-        <p-splitButton
+        <p-button
           *ngIf="imageEditor"
           (onClick)="applyChanges()"
           label="Save"
           icon="pi pi-save"
-          styleClass="p-button-sm p-button-info"
-          style="padding: 0; margin: 0"
-          [model]="saveOptions"
-        ></p-splitButton>
-      </div>
-      <div>
+          styleClass="p-button-sm p-button-text"
+        ></p-button>
+        <p-button
+          *ngIf="imageEditor"
+          (onClick)="applyChanges()"
+          label="Save a copy"
+          icon="pi pi-save"
+          styleClass="p-button-sm p-button-text"
+        ></p-button>
+        <button
+          pButton
+          pRipple
+          type="button"
+          icon="pi pi-replay"
+          class="p-button-rounded p-button-text p-button-info"
+        ></button>
+        <button
+          pButton
+          pRipple
+          type="button"
+          icon="pi pi-refresh"
+          class="p-button-rounded p-button-text p-button-info"
+        ></button>
+
         <button
           pButton
           pRipple
@@ -104,42 +123,6 @@
       </div>
     </div>
   </p-toolbar>
-
-  <!-- <div class="bg-black h-[60px] flex justify-end items-center p-1">
-    <button
-      *ngIf="imageEditor"
-      (click)="saveOptionsMenu.toggle($event)"
-      label="Save"
-      pButton
-      pRipple
-      icon="pi pi-angle-down"
-      iconPos="right"
-      class="p-button-raised p-button-sm"
-      styleClass="p-button-sm"
-      style="margin-right: 10px"
-    ></button>
-    <p-menu #saveOptionsMenu [popup]="true" [model]="saveOptions"></p-menu>
-    <button
-      (click)="imageEditor ? exitEditor() : closeImageSpotlight()"
-      [label]="imageEditor ? 'Exit Editor' : 'Close'"
-      pButton
-      pRipple
-      icon="pi pi-times"
-      iconPos="right"
-      class="p-button-outlined p-button-secondary p-button-sm"
-      styleClass="p-button-sm"
-    ></button>
-    <span
-      class="pi pi-ellipsis-v text-xl text-white mx-4 cursor-pointer"
-      (click)="imageMenu.toggle($event)"
-    ></span>
-    <p-menu
-      #imageMenu
-      [popup]="true"
-      [baseZIndex]="2"
-      [model]="imageOptions"
-    ></p-menu>
-  </div> -->
 
   <!-- - Image -->
   <div

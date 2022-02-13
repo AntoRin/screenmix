@@ -13,8 +13,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from "@angular/core";
-import { GalleryEvent, MediaFile } from "common-types";
-import Cropper from "cropperjs";
+import { GalleryEvent, ImageViewerEvent, MediaFile } from "common-types";
 import { ConfirmationService, MenuItem, MessageService } from "primeng/api";
 import { ContextMenu } from "primeng/contextmenu";
 import { Menu } from "primeng/menu";
@@ -49,16 +48,9 @@ export class GalleryComponent
   @ViewChild("contextMenuRef") public contextMenuRef: ContextMenu | undefined;
   @ViewChild("mediaItems") public mediaContainerRef: ElementRef | undefined;
   @ViewChild("imageMenu") public imageMenu: Menu | undefined;
-  public imageEditor: Cropper | null = null;
-  public spotlightImage: MediaFile | null = null;
 
-  public imageOptions: MenuItem[] = [
-    {
-      label: "Edit",
-      icon: "pi pi-pencil",
-      command: this.enableImageEditing.bind(this),
-    },
-  ];
+  public spotlightImage: MediaFile | null = null;
+  public editing: boolean = false;
 
   public saveOptions = [
     {
@@ -228,7 +220,7 @@ export class GalleryComponent
         command: () => {
           this.showImageInSpotlight(getMediaFileIdx());
           this._cd.detectChanges();
-          this.enableImageEditing();
+          this.editing = true;
         },
         visible: mediaFile.type === "image",
       },
@@ -281,24 +273,8 @@ export class GalleryComponent
       this.mediaFiles[imageIdx].type === "image"
         ? this.mediaFiles[imageIdx]
         : null;
-  }
 
-  enableImageEditing() {
-    if (!this.spotlightImgRef) return;
-    this.showImageInEditor(this.spotlightImgRef.nativeElement);
-  }
-
-  showImageInEditor(imageElement: HTMLImageElement) {
-    if (this.imageEditor || !this.spotlightImage) return;
-
-    this.imageEditor = new Cropper(imageElement, {
-      guides: false,
-      autoCropArea: 1,
-      scalable: true,
-      zoomable: true,
-      background: false,
-      crop: () => {},
-    });
+    this._cd.detectChanges();
   }
 
   nextImage() {
@@ -343,64 +319,9 @@ export class GalleryComponent
     this.spotlightImage = this.mediaFiles[prevIdx];
   }
 
-  rotateLeft() {
-    if (!this.imageEditor) return;
-    this.imageEditor.rotate(-90);
-    this.resetCropBoxToFitImage();
-  }
-
-  rotateRight() {
-    if (!this.imageEditor) return;
-    this.imageEditor.rotate(90);
-    this.resetCropBoxToFitImage();
-  }
-
-  resetCropBoxToFitImage() {
-    if (!this.imageEditor) return;
-
-    const cropData = this.imageEditor.getData();
-    const imageData = this.imageEditor.getImageData();
-    const canvasData = this.imageEditor.getCanvasData();
-
-    this.imageEditor.setCropBoxData({
-      height:
-        cropData.rotate === 90 || cropData.rotate === 270
-          ? imageData.width
-          : imageData.height,
-      width:
-        cropData.rotate === 90 || cropData.rotate === 270
-          ? imageData.height
-          : imageData.width,
-      left: canvasData.left,
-      top: canvasData.top,
-    });
-  }
-
-  cropPreview() {
-    if (!this.imageEditor) return;
-
-    this.imageEditor.replace(
-      this.imageEditor.getCroppedCanvas({}).toDataURL("image/png")
-    );
-  }
-
-  /**
-   * Reset edits to original using backed-up image src, wait until UI loads the new image, and then enable editing again.
-   */
-  resetImageToPrevEditingState() {
-    if (!this.imageEditor || !this.spotlightImage) return;
-    this.imageEditor.replace(this.spotlightImage.path);
-  }
-
-  async applyChanges() {
+  async applyChanges(editedImgUrl: string) {
     try {
-      if (!this.spotlightImage || !this.imageEditor) return;
-
-      const editedImgUrl: string = this.imageEditor
-        .getCroppedCanvas({})
-        .toDataURL("image/png");
-
-      this.exitEditor();
+      if (!this.spotlightImage) return;
 
       const currentIdx = this.mediaFiles.findIndex(
         (f) => f.name === this.spotlightImage?.name
@@ -418,19 +339,29 @@ export class GalleryComponent
     }
   }
 
-  exitEditor() {
-    this._destroyImageEditor();
-  }
-
-  private _destroyImageEditor() {
-    if (!this.imageEditor) return;
-    this.imageEditor.destroy();
-    this.imageEditor = null;
-  }
-
-  closeImageSpotlight() {
-    this.exitEditor();
-    this.spotlightImage = null;
+  handleViewerEvent(event: ImageViewerEvent) {
+    switch (event.eventName) {
+      case "save":
+        return event.data ? this.applyChanges(event.data) : undefined;
+      case "nextImage":
+        return this.nextImage();
+      case "previousImage":
+        return this.previousImage();
+      case "closeViewer":
+        this.spotlightImage = null;
+        this.editing = false;
+        return;
+      case "closeEditor":
+        console.log("close editor");
+        this.editing = false;
+        this._cd.detectChanges();
+        return;
+      case "openEditor":
+        this.editing = true;
+        return;
+      default:
+        return;
+    }
   }
 
   async deleteSelectedItems(mediaFiles?: MediaFile | MediaFile[]) {

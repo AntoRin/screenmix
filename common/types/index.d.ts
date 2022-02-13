@@ -20,9 +20,11 @@ export type GalleryEvent = "selectModeOn" | "selectModeOff" | "itemSelected";
 
 export type VideoCaptureStatus = "videoCaptureStart" | "videoCaptureEnd";
 
-export interface EditState {
-   previousImageIdx?: number;
-   previousImageSrc: string;
+export type ImageViewerEventType = "nextImage" | "previousImage" | "save" | "closeViewer" | "closeEditor" | "openEditor";
+
+export interface ImageViewerEvent {
+   eventName: ImageViewerEventType;
+   data?: any;
 }
 
 export interface MediaFile {

@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -18,7 +17,6 @@ import { ConfirmationService, MenuItem, MessageService } from "primeng/api";
 import { ContextMenu } from "primeng/contextmenu";
 import { Menu } from "primeng/menu";
 import { Subject } from "rxjs";
-import ImageViewer from "viewerjs";
 
 @Component({
   selector: "app-gallery",
@@ -26,9 +24,7 @@ import ImageViewer from "viewerjs";
   styleUrls: ["./gallery.component.css"],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GalleryComponent
-  implements OnInit, OnChanges, OnDestroy, AfterViewInit
-{
+export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
   @Input() public mediaFiles: MediaFile[] = [];
   @Input() public actions$: Subject<string> | undefined;
   @Input() public selectMode: boolean = false;
@@ -46,7 +42,6 @@ export class GalleryComponent
     | ElementRef
     | undefined;
   @ViewChild("contextMenuRef") public contextMenuRef: ContextMenu | undefined;
-  @ViewChild("mediaItems") public mediaContainerRef: ElementRef | undefined;
   @ViewChild("imageMenu") public imageMenu: Menu | undefined;
 
   public spotlightImage: MediaFile | null = null;
@@ -65,7 +60,6 @@ export class GalleryComponent
 
   private _editedImageRefs: string[] = [];
   private _unsubscribe$: Subject<void> = new Subject<void>();
-  private _imageViewer: ImageViewer | undefined;
 
   constructor(
     private _cd: ChangeDetectorRef,
@@ -104,65 +98,6 @@ export class GalleryComponent
         }
       });
     }
-  }
-
-  ngAfterViewInit() {
-    if (!this.mediaContainerRef) return;
-
-    const container: HTMLDivElement = this.mediaContainerRef.nativeElement;
-
-    this.initializeImageViewer(container);
-
-    const observer = new MutationObserver(
-      this.initializeImageViewer.bind(this, container)
-    );
-
-    observer.observe(container, {
-      childList: true,
-    });
-
-    this._unsubscribe$.asObservable().subscribe(() => {
-      observer.disconnect();
-    });
-  }
-
-  initializeImageViewer(container: HTMLDivElement) {
-    if (this._imageViewer) {
-      this._imageViewer.update();
-      return;
-    }
-
-    if (!this.imageViewerContainerRef) return;
-
-    this._imageViewer = new ImageViewer(container, {
-      inline: false,
-      container: this.imageViewerContainerRef.nativeElement as HTMLDivElement,
-      zIndex: 1000,
-      view: () => {},
-      show: (event) => {
-        if (this.selectMode) event.preventDefault();
-      },
-      viewed: () => {},
-      toolbar: {
-        zoomIn: true,
-        zoomOut: true,
-        oneToOne: true,
-        reset: true,
-        prev: true,
-        play: true,
-        next: true,
-        rotateLeft: true,
-        rotateRight: true,
-        flipHorizontal: true,
-        flipVertical: true,
-        options: {
-          show: true,
-          click: (event: PointerEvent) => {
-            this.imageMenu?.show(event);
-          },
-        },
-      },
-    });
   }
 
   bustCache(url: string) {

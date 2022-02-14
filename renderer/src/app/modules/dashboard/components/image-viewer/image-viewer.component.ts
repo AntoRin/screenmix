@@ -36,6 +36,7 @@ export class ImageViewerComponent
 
   public imageEditor: Cropper | null = null;
 
+  public _viewOnlyMode: boolean = true;
   private _unsubscribe$: Subject<void> = new Subject<void>();
 
   constructor() {}
@@ -43,8 +44,13 @@ export class ImageViewerComponent
   ngOnInit(): void {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes["editing"]) {
-      this.editing = changes["editing"].currentValue as boolean;
+    if (changes["editing"]?.currentValue) {
+      this.imageEditor?.crop();
+      this.resetCropBoxToFitImage();
+      this._viewOnlyMode = false;
+    } else {
+      this.imageEditor?.clear();
+      this._viewOnlyMode = true;
     }
 
     if (changes["spotlightImage"]) {
@@ -107,11 +113,17 @@ export class ImageViewerComponent
 
     this.imageEditor = new Cropper(imageElement, {
       guides: false,
+      autoCrop: false,
       autoCropArea: 1,
       scalable: true,
       zoomable: true,
       background: false,
-      crop: () => {},
+      crop: (event: Cropper.CropEvent) => {},
+      cropstart: (event: Cropper.CropStartEvent) => {
+        if (this._viewOnlyMode) {
+          event.preventDefault();
+        }
+      },
       responsive: true,
       restore: true,
     });

@@ -287,7 +287,6 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
         this.editing = false;
         return;
       case "closeEditor":
-        console.log("close editor");
         this.editing = false;
         this._cd.detectChanges();
         return;

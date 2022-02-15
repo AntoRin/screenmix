@@ -131,9 +131,12 @@ export class ImageViewerComponent
       scalable: true,
       zoomable: true,
       background: false,
-      crop: (event: Cropper.CropEvent) => {},
+      dragMode: "move",
+      ready: () => {
+        if (!this._viewOnlyMode) this.imageEditor?.crop();
+      },
       cropstart: (event: Cropper.CropStartEvent) => {
-        if (this._viewOnlyMode) {
+        if (this._viewOnlyMode && event.detail.action !== "move") {
           event.preventDefault();
         }
       },
@@ -153,6 +156,8 @@ export class ImageViewerComponent
     this.emitViewerEvent({
       eventName: "closeEditor",
     });
+
+    this.resetImageToPrevEditingState();
   }
 
   private _destroyImageEditor() {

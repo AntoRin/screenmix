@@ -20,7 +20,18 @@ export type GalleryEvent = "selectModeOn" | "selectModeOff" | "itemSelected";
 
 export type VideoCaptureStatus = "videoCaptureStart" | "videoCaptureEnd";
 
-export type ImageViewerEventType = "nextImage" | "previousImage" | "save" | "closeViewer" | "closeEditor" | "openEditor";
+export type ImageViewerEventType =
+   | "nextImage"
+   | "previousImage"
+   | "save"
+   | "closeViewer"
+   | "closeEditor"
+   | "openEditor";
+
+export interface ImageResolution {
+   width: number;
+   height: number;
+}
 
 export interface ImageViewerEvent {
    eventName: ImageViewerEventType;
@@ -59,7 +70,11 @@ export type IpcApi = Required<keyof RendererProcessCtx>;
 
 export type IpcChannel = `ipc:${IpcApi}`;
 
-export type KeybindType = "ssHotKey" | "scHotKey" | "ssHotKeyCurrentWindow" | "scHotKeyCurrentWindow";
+export type KeybindType =
+   | "ssHotKey"
+   | "scHotKey"
+   | "ssHotKeyCurrentWindow"
+   | "scHotKeyCurrentWindow";
 
 export type UserDataField =
    | "baseDirectory"
@@ -79,4 +94,6 @@ export interface CaptureData {
    name?: string;
 }
 
-export type MainProcessInternalEvent = "videoCaptureStatusChange" | "exitApplication";
+export type MainProcessInternalEvent =
+   | "videoCaptureStatusChange"
+   | "exitApplication";

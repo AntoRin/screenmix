@@ -48,6 +48,21 @@
 </div>
 
 <!-- - Spotlight Image -->
+<div
+  *ngIf="spotlightImage"
+  (click)="previousImage()"
+  class="absolute left-2 top-[50%] translate-y-[-50%] z-[55] cursor-pointer"
+>
+  <i class="pi pi-angle-left text-5xl text-white"></i>
+</div>
+<div
+  *ngIf="spotlightImage"
+  (click)="nextImage()"
+  class="absolute right-2 top-[50%] translate-y-[-50%] z-[55] cursor-pointer"
+>
+  <i class="pi pi-angle-right text-5xl text-white"></i>
+</div>
+
 <app-image-viewer
   *ngIf="spotlightImage"
   [editing]="editing"

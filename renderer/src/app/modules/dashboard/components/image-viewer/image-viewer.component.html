@@ -6,111 +6,113 @@
   <!-- - Top Menu -->
   <p-toolbar styleClass="h-[60px]">
     <div
-      class="p-toolbar-group-left h-full w-full flex justify-between items-center"
+      class="p-toolbar-group-left h-full w-full"
+      style="display: grid; grid-template-columns: 1fr 1fr 1fr"
     >
-      <div></div>
-      <div>
-        <p-button
-          *ngIf="!editing"
-          (onClick)="emitViewerEvent({ eventName: 'openEditor' })"
-          label="Edit"
-          icon="pi pi-pencil"
-          styleClass="p-button-sm p-button-text"
-        ></p-button>
-        <p-button
-          *ngIf="editing"
-          (onClick)="handleSave()"
-          label="Save"
-          icon="pi pi-save"
-          styleClass="p-button-sm p-button-text"
-        ></p-button>
-        <p-button
-          *ngIf="editing"
-          (onClick)="handleSave()"
-          label="Save a copy"
-          icon="pi pi-save"
-          styleClass="p-button-sm p-button-text"
-        ></p-button>
-        <button
-          pButton
-          pRipple
-          type="button"
-          icon="pi pi-replay"
-          (click)="rotateLeft()"
-          class="p-button-rounded p-button-text p-button-info"
-        ></button>
-        <button
-          pButton
-          pRipple
-          type="button"
-          icon="pi pi-refresh"
-          (click)="rotateRight()"
-          class="p-button-rounded p-button-text p-button-info"
-        ></button>
-
-        <button
-          *ngIf="editing"
-          (click)="cropPreview()"
-          pButton
-          pRipple
-          type="button"
-          icon="pi pi-eye"
-          label=""
-          class="p-button-rounded p-button-text p-button-info"
-        ></button>
-        <button
-          *ngIf="editing"
-          (click)="resetImageToPrevEditingState()"
-          pButton
-          pRipple
-          type="button"
-          icon="pi pi-ban"
-          label=""
-          class="p-button-rounded p-button-text p-button-info"
-        ></button>
-
-        <button
-          pButton
-          pRipple
-          type="button"
-          icon="pi pi-trash"
-          class="p-button-rounded p-button-text p-button-danger"
-        ></button>
+      <div class="text-gray-300 flex justify-start">
+        <h3>
+          {{ spotlightImage.name }} - {{ imageResolution?.width }}x{{
+            imageResolution?.height
+          }}
+        </h3>
       </div>
-      <div>
-        <button
-          (click)="editing ? exitEditor() : closeImageSpotlight()"
-          pButton
-          pRipple
-          type="button"
-          icon="pi pi-times"
-          class="p-button-rounded p-button-text p-button-secondary"
-        ></button>
+      <div class="flex justify-center">
+        <div>
+          <p-button
+            *ngIf="!editing"
+            (onClick)="emitViewerEvent({ eventName: 'openEditor' })"
+            label="Edit"
+            icon="pi pi-pencil"
+            styleClass="p-button-sm p-button-text"
+          ></p-button>
+          <p-button
+            *ngIf="editing"
+            (onClick)="handleSave()"
+            label="Save"
+            icon="pi pi-save"
+            styleClass="p-button-sm p-button-text"
+          ></p-button>
+          <p-button
+            *ngIf="editing"
+            (onClick)="handleSave()"
+            label="Save a copy"
+            icon="pi pi-save"
+            styleClass="p-button-sm p-button-text"
+          ></p-button>
+          <button
+            pButton
+            pRipple
+            type="button"
+            icon="pi pi-replay"
+            (click)="rotateLeft()"
+            class="p-button-rounded p-button-text p-button-info"
+          ></button>
+          <button
+            pButton
+            pRipple
+            type="button"
+            icon="pi pi-refresh"
+            (click)="rotateRight()"
+            class="p-button-rounded p-button-text p-button-info"
+          ></button>
+
+          <button
+            *ngIf="editing"
+            (click)="cropPreview()"
+            pButton
+            pRipple
+            type="button"
+            icon="pi pi-eye"
+            label=""
+            class="p-button-rounded p-button-text p-button-info"
+          ></button>
+          <button
+            (click)="resetImageToPrevEditingState()"
+            pButton
+            pRipple
+            type="button"
+            icon="pi pi-ban"
+            label=""
+            class="p-button-rounded p-button-text p-button-info"
+          ></button>
+
+          <button
+            pButton
+            pRipple
+            type="button"
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-text p-button-danger"
+          ></button>
+        </div>
+      </div>
+      <div class="flex justify-end">
+        <div>
+          <button
+            (click)="editing ? exitEditor() : closeImageSpotlight()"
+            pButton
+            pRipple
+            type="button"
+            icon="pi pi-times"
+            class="p-button-rounded p-button-text p-button-secondary"
+          ></button>
+        </div>
       </div>
     </div>
   </p-toolbar>
 
   <!-- - Image -->
   <div
-    class="flex justify-center items-center"
-    style="height: calc(100vh - 120px)"
+    class="flex justify-center items-center py-3"
+    style="height: calc(100vh - 60px)"
   >
-    <img
-      #spotlightImageElement
-      [src]="spotlightImage.path"
-      class="h-[100%] w-[100%] max-w-[85%] object-contain"
-      alt=""
-    />
-  </div>
-
-  <!-- - Bottom Toolbar -->
-  <div class="h-[60px] flex justify-center items-center relative">
-    <div class="absolute left-0">
-      <h3 class="text-white">
-        {{ spotlightImage.name }}|{{ spotlightImageElement.naturalWidth }}x{{
-          spotlightImageElement.naturalHeight
-        }}
-      </h3>
+    <div class="max-w-[95%] h-[100%]">
+      <img
+        #spotlightImageElement
+        (load)="updateImageData()"
+        [src]="spotlightImage.path"
+        class="h-[100%] w-[100%] max-w-[100%] object-contain"
+        alt=""
+      />
     </div>
   </div>
 </div>

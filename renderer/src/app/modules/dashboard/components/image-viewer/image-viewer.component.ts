@@ -12,7 +12,7 @@ import {
   ViewChild,
 } from "@angular/core";
 import Cropper from "cropperjs";
-import { ImageViewerEvent, MediaFile } from "common-types";
+import { ImageResolution, ImageViewerEvent, MediaFile } from "common-types";
 import { Subject } from "rxjs";
 
 @Component({
@@ -35,8 +35,9 @@ export class ImageViewerComponent
   @ViewChild("containerElement") public containerRef: ElementRef | undefined;
 
   public imageEditor: Cropper | null = null;
+  public imageResolution: ImageResolution | undefined;
 
-  public _viewOnlyMode: boolean = true;
+  private _viewOnlyMode: boolean = true;
   private _unsubscribe$: Subject<void> = new Subject<void>();
 
   constructor() {}
@@ -63,6 +64,18 @@ export class ImageViewerComponent
   ngAfterViewInit(): void {
     this.enableImageEditing();
     this.watchContainerSize();
+  }
+
+  updateImageData() {
+    if (!this.spotlightImgRef) return;
+
+    const imgEl: HTMLImageElement = this.spotlightImgRef
+      .nativeElement as HTMLImageElement;
+
+    this.imageResolution = {
+      width: imgEl.naturalWidth,
+      height: imgEl.naturalHeight,
+    };
   }
 
   watchContainerSize(): void {

@@ -84,6 +84,8 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes["mediaFiles"]) {
+      let spotlightImageUpdated = false;
+
       this.mediaFiles.forEach((f, i) => {
         f.path = this._editedImageRefs.includes(f.name)
           ? this.bustCache(f.path)
@@ -95,8 +97,15 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
 
         if (f.name === this.spotlightImage?.name) {
           this.spotlightImage = f;
+          spotlightImageUpdated = true;
         }
       });
+
+      // If the updated list of images don't have an image with the same name as the current spotlightImage, close image viewer. Happens especially when an image is deleted within the image viewer.
+      if (this.spotlightImage && !spotlightImageUpdated) {
+        this.editing = false;
+        this.spotlightImage = null;
+      }
     }
   }
 
@@ -233,6 +242,8 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     this.spotlightImage = this.mediaFiles[nextIdx];
+
+    this.editing = false;
   }
 
   previousImage() {
@@ -252,6 +263,8 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     this.spotlightImage = this.mediaFiles[prevIdx];
+
+    this.editing = false;
   }
 
   async applyChanges(editedImgUrl: string) {
@@ -293,12 +306,16 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
       case "openEditor":
         this.editing = true;
         return;
+      case "delete":
+        return this.spotlightImage
+          ? this.deleteSelectedItems(this.spotlightImage)
+          : undefined;
       default:
         return;
     }
   }
 
-  async deleteSelectedItems(mediaFiles?: MediaFile | MediaFile[]) {
+  deleteSelectedItems(mediaFiles?: MediaFile | MediaFile[]) {
     try {
       const selectedItems: MediaFile[] = mediaFiles
         ? ([] as MediaFile[]).concat(mediaFiles)

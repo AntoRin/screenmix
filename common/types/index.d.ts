@@ -26,7 +26,8 @@ export type ImageViewerEventType =
    | "save"
    | "closeViewer"
    | "closeEditor"
-   | "openEditor";
+   | "openEditor"
+   | "delete";
 
 export interface ImageResolution {
    width: number;

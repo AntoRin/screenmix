@@ -13,15 +13,17 @@
         grid-template-rows: 100%;
       "
     >
-      <div class="text-gray-300 flex justify-start">
+      <div
+        [pTooltip]="
+          spotlightImage.name +
+          ' - ' +
+          imageResolution?.width +
+          'x' +
+          imageResolution?.height
+        "
+        class="text-gray-300 flex justify-start"
+      >
         <h3
-          [pTooltip]="
-            spotlightImage.name +
-            ' - ' +
-            imageResolution?.width +
-            'x' +
-            imageResolution?.height
-          "
           tooltipPosition="bottom"
           class="max-w-full overflow-hidden overflow-ellipsis select-none cursor-default"
         >
@@ -34,34 +36,34 @@
         <div>
           <p-button
             *ngIf="!editing"
+            pTooltip="Edit"
+            tooltipPosition="bottom"
             (onClick)="emitViewerEvent({ eventName: 'openEditor' })"
-            label="Edit"
+            label=""
             icon="pi pi-pencil"
             styleClass="p-button-sm p-button-text"
           ></p-button>
           <p-button
             *ngIf="editing"
+            pTooltip="Save"
+            tooltipPosition="bottom"
             (onClick)="handleSave()"
-            label="Save"
+            label=""
             icon="pi pi-save"
             styleClass="p-button-sm p-button-text"
           ></p-button>
           <p-button
             *ngIf="editing"
+            pTooltip="Save a copy"
+            tooltipPosition="bottom"
             (onClick)="handleSave()"
-            label="Save a copy"
-            icon="pi pi-save"
+            label=""
+            icon="pi pi-plus"
             styleClass="p-button-sm p-button-text"
           ></p-button>
           <button
-            pButton
-            pRipple
-            type="button"
-            icon="pi pi-replay"
-            (click)="rotateLeft()"
-            class="p-button-rounded p-button-text p-button-info"
-          ></button>
-          <button
+            pTooltip="Rotate Right"
+            tooltipPosition="bottom"
             pButton
             pRipple
             type="button"
@@ -69,28 +71,33 @@
             (click)="rotateRight()"
             class="p-button-rounded p-button-text p-button-info"
           ></button>
-
           <button
             *ngIf="editing"
+            pTooltip="Crop"
+            tooltipPosition="bottom"
             (click)="cropPreview()"
             pButton
             pRipple
             type="button"
-            icon="pi pi-eye"
+            icon="pi pi-box"
             label=""
             class="p-button-rounded p-button-text p-button-info"
           ></button>
           <button
+            pTooltip="Reset"
+            tooltipPosition="bottom"
             (click)="resetImageToPrevEditingState()"
             pButton
             pRipple
             type="button"
-            icon="pi pi-ban"
+            icon="pi pi-undo"
             label=""
             class="p-button-rounded p-button-text p-button-info"
           ></button>
-
           <button
+            (click)="deleteImage()"
+            pTooltip="Delete"
+            tooltipPosition="bottom"
             pButton
             pRipple
             type="button"

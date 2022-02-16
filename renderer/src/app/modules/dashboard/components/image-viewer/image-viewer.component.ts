@@ -14,6 +14,7 @@ import {
 import Cropper from "cropperjs";
 import { ImageResolution, ImageViewerEvent, MediaFile } from "common-types";
 import { Subject } from "rxjs";
+import { MenuItem } from "primeng/api";
 
 @Component({
   selector: "app-image-viewer",
@@ -32,7 +33,6 @@ export class ImageViewerComponent
   @ViewChild("spotlightImageElement") public spotlightImgRef:
     | ElementRef
     | undefined;
-  @ViewChild("containerElement") public containerRef: ElementRef | undefined;
 
   public imageEditor: Cropper | null = null;
   public imageResolution: ImageResolution | undefined;
@@ -46,11 +46,10 @@ export class ImageViewerComponent
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes["editing"]?.currentValue) {
-      this.imageEditor?.crop();
-      this.resetCropBoxToFitImage();
+      this.resetImageToPrevEditingState();
       this._viewOnlyMode = false;
     } else {
-      this.imageEditor?.clear();
+      this.resetImageToPrevEditingState();
       this._viewOnlyMode = true;
     }
 
@@ -63,7 +62,6 @@ export class ImageViewerComponent
 
   ngAfterViewInit(): void {
     this.enableImageEditing();
-    this.watchContainerSize();
   }
 
   updateImageData() {
@@ -76,25 +74,6 @@ export class ImageViewerComponent
       width: imgEl.naturalWidth,
       height: imgEl.naturalHeight,
     };
-  }
-
-  watchContainerSize(): void {
-    if (!this.containerRef) return;
-
-    const container: HTMLDivElement = this.containerRef
-      .nativeElement as HTMLDivElement;
-
-    const resizeImage = (): void => {};
-
-    const observer = new MutationObserver(resizeImage);
-
-    observer.observe(container, {
-      attributes: true,
-    });
-
-    this._unsubscribe$.asObservable().subscribe(() => {
-      observer.disconnect();
-    });
   }
 
   emitViewerEvent(event: ImageViewerEvent) {
@@ -132,6 +111,11 @@ export class ImageViewerComponent
       zoomable: true,
       background: false,
       dragMode: "move",
+      responsive: true,
+      restore: true,
+      wheelZoomRatio: 0.5,
+      zoom: (event) =>
+        event.detail.ratio < 0.5 ? event.preventDefault() : undefined,
       ready: () => {
         if (!this._viewOnlyMode) this.imageEditor?.crop();
       },
@@ -140,8 +124,6 @@ export class ImageViewerComponent
           event.preventDefault();
         }
       },
-      responsive: true,
-      restore: true,
     });
   }
 
@@ -156,8 +138,6 @@ export class ImageViewerComponent
     this.emitViewerEvent({
       eventName: "closeEditor",
     });
-
-    this.resetImageToPrevEditingState();
   }
 
   private _destroyImageEditor() {
@@ -210,6 +190,12 @@ export class ImageViewerComponent
   resetImageToPrevEditingState() {
     if (!this.imageEditor || !this.spotlightImage) return;
     this.imageEditor.replace(this.spotlightImage.path);
+  }
+
+  deleteImage() {
+    this.emitViewerEvent({
+      eventName: "delete",
+    });
   }
 
   ngOnDestroy(): void {

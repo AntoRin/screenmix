@@ -4,13 +4,27 @@
   #containerElement
 >
   <!-- - Top Menu -->
-  <p-toolbar styleClass="h-[60px]">
+  <p-toolbar styleClass="h-[60px] p-0">
     <div
-      class="p-toolbar-group-left h-full w-full"
-      style="display: grid; grid-template-columns: 1fr 1fr 1fr"
+      class="p-toolbar-group-left h-full w-full whitespace-nowrap"
+      style="
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-rows: 100%;
+      "
     >
       <div class="text-gray-300 flex justify-start">
-        <h3>
+        <h3
+          [pTooltip]="
+            spotlightImage.name +
+            ' - ' +
+            imageResolution?.width +
+            'x' +
+            imageResolution?.height
+          "
+          tooltipPosition="bottom"
+          class="max-w-full overflow-hidden overflow-ellipsis select-none cursor-default"
+        >
           {{ spotlightImage.name }} - {{ imageResolution?.width }}x{{
             imageResolution?.height
           }}

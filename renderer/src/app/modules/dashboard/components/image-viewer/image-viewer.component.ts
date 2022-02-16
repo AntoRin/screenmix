@@ -14,7 +14,6 @@ import {
 import Cropper from "cropperjs";
 import { ImageResolution, ImageViewerEvent, MediaFile } from "common-types";
 import { Subject } from "rxjs";
-import { MenuItem } from "primeng/api";
 
 @Component({
   selector: "app-image-viewer",
@@ -113,9 +112,10 @@ export class ImageViewerComponent
       dragMode: "move",
       responsive: true,
       restore: true,
+      viewMode: 0,
       wheelZoomRatio: 0.5,
       zoom: (event) =>
-        event.detail.ratio < 0.5 ? event.preventDefault() : undefined,
+        event.detail.ratio < 0.1 ? event.preventDefault() : undefined,
       ready: () => {
         if (!this._viewOnlyMode) this.imageEditor?.crop();
       },
@@ -156,6 +156,14 @@ export class ImageViewerComponent
     if (!this.imageEditor) return;
     this.imageEditor.rotate(90);
     this.resetCropBoxToFitImage();
+  }
+
+  zoomOut() {
+    this.imageEditor?.zoom(-0.5);
+  }
+
+  zoomIn() {
+    this.imageEditor?.zoom(0.5);
   }
 
   resetCropBoxToFitImage() {

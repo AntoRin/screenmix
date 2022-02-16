@@ -34,33 +34,6 @@
       </div>
       <div class="flex justify-center">
         <div>
-          <p-button
-            *ngIf="!editing"
-            pTooltip="Edit"
-            tooltipPosition="bottom"
-            (onClick)="emitViewerEvent({ eventName: 'openEditor' })"
-            label=""
-            icon="pi pi-pencil"
-            styleClass="p-button-sm p-button-text"
-          ></p-button>
-          <p-button
-            *ngIf="editing"
-            pTooltip="Save"
-            tooltipPosition="bottom"
-            (onClick)="handleSave()"
-            label=""
-            icon="pi pi-save"
-            styleClass="p-button-sm p-button-text"
-          ></p-button>
-          <p-button
-            *ngIf="editing"
-            pTooltip="Save a copy"
-            tooltipPosition="bottom"
-            (onClick)="handleSave()"
-            label=""
-            icon="pi pi-plus"
-            styleClass="p-button-sm p-button-text"
-          ></p-button>
           <button
             pTooltip="Rotate Right"
             tooltipPosition="bottom"
@@ -69,6 +42,26 @@
             type="button"
             icon="pi pi-refresh"
             (click)="rotateRight()"
+            class="p-button-rounded p-button-text p-button-info"
+          ></button>
+          <button
+            pTooltip="Zoom Out"
+            tooltipPosition="bottom"
+            pButton
+            pRipple
+            type="button"
+            icon="pi pi-search-minus"
+            (click)="zoomOut()"
+            class="p-button-rounded p-button-text p-button-info"
+          ></button>
+          <button
+            pTooltip="Zoom In"
+            tooltipPosition="bottom"
+            pButton
+            pRipple
+            type="button"
+            icon="pi pi-search-plus"
+            (click)="zoomIn()"
             class="p-button-rounded p-button-text p-button-info"
           ></button>
           <button
@@ -108,6 +101,35 @@
       </div>
       <div class="flex justify-end">
         <div>
+          <p-button
+            *ngIf="!editing"
+            pTooltip="Edit"
+            tooltipPosition="bottom"
+            (onClick)="emitViewerEvent({ eventName: 'openEditor' })"
+            label="Edit"
+            icon="pi pi-pencil"
+            styleClass="p-button-sm p-button-text"
+          ></p-button>
+          <div class="inline-flex mr-1">
+            <p-button
+              *ngIf="editing"
+              pTooltip="Save"
+              tooltipPosition="bottom"
+              (onClick)="handleSave()"
+              label="Save"
+              icon="pi pi-save"
+              styleClass="p-button-sm p-button-outlined"
+            ></p-button>
+            <p-button
+              *ngIf="editing"
+              pTooltip="Save a copy"
+              tooltipPosition="bottom"
+              (onClick)="handleSave()"
+              label=""
+              icon="pi pi-plus"
+              styleClass="p-button-sm p-button-outlined"
+            ></p-button>
+          </div>
           <button
             (click)="editing ? exitEditor() : closeImageSpotlight()"
             pButton

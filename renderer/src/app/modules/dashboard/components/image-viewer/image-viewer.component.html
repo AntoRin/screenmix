@@ -65,6 +65,16 @@
             class="p-button-rounded p-button-text p-button-info"
           ></button>
           <button
+            pTooltip="Center"
+            tooltipPosition="bottom"
+            pButton
+            pRipple
+            type="button"
+            icon="pi pi-th-large"
+            (click)="centerImage()"
+            class="p-button-rounded p-button-text p-button-info"
+          ></button>
+          <button
             *ngIf="editing"
             pTooltip="Crop"
             tooltipPosition="bottom"

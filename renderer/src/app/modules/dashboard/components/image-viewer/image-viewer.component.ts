@@ -166,6 +166,21 @@ export class ImageViewerComponent
     this.imageEditor?.zoom(0.5);
   }
 
+  centerImage(): void {
+    if (!this.imageEditor) return;
+
+    const containerData = this.imageEditor.getContainerData();
+    const canvasData = this.imageEditor.getCanvasData();
+
+    this.imageEditor.setCanvasData({
+      height: canvasData.height,
+      left: containerData.width / 2 - (canvasData.width - canvasData.width / 2),
+      width: canvasData.width,
+      top:
+        containerData.height / 2 - (canvasData.height - canvasData.height / 2),
+    });
+  }
+
   resetCropBoxToFitImage() {
     if (!this.imageEditor) return;
 

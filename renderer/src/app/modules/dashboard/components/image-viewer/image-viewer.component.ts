@@ -79,7 +79,7 @@ export class ImageViewerComponent
     this.viewerEvent.emit(event);
   }
 
-  handleSave() {
+  handleSave(asCopy: boolean = false) {
     if (!this.spotlightImage || !this.imageEditor) return;
 
     const editedImgUrl: string = this.imageEditor
@@ -88,10 +88,15 @@ export class ImageViewerComponent
 
     this.exitEditor();
 
-    this.emitViewerEvent({
-      eventName: "save",
-      data: editedImgUrl,
-    });
+    asCopy
+      ? this.emitViewerEvent({
+          eventName: "saveAsCopy",
+          data: editedImgUrl,
+        })
+      : this.emitViewerEvent({
+          eventName: "save",
+          data: editedImgUrl,
+        });
   }
 
   enableImageEditing() {

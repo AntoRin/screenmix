@@ -24,6 +24,7 @@ export type ImageViewerEventType =
    | "nextImage"
    | "previousImage"
    | "save"
+   | "saveAsCopy"
    | "closeViewer"
    | "closeEditor"
    | "openEditor"

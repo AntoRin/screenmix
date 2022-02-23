@@ -267,13 +267,19 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
     this.editing = false;
   }
 
-  async applyChanges(editedImgUrl: string) {
+  async applyChanges(editedImgUrl: string, asCopy: boolean = false) {
     try {
       if (!this.spotlightImage) return;
 
       const currentIdx = this.mediaFiles.findIndex(
         (f) => f.name === this.spotlightImage?.name
       );
+
+      if (asCopy)
+        this.mediaFiles[currentIdx].name =
+          Date.now() +
+          "." +
+          (this.mediaFiles[currentIdx]?.name.split(".").pop() || "");
 
       await window.rendererProcessCtrl.invoke("ipc:saveEditedImage", {
         dataUrl: editedImgUrl,
@@ -291,6 +297,8 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
     switch (event.eventName) {
       case "save":
         return event.data ? this.applyChanges(event.data) : undefined;
+      case "saveAsCopy":
+        return event.data ? this.applyChanges(event.data, true) : undefined;
       case "nextImage":
         return this.nextImage();
       case "previousImage":

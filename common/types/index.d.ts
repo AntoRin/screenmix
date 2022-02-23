@@ -43,6 +43,7 @@ export interface MediaFile {
    name: string;
    type: "video" | "image";
    path: string;
+   createdAt: number;
    customData?: { [key: string]: string | boolean | number };
 }
 

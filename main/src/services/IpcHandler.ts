@@ -1,6 +1,14 @@
 import path from "path";
 import { fileURLToPath } from "url";
-import { BrowserWindow, dialog, desktopCapturer, globalShortcut, ipcMain, nativeImage, clipboard } from "electron";
+import {
+   BrowserWindow,
+   dialog,
+   desktopCapturer,
+   globalShortcut,
+   ipcMain,
+   nativeImage,
+   clipboard,
+} from "electron";
 import {
    CaptureData,
    IpcApi,
@@ -118,7 +126,9 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    async removeMediaDirectory(path: string) {
       try {
          await this._store.write({
-            mediaDirectories: (this._store.read("mediaDirectories") as string[]).filter(p => p !== path),
+            mediaDirectories: (this._store.read("mediaDirectories") as string[]).filter(
+               p => p !== path
+            ),
          });
 
          if (this._store.read("baseDirectory") === path) {
@@ -167,51 +177,67 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
 
          if (!baseDirectory) return [];
 
-         let files: string[] = [];
-
-         try {
-            const directoryContents: Dirent[] = await fsp.readdir(baseDirectory!, {
+         const files = this._createSortedMediaFileList(
+            await fsp.readdir(baseDirectory, {
                withFileTypes: true,
-            });
+            }),
+            baseDirectory
+         );
 
-            for (const fileData of directoryContents) {
-               if (
-                  fileData.isFile() &&
-                  (this._imageExtensions.includes(path.extname(fileData.name).toLowerCase()) ||
-                     this._videoExtensions.includes(path.extname(fileData.name).toLowerCase()))
-               ) {
-                  files.push(path.join(baseDirectory!, fileData.name));
-               }
+         return files;
+      } catch (error) {
+         throw error;
+      }
+   }
+
+   private _createSortedMediaFileList(
+      dirents: Dirent[],
+      baseDirectory: string
+   ): MediaFile[] {
+      let files: MediaFile[] = [];
+
+      for (const dirent of dirents) {
+         try {
+            if (
+               dirent.isFile() &&
+               (this._imageExtensions.includes(path.extname(dirent.name).toLowerCase()) ||
+                  this._videoExtensions.includes(path.extname(dirent.name).toLowerCase()))
+            ) {
+               const mediaFile: MediaFile = {
+                  name: path.basename(dirent.name),
+                  path: path.join("file:///", baseDirectory, dirent.name),
+                  type: this._imageExtensions.includes(
+                     path.extname(dirent.name).toLowerCase()
+                  )
+                     ? "image"
+                     : "video",
+                  createdAt: statSync(
+                     path.join(baseDirectory, dirent.name)
+                  ).birthtime.getTime(),
+               };
+
+               let idx = 0;
+
+               do {
+                  if (
+                     mediaFile.createdAt >=
+                     (files[idx]?.createdAt || Number.NEGATIVE_INFINITY)
+                  ) {
+                     files.splice(idx, 0, mediaFile);
+                     break;
+                  }
+
+                  idx++;
+               } while (idx <= files.length);
             }
          } catch (error: any) {
             if (error.code !== "ENOENT") {
                throw error;
             }
          }
-
-         this._sortFilePathsBasedOnBirthTime(files);
-
-         return files.map(f => ({
-            name: path.basename(f),
-            path: path.join("file:///", f),
-            type: this._imageExtensions.includes(path.extname(f).toLowerCase()) ? "image" : "video",
-         }));
-      } catch (error) {
-         throw error;
       }
-   }
 
-   private _sortFilePathsBasedOnBirthTime(filePaths: string[]) {
-      try {
-         filePaths.sort((filePath1, filePath2) => {
-            const file1Time = statSync(filePath1).birthtime.getTime();
-            const file2Time = statSync(filePath2).birthtime.getTime();
-
-            return file1Time > file2Time ? -1 : file2Time > file1Time ? 1 : 0;
-         });
-      } catch (error) {
-         throw error;
-      }
+      return files;
    }
 
    public takeScreenshot() {
@@ -255,7 +281,9 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
                  try {
                     const activeSource = await activeWin();
                     if (!activeSource) return undefined;
-                    return sources.find(s => s.id.indexOf(String(activeSource.id)) !== -1);
+                    return sources.find(
+                       s => s.id.indexOf(String(activeSource.id)) !== -1
+                    );
                  } catch (error) {
                     return undefined;
                  }
@@ -288,7 +316,8 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
             encoding: "base64",
          });
 
-         const notification = captureData.mode === "image" ? "fromMain:newImage" : "fromMain:newVideo";
+         const notification =
+            captureData.mode === "image" ? "fromMain:newImage" : "fromMain:newVideo";
 
          if (notify) this._notifyRenderer(notification);
       } catch (error) {
@@ -343,12 +372,16 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    async openBaseDirectory() {
       try {
          await new Promise<void>((resolve, reject) => {
-            const proc: ChildProcess = spawn("explorer", [this._store.read("baseDirectory")], {
-               stdio: ["pipe", "pipe", "pipe"],
-               detached: false,
-               windowsHide: true,
-               shell: true,
-            });
+            const proc: ChildProcess = spawn(
+               "explorer",
+               [this._store.read("baseDirectory")],
+               {
+                  stdio: ["pipe", "pipe", "pipe"],
+                  detached: false,
+                  windowsHide: true,
+                  shell: true,
+               }
+            );
 
             let promiseEnded: boolean = false;
 

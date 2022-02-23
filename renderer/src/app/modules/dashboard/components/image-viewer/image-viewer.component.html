@@ -128,16 +128,16 @@
               (onClick)="handleSave()"
               label="Save"
               icon="pi pi-save"
-              styleClass="p-button-sm p-button-outlined"
+              styleClass="p-button-sm p-button-text"
             ></p-button>
             <p-button
               *ngIf="editing"
               pTooltip="Save a copy"
               tooltipPosition="bottom"
-              (onClick)="handleSave()"
-              label=""
+              (onClick)="handleSave(true)"
+              label="Save a copy"
               icon="pi pi-plus"
-              styleClass="p-button-sm p-button-outlined"
+              styleClass="p-button-sm p-button-text"
             ></p-button>
           </div>
           <button

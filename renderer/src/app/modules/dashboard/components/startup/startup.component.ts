@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { ProgressBarService } from "../../modules/shared/services/progress-bar.service";
+import { ProgressBarService } from "../../../shared/services/progress-bar.service";
 
 @Component({
   selector: "app-startup",

@@ -7,10 +7,17 @@ import { GalleryComponent } from "./components/gallery/gallery.component";
 import { SharedModule } from "../shared/shared.module";
 import { SettingsComponent } from "./components/settings/settings.component";
 import { FormsModule } from "@angular/forms";
-import { ImageViewerComponent } from './components/image-viewer/image-viewer.component';
+import { ImageViewerComponent } from "./components/image-viewer/image-viewer.component";
+import { StartupComponent } from "./components/startup/startup.component";
 
 @NgModule({
-  declarations: [DashboardComponent, GalleryComponent, SettingsComponent, ImageViewerComponent],
+  declarations: [
+    StartupComponent,
+    DashboardComponent,
+    GalleryComponent,
+    SettingsComponent,
+    ImageViewerComponent,
+  ],
   imports: [
     CommonModule,
     FormsModule,

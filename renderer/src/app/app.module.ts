@@ -5,11 +5,11 @@ import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { DashboardModule } from "./modules/dashboard/dashboard.module";
 import { PrimengModule } from "./modules/primeng/primeng.module";
-import { StartupComponent } from "./components/startup/startup.component";
+
 import { SharedModule } from "./modules/shared/shared.module";
 
 @NgModule({
-  declarations: [AppComponent, StartupComponent],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,

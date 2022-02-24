@@ -139,20 +139,7 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
       },
       {
         label: "Copy",
-        command: async () => {
-          await window.rendererProcessCtrl
-            .invoke("ipc:copyImageToClipboard", mediaFile)
-            ?.catch((e: any) => {
-              this._messageServ.add({
-                severity: "error",
-                detail: "There was an error copying the image to clipboard.",
-              });
-            });
-          this._messageServ.add({
-            severity: "info",
-            detail: "Copied to clipboard.",
-          });
-        },
+        command: this.copyImageToClipboard.bind(this, mediaFile),
         visible: mediaFile.type === "image",
       },
       {
@@ -219,6 +206,21 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
         : null;
 
     this._cd.detectChanges();
+  }
+
+  async copyImageToClipboard(mediaFile: MediaFile) {
+    await window.rendererProcessCtrl
+      .invoke("ipc:copyImageToClipboard", mediaFile)
+      ?.catch((e: any) => {
+        this._messageServ.add({
+          severity: "error",
+          detail: "There was an error copying the image to clipboard.",
+        });
+      });
+    this._messageServ.add({
+      severity: "info",
+      detail: "Copied to clipboard.",
+    });
   }
 
   nextImage() {
@@ -299,6 +301,10 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
         return event.data ? this.applyChanges(event.data) : undefined;
       case "saveAsCopy":
         return event.data ? this.applyChanges(event.data, true) : undefined;
+      case "copyImage":
+        return this.spotlightImage
+          ? this.copyImageToClipboard(this.spotlightImage)
+          : undefined;
       case "nextImage":
         return this.nextImage();
       case "previousImage":

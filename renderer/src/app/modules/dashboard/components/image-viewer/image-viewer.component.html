@@ -45,6 +45,17 @@
             class="p-button-rounded p-button-text p-button-info"
           ></button>
           <button
+            *ngIf="!editing"
+            pTooltip="Copy"
+            tooltipPosition="bottom"
+            pButton
+            pRipple
+            type="button"
+            icon="pi pi-copy"
+            (click)="copyImage()"
+            class="p-button-rounded p-button-text p-button-info"
+          ></button>
+          <button
             pTooltip="Zoom Out"
             tooltipPosition="bottom"
             pButton

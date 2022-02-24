@@ -132,6 +132,12 @@ export class ImageViewerComponent
     });
   }
 
+  copyImage() {
+    this.emitViewerEvent({
+      eventName: "copyImage",
+    });
+  }
+
   closeImageSpotlight() {
     this.exitEditor();
     this.emitViewerEvent({

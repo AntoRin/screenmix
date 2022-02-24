@@ -26,6 +26,7 @@ export type ImageViewerEventType =
    | "save"
    | "saveAsCopy"
    | "closeViewer"
+   | "copyImage"
    | "closeEditor"
    | "openEditor"
    | "delete";
@@ -97,6 +98,4 @@ export interface CaptureData {
    name?: string;
 }
 
-export type MainProcessInternalEvent =
-   | "videoCaptureStatusChange"
-   | "exitApplication";
+export type MainProcessInternalEvent = "videoCaptureStatusChange" | "exitApplication";

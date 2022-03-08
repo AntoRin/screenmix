@@ -143,6 +143,7 @@ export class ImageViewerComponent
           event.preventDefault();
         }
       },
+      cropend: this.cropPreview.bind(this),
     });
   }
 

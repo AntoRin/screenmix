@@ -1,10 +1,4 @@
-import {
-   app,
-   BrowserWindow,
-   Menu,
-   MenuItemConstructorOptions,
-   Tray,
-} from "electron";
+import { app, BrowserWindow, Menu, MenuItemConstructorOptions, Tray } from "electron";
 import { IpcHandler } from "./services/IpcHandler";
 
 import ess from "electron-squirrel-startup";
@@ -34,9 +28,16 @@ class Screenmix {
 
          this._ipcHandler = new IpcHandler(this._mainWindow);
 
+         this._ipcHandler.on("exitApplication", this._setFlagAndExit.bind(this));
+
          this._ipcHandler.on(
-            "exitApplication",
-            this._setFlagAndExit.bind(this)
+            "hideMainWindow",
+            this._mainWindow.hide.bind(this._mainWindow)
+         );
+
+         this._ipcHandler.on(
+            "showMainWindow",
+            this._mainWindow.show.bind(this._mainWindow)
          );
 
          app.on("activate", () => {
@@ -85,6 +86,21 @@ class Screenmix {
 
       this._mainWindow.setMinimumSize(640, 480);
 
+      this._mainWindow.on("hide", async () => {
+         if (this._ipcHandler) {
+            await new Promise<void>((resolve, reject) => {
+               setTimeout(resolve, 100);
+            });
+            this._ipcHandler.emit("windowHidden");
+         }
+      });
+
+      this._mainWindow.on("show", () => {
+         if (this._ipcHandler) {
+            this._ipcHandler.emit("windowShown");
+         }
+      });
+
       this._mainWindow.on("close", event => {
          if (this._isQuitting) return true;
 
@@ -103,18 +119,13 @@ class Screenmix {
 
       this._tray.on("click", this._mainWindow.show.bind(this._mainWindow));
 
-      this._tray.setContextMenu(
-         Menu.buildFromTemplate(this._generateTrayCtxMenu())
-      );
+      this._tray.setContextMenu(Menu.buildFromTemplate(this._generateTrayCtxMenu()));
 
-      this._ipcHandler.on(
-         "videoCaptureStatusChange",
-         (status: VideoCaptureStatus) => {
-            this._tray?.setContextMenu(
-               Menu.buildFromTemplate(this._generateTrayCtxMenu(status))
-            );
-         }
-      );
+      this._ipcHandler.on("videoCaptureStatusChange", (status: VideoCaptureStatus) => {
+         this._tray?.setContextMenu(
+            Menu.buildFromTemplate(this._generateTrayCtxMenu(status))
+         );
+      });
    }
 
    private _generateTrayCtxMenu(

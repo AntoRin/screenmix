@@ -12,7 +12,12 @@ import {
   SimpleChanges,
   ViewChild,
 } from "@angular/core";
-import { GalleryEvent, ImageViewerEvent, MediaFile } from "common-types";
+import {
+  GalleryAction,
+  GalleryEvent,
+  ImageViewerEvent,
+  MediaFile,
+} from "common-types";
 import { ConfirmationService, MenuItem, MessageService } from "primeng/api";
 import { ContextMenu } from "primeng/contextmenu";
 import { Menu } from "primeng/menu";
@@ -26,7 +31,7 @@ import { Subject } from "rxjs";
 })
 export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
   @Input() public mediaFiles: MediaFile[] = [];
-  @Input() public actions$: Subject<string> | undefined;
+  @Input() public actions$: Subject<GalleryAction> | undefined;
   @Input() public selectMode: boolean = false;
   @Input() public mediaFileFilter: MediaFile["type"] = "image";
 
@@ -46,6 +51,7 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
 
   public spotlightImage: MediaFile | null = null;
   public editing: boolean = false;
+  public previewMode: boolean = false;
 
   public saveOptions = [
     {
@@ -60,6 +66,10 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
 
   private _editedImageRefs: string[] = [];
   private _unsubscribe$: Subject<void> = new Subject<void>();
+  private _previewStatus$: Subject<{
+    status: boolean;
+    updatedImageData: string | undefined;
+  }> | null = null;
 
   constructor(
     private _cd: ChangeDetectorRef,
@@ -71,9 +81,52 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
     if (this.actions$) {
       const actionsSubscription = this.actions$
         .asObservable()
-        .subscribe((action) => {
-          if (action === "delete") {
+        .subscribe((action: GalleryAction) => {
+          if (action.name === "delete") {
             this.deleteSelectedItems();
+          } else if (action.name === "imagePreview") {
+            if (action.data) {
+              this.spotlightImage = {
+                name: "Preview",
+                path: action.data,
+                type: "image",
+                createdAt: Date.now(),
+              };
+              this.editing = true;
+              this.previewMode = true;
+
+              this._cd.detectChanges();
+
+              new Promise<string | undefined>((resolve, reject) => {
+                this._previewStatus$ = new Subject<{
+                  status: boolean;
+                  updatedImageData: string | undefined;
+                }>();
+                this._previewStatus$
+                  .asObservable()
+                  .subscribe(({ status, updatedImageData }) => {
+                    if (status) return resolve(updatedImageData);
+                    return reject("Preview rejected");
+                  });
+              })
+                .then((updatedImageData: string | undefined) => {
+                  action.callback &&
+                    typeof action.callback === "function" &&
+                    action.callback(undefined, updatedImageData);
+                })
+                .catch((e: any) => {
+                  action.callback &&
+                    typeof action.callback === "function" &&
+                    action.callback(e);
+                })
+                .finally(() => {
+                  this._previewStatus$?.complete();
+                  this._previewStatus$ = null;
+                  this.spotlightImage = null;
+                  this.editing = false;
+                  this.previewMode = false;
+                });
+            }
           }
         });
       this._unsubscribe$.asObservable().subscribe(() => {
@@ -324,6 +377,16 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
         return this.spotlightImage
           ? this.deleteSelectedItems(this.spotlightImage)
           : undefined;
+      case "acceptPreview":
+        return this._previewStatus$?.next({
+          status: true,
+          updatedImageData: event.data,
+        });
+      case "rejectPreview":
+        return this._previewStatus$?.next({
+          status: false,
+          updatedImageData: undefined,
+        });
       default:
         return;
     }

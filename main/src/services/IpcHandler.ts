@@ -49,6 +49,11 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
       return this;
    }
 
+   override once(event: MainProcessInternalEvent, callback: (...args: any[]) => void) {
+      super.once.apply(this, [event, callback]);
+      return this;
+   }
+
    public initializeIpcListeners() {
       Channels.forEach((channel: IpcChannel) => {
          ipcMain.handle(channel, (e, ...args: any[]) => {
@@ -402,6 +407,18 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
       } catch (error) {
          throw error;
       }
+   }
+
+   async modifyMainWindow(actionType: "hide" | "show"): Promise<void> {
+      await new Promise<void>((resolve, reject) => {
+         if (actionType === "hide") {
+            this.once("windowHidden", resolve);
+            this.emit("hideMainWindow");
+         } else if (actionType === "show") {
+            this.once("windowShown", resolve);
+            this.emit("showMainWindow");
+         }
+      });
    }
 
    exitApplication() {

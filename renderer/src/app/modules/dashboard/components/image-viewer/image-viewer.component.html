@@ -136,13 +136,13 @@
               *ngIf="editing"
               pTooltip="Save"
               tooltipPosition="bottom"
-              (onClick)="handleSave()"
+              (onClick)="!previewMode ? handleSave(true) : acceptPreview()"
               label="Save"
               icon="pi pi-save"
               styleClass="p-button-sm p-button-text"
             ></p-button>
             <p-button
-              *ngIf="editing"
+              *ngIf="editing && !previewMode"
               pTooltip="Save a copy"
               tooltipPosition="bottom"
               (onClick)="handleSave(true)"
@@ -152,7 +152,13 @@
             ></p-button>
           </div>
           <button
-            (click)="editing ? exitEditor() : closeImageSpotlight()"
+            (click)="
+              previewMode
+                ? rejectPreview()
+                : editing
+                ? exitEditor()
+                : closeImageSpotlight()
+            "
             pButton
             pRipple
             type="button"

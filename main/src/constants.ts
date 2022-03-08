@@ -20,7 +20,8 @@ export const Channels: IpcChannel[] = (
       "setBaseDirectory",
       "handleVideoCaptureStatusChange",
       "exitApplication",
-      "openBaseDirectory"
+      "openBaseDirectory",
+      "modifyMainWindow",
    ] as IpcApi[]
 ).map(val => `ipc:${val}`) as IpcChannel[];
 

@@ -2,8 +2,8 @@ import { Injectable } from "@angular/core";
 import { Subject } from "rxjs";
 import {
   CaptureMode,
+  MediaStreamEvent,
   ProcessNotification,
-  VideoCaptureStatus,
 } from "common-types";
 
 @Injectable({
@@ -14,7 +14,7 @@ export class MediaStreamService {
   private _processNotificationSubject: Subject<ProcessNotification> =
     new Subject<ProcessNotification>();
 
-  streamNotifications$ = new Subject<VideoCaptureStatus>();
+  streamNotifications$ = new Subject<MediaStreamEvent>();
 
   constructor() {}
 
@@ -24,13 +24,13 @@ export class MediaStreamService {
 
   set videoCaptureInProgress(status) {
     if (status) {
-      this.streamNotifications$.next("videoCaptureStart");
+      this.streamNotifications$.next({ name: "videoCaptureStart" });
       window.rendererProcessCtrl.invoke(
         "ipc:handleVideoCaptureStatusChange",
         "videoCaptureStart"
       );
     } else {
-      this.streamNotifications$.next("videoCaptureEnd");
+      this.streamNotifications$.next({ name: "videoCaptureEnd" });
       window.rendererProcessCtrl.invoke(
         "ipc:handleVideoCaptureStatusChange",
         "videoCaptureEnd"
@@ -42,7 +42,8 @@ export class MediaStreamService {
   async captureScreen(
     mode: CaptureMode,
     resolution: string,
-    currentWindow: boolean = false
+    currentWindow: boolean = false,
+    preview: boolean = false
   ): Promise<void> {
     try {
       if (this.videoCaptureInProgress && mode === "video")
@@ -52,6 +53,10 @@ export class MediaStreamService {
 
       if (isNaN(Number(width)) || isNaN(Number(height))) {
         throw new Error("INVALID_RESOLUTION");
+      }
+
+      if (preview) {
+        await window.rendererProcessCtrl.invoke("ipc:modifyMainWindow", "hide");
       }
 
       const srcId = await window.rendererProcessCtrl.invoke(
@@ -74,7 +79,7 @@ export class MediaStreamService {
       });
 
       if (mode === "image")
-        return this.handleImageCapture(stream, [+width, +height]);
+        return this.handleImageCapture(stream, [+width, +height], preview);
 
       if (mode === "video") return this.handleVideoCapture(stream);
     } catch (error) {
@@ -148,12 +153,10 @@ export class MediaStreamService {
 
   async handleImageCapture(
     stream: MediaStream,
-    [width, height]: number[] = []
+    [width, height]: [number, number] = [1280, 720],
+    preview: boolean = false
   ) {
     try {
-      if (!width) width = 1280;
-      if (!height) height = 720;
-
       const videoElement: HTMLVideoElement = document.createElement("video");
 
       videoElement.style.width = `${width}px`;
@@ -168,11 +171,39 @@ export class MediaStreamService {
         const ctx = canvas.getContext("2d");
 
         ctx!.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-        const imageDataUrl = canvas.toDataURL("image/png");
+        let imageDataUrl = canvas.toDataURL("image/png");
 
         this.destroyMediaStream(stream);
         videoElement.remove();
         canvas.remove();
+
+        if (preview) {
+          await window.rendererProcessCtrl.invoke(
+            "ipc:modifyMainWindow",
+            "show"
+          );
+
+          const previewResult: false | string | undefined = await new Promise<false | string | undefined>(
+            (resolve) => {
+              this.streamNotifications$.next({
+                name: "imagePreview",
+                data: imageDataUrl,
+                callback: (e?: any, updatedPreview?: string) => {
+                  if (e) return resolve(false);
+                  return resolve(updatedPreview);
+                },
+              });
+            }
+          );
+
+          if (previewResult === false) return;
+
+          if (previewResult) {
+            imageDataUrl = previewResult;
+          }
+
+          console.log(previewResult);
+        }
 
         await window.rendererProcessCtrl.invoke("ipc:saveCapture", {
           dataUrl: imageDataUrl,

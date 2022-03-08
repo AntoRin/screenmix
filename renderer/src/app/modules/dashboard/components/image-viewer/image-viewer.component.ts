@@ -25,6 +25,7 @@ export class ImageViewerComponent
 {
   @Input() public editing: boolean = false;
   @Input() public spotlightImage: MediaFile | null = null;
+  @Input() public previewMode: boolean = false;
 
   @Output() public viewerEvent: EventEmitter<ImageViewerEvent> =
     new EventEmitter<ImageViewerEvent>();
@@ -97,6 +98,19 @@ export class ImageViewerComponent
           eventName: "save",
           data: editedImgUrl,
         });
+  }
+
+  acceptPreview() {
+    this.emitViewerEvent({
+      eventName: "acceptPreview",
+      data: this.imageEditor?.getCroppedCanvas({}).toDataURL("image/png"),
+    });
+  }
+
+  rejectPreview() {
+    this.emitViewerEvent({
+      eventName: "rejectPreview",
+    });
   }
 
   enableImageEditing() {

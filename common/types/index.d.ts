@@ -19,6 +19,17 @@ export type TopMenuEvent = "delete" | "selectToggle";
 export type GalleryEvent = "selectModeOn" | "selectModeOff" | "itemSelected";
 
 export type VideoCaptureStatus = "videoCaptureStart" | "videoCaptureEnd";
+export interface MediaStreamEvent {
+   name: VideoCaptureStatus | "imagePreview" | "videoPreview";
+   data?: string;
+   callback?: (error?: any, data?: string) => void;
+}
+
+export interface GalleryAction {
+   name: "delete" | "imagePreview" | "videoPreview";
+   data?: string;
+   callback?: (error?: any, data?: string) => void;
+}
 
 export type ImageViewerEventType =
    | "nextImage"
@@ -29,7 +40,9 @@ export type ImageViewerEventType =
    | "copyImage"
    | "closeEditor"
    | "openEditor"
-   | "delete";
+   | "delete"
+   | "acceptPreview"
+   | "rejectPreview";
 
 export interface ImageResolution {
    width: number;
@@ -68,6 +81,7 @@ export interface RendererProcessCtx {
    handleVideoCaptureStatusChange(status: VideoCaptureStatus): Promise<void>;
    exitApplication(): void;
    openBaseDirectory(): Promise<void>;
+   modifyMainWindow(actionType: "hide" | "show"): Promise<void>;
 }
 
 export type IpcApi = Required<keyof RendererProcessCtx>;
@@ -98,4 +112,10 @@ export interface CaptureData {
    name?: string;
 }
 
-export type MainProcessInternalEvent = "videoCaptureStatusChange" | "exitApplication";
+export type MainProcessInternalEvent =
+   | "videoCaptureStatusChange"
+   | "exitApplication"
+   | "hideMainWindow"
+   | "showMainWindow"
+   | "windowHidden"
+   | "windowShown";

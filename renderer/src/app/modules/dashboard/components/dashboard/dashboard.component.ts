@@ -1,9 +1,12 @@
 import { Component, HostListener, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import {
+  CaptureMode,
   DashboardTab,
+  GalleryAction,
   GalleryEvent,
   MediaFile,
+  MediaStreamEvent,
   TopMenuEvent,
   UserDataStore,
 } from "common-types";
@@ -22,7 +25,7 @@ export class DashboardComponent implements OnInit {
   public PREFERENCES: UserDataStore = {};
   public mediaFiles: MediaFile[] = [];
   public showVideoCaptureMarker: boolean = false;
-  public galleryActions$: Subject<string> = new Subject<string>();
+  public galleryActions$: Subject<GalleryAction> = new Subject<GalleryAction>();
   public gallerySelectMode: boolean = false;
   public totalSelectedItems: number = 0;
 
@@ -52,11 +55,22 @@ export class DashboardComponent implements OnInit {
     this.getRequiredData();
     this._mediaStreamService.streamNotifications$
       .asObservable()
-      .subscribe((notification) => {
-        if (notification === "videoCaptureStart") {
-          this.showVideoCaptureMarker = true;
-        } else if (notification === "videoCaptureEnd") {
-          this.showVideoCaptureMarker = false;
+      .subscribe((notification: MediaStreamEvent) => {
+        switch (notification.name) {
+          case "videoCaptureStart":
+            this.showVideoCaptureMarker = true;
+            break;
+          case "videoCaptureEnd":
+            this.showVideoCaptureMarker = false;
+            break;
+          case "imagePreview":
+            if (notification.data && notification.callback) {
+              this.galleryActions$.next({
+                name: "imagePreview",
+                data: notification.data,
+                callback: notification.callback,
+              });
+            }
         }
       });
   }
@@ -72,12 +86,14 @@ export class DashboardComponent implements OnInit {
             icon: "pi pi-fw pi-plus",
             items: [
               {
-                label: "Bookmark",
-                icon: "pi pi-fw pi-bookmark",
+                label: "Screenshot",
+                icon: "pi pi-fw pi-camera",
+                command: this.handleCaptureOnClick.bind(this, "image"),
               },
               {
-                label: "Video",
+                label: "Capture Screen",
                 icon: "pi pi-fw pi-video",
+                command: this.handleCaptureOnClick.bind(this, "video"),
               },
             ],
           },
@@ -224,6 +240,20 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+  handleCaptureOnClick(mode: CaptureMode) {
+    const resolution =
+      mode === "image"
+        ? this.PREFERENCES.ssResolution
+        : this.PREFERENCES.scResolution;
+
+    return this._mediaStreamService.captureScreen(
+      mode,
+      resolution,
+      false,
+      true
+    );
+  }
+
   changeTab(tab: DashboardTab) {
     this.currentTab = tab;
   }
@@ -295,7 +325,7 @@ export class DashboardComponent implements OnInit {
   handleTopMenuSelection(event: TopMenuEvent): void {
     switch (event) {
       case "delete":
-        return this.galleryActions$.next(event);
+        return this.galleryActions$.next({ name: event });
       case "selectToggle":
         return this.toggleGallerySelectMode();
       default:

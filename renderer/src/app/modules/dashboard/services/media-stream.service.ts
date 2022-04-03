@@ -46,6 +46,7 @@ export class MediaStreamService {
     preview: boolean = false
   ): Promise<void> {
     try {
+      // If video capture is already in progress, stop it.
       if (this.videoCaptureInProgress && mode === "video")
         return this._processNotificationSubject.next("stopVideoCapture");
 

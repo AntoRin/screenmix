@@ -5,7 +5,7 @@ declare global {
 }
 
 export interface RendererExposedApi {
-   invoke(channel: IpcChannel, data?: any): Promise<any> | undefined;
+   invoke<T>(channel: IpcChannel, data?: any): Promise<T>;
 }
 
 export type CaptureMode = "image" | "video";

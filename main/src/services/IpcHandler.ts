@@ -16,13 +16,14 @@ import {
    MainProcessInternalEvent,
    MediaFile,
    RendererProcessCtx,
+   ScreenData,
    UserDataStore,
    VideoCaptureStatus,
 } from "common-types";
 import { Store } from "./Store";
 import { Dirent, promises as fsp, statSync } from "fs";
 import activeWin from "active-win";
-import { Channels } from "../constants";
+import { CHANNELS } from "../constants";
 import EventEmitter from "events";
 import { ChildProcess, spawn } from "child_process";
 
@@ -55,7 +56,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    }
 
    public initializeIpcListeners() {
-      Channels.forEach((channel: IpcChannel) => {
+      CHANNELS.forEach((channel: IpcChannel) => {
          ipcMain.handle(channel, (e, ...args: any[]) => {
             const method: IpcApi = channel.split(":")[1] as IpcApi;
 

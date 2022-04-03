@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { IpcChannel, RendererExposedApi } from "common-types";
-import { Channels } from "./constants";
+import { CHANNELS } from "./constants";
 
 class Preload {
    constructor() {
@@ -19,15 +19,19 @@ class Preload {
          "fromMain:newVideo",
          "fromMain:takeScreenshotOfCurrentWindow",
          "fromMain:captureCurrentScreen",
+         "fromMain:enablePreviewPaneMode",
       ];
 
-      fromMainEvents.forEach(eventName => ipcRenderer.on(eventName, () => window.postMessage(eventName)));
+      fromMainEvents.forEach(eventName =>
+         ipcRenderer.on(eventName, () => window.postMessage(eventName))
+      );
    }
 
    getExposedApis(): RendererExposedApi {
       return {
-         invoke: (channel: IpcChannel, data?: any) => {
-            return !Channels.includes(channel) ? undefined : data ? ipcRenderer.invoke(channel, data) : ipcRenderer.invoke(channel);
+         invoke: <T>(channel: IpcChannel, data?: any): Promise<T> => {
+            if (!CHANNELS.includes(channel)) throw new Error("Invalid Channel");
+            return data ? ipcRenderer.invoke(channel, data) : ipcRenderer.invoke(channel);
          },
       };
    }

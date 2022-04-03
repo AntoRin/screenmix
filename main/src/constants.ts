@@ -1,7 +1,7 @@
 import path from "path";
 import { IpcApi, IpcChannel } from "common-types";
 
-export const Channels: IpcChannel[] = (
+export const CHANNELS: IpcChannel[] = (
    [
       "addMediaDirectory",
       "copyImageToClipboard",
@@ -22,10 +22,12 @@ export const Channels: IpcChannel[] = (
       "exitApplication",
       "openBaseDirectory",
       "modifyMainWindow",
+      "showPreviewPane",
+      "getAvailableScreens",
    ] as IpcApi[]
 ).map(val => `ipc:${val}`) as IpcChannel[];
 
-export const Paths = {
+export const PATHS = {
    icons: {
       jpeg: path.join(__dirname, "./assets", "logo", "logo_jpeg.jpeg"),
    },

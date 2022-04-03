@@ -2,7 +2,7 @@ import { app, BrowserWindow, Menu, MenuItemConstructorOptions, Tray } from "elec
 import { IpcHandler } from "./services/IpcHandler";
 
 import ess from "electron-squirrel-startup";
-import { Paths } from "./constants";
+import { PATHS } from "./constants";
 import { VideoCaptureStatus } from "common-types";
 import electronIsDev from "electron-is-dev";
 
@@ -72,15 +72,15 @@ class Screenmix {
          height: 720,
          webPreferences: {
             devTools: electronIsDev,
-            preload: Paths.preload,
+            preload: PATHS.preload,
             contextIsolation: true,
          },
-         icon: Paths.icons.jpeg,
+         icon: PATHS.icons.jpeg,
          title: "screenmix",
          backgroundColor: "#000",
       });
 
-      this._mainWindow.loadFile(Paths.targetHtml);
+      this._mainWindow.loadFile(PATHS.targetHtml);
 
       if (!electronIsDev) this._mainWindow.removeMenu();
 
@@ -113,7 +113,7 @@ class Screenmix {
    private _initializeTray(): void {
       if (!this._ipcHandler || !this._mainWindow) return;
 
-      this._tray = new Tray(Paths.icons.jpeg);
+      this._tray = new Tray(PATHS.icons.jpeg);
 
       this._tray.setToolTip("screenmix");
 

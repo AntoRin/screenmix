@@ -302,6 +302,18 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
       }
    }
 
+   async getAvailableScreens(): Promise<ScreenData[]> {
+      return (
+         await desktopCapturer.getSources({
+            types: ["window", "screen"],
+         })
+      ).map(source => ({
+         id: source.id,
+         name: source.name,
+         thumbnail: source.thumbnail.toDataURL(),
+      }));
+   }
+
    private _notifyRenderer(notification: string) {
       if (!this._mainWindow) return;
       this._mainWindow.webContents.send(notification);
@@ -420,6 +432,10 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
             this.emit("showMainWindow");
          }
       });
+   }
+
+   async showPreviewPane(): Promise<void> {
+      this.emit("showPreviewPaneWindow");
    }
 
    exitApplication() {

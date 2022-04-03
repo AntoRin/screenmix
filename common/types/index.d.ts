@@ -20,7 +20,7 @@ export type GalleryEvent = "selectModeOn" | "selectModeOff" | "itemSelected";
 
 export type VideoCaptureStatus = "videoCaptureStart" | "videoCaptureEnd";
 export interface MediaStreamEvent {
-   name: VideoCaptureStatus | "imagePreview" | "videoPreview";
+   name: VideoCaptureStatus | "imagePreview" | "videoPreview" | "selectScreen";
    data?: string;
    callback?: (error?: any, data?: string) => void;
 }
@@ -82,6 +82,8 @@ export interface RendererProcessCtx {
    exitApplication(): void;
    openBaseDirectory(): Promise<void>;
    modifyMainWindow(actionType: "hide" | "show"): Promise<void>;
+   showPreviewPane(): Promise<void>;
+   getAvailableScreens(): Promise<ScreenData[]>;
 }
 
 export type IpcApi = Required<keyof RendererProcessCtx>;
@@ -118,4 +120,11 @@ export type MainProcessInternalEvent =
    | "hideMainWindow"
    | "showMainWindow"
    | "windowHidden"
-   | "windowShown";
+   | "windowShown"
+   | "showPreviewPaneWindow";
+
+export interface ScreenData {
+   name: string;
+   id: string;
+   thumbnail: string;
+}

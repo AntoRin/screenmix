@@ -10,6 +10,25 @@
   acceptButtonStyleClass="p-button-sm"
   rejectButtonStyleClass="p-button-sm"
 ></p-confirmDialog>
+<p-dialog header="Select Screen" [(visible)]="showSelectScreenModal">
+  <div class="flex justify-center">
+    <div
+      *ngFor="let screen of availableScreensList"
+      class="flex justify-between items-center flex-col m-3"
+    >
+      <img
+        class="cursor-pointer"
+        (click)="selectScreen(screen.id)"
+        [src]="screen.thumbnail"
+      />
+      <span
+        class="overflow-hidden overflow-ellipsis whitespace-nowrap max-w-[20ch]"
+        [title]="screen.name"
+        >{{ screen.name }}</span
+      >
+    </div>
+  </div>
+</p-dialog>
 <div class="h-screen w-screen bg-gray-900 overflow-x-hidden">
   <p-menubar
     [model]="

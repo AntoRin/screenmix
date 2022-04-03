@@ -7,6 +7,7 @@ import {
   GalleryEvent,
   MediaFile,
   MediaStreamEvent,
+  ScreenData,
   TopMenuEvent,
   UserDataStore,
 } from "common-types";
@@ -45,6 +46,10 @@ export class DashboardComponent implements OnInit {
     },
   ];
 
+  public availableScreensList: ScreenData[] = [];
+  public showSelectScreenModal: boolean = false;
+  public selectScreenModalSubject: Subject<string> = new Subject<string>();
+
   constructor(
     private _router: Router,
     private _mediaStreamService: MediaStreamService,
@@ -71,8 +76,32 @@ export class DashboardComponent implements OnInit {
                 callback: notification.callback,
               });
             }
+            break;
+          case "selectScreen":
+            if (!notification.callback) break;
+
+            window.rendererProcessCtrl
+              .invoke<ScreenData[]>("ipc:getAvailableScreens")
+              ?.then((data) => {
+                this.availableScreensList = data;
+                this.showSelectScreenModal = true;
+                const selectModalSubscription = this.selectScreenModalSubject
+                  .asObservable()
+                  .subscribe((srcId) => {
+                    if (!notification.callback) return;
+                    notification.callback(undefined, srcId);
+                    selectModalSubscription.unsubscribe();
+                  });
+              });
+            break;
         }
       });
+  }
+
+  selectScreen(srcId: string) {
+    this.selectScreenModalSubject.next(srcId);
+    this.availableScreensList = [];
+    this.showSelectScreenModal = false;
   }
 
   getMenuItemsDefault() {
@@ -182,6 +211,12 @@ export class DashboardComponent implements OnInit {
             icon: "pi pi-video",
             styleClass: "bg-indigo-800",
             title: "Recording in progress",
+            command: () => {
+              this._mediaStreamService.captureScreen(
+                "video",
+                this.PREFERENCES.scResolution
+              );
+            },
           }
         )
       : currentItems;
@@ -234,6 +269,9 @@ export class DashboardComponent implements OnInit {
 
       case "fromMain:refreshGallery":
         return this.getGallery();
+
+      case "fromMain:enablePreviewPaneMode":
+        return this._router.navigate(["preview-pane"]);
 
       default:
         return;

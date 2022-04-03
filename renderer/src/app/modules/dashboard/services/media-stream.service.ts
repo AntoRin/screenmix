@@ -56,14 +56,29 @@ export class MediaStreamService {
         throw new Error("INVALID_RESOLUTION");
       }
 
+      let selectedScreenSrc: string | undefined;
+
       if (preview) {
-        await window.rendererProcessCtrl.invoke("ipc:modifyMainWindow", "hide");
+        selectedScreenSrc = await new Promise<string>((resolve, reject) => {
+          this.streamNotifications$.next({
+            name: "selectScreen",
+            callback: (error: any, data: any) => {
+              if (error) return reject(error);
+              resolve(data as string);
+            },
+          });
+        });
+
+        // await window.rendererProcessCtrl.invoke("ipc:modifyMainWindow", "hide");
+        // await window.rendererProcessCtrl.invoke("ipc:showPreviewPane");
       }
 
-      const srcId = await window.rendererProcessCtrl.invoke(
-        "ipc:getDesktopSourceId",
-        currentWindow
-      );
+      const srcId = selectedScreenSrc
+        ? selectedScreenSrc
+        : await window.rendererProcessCtrl.invoke(
+            "ipc:getDesktopSourceId",
+            currentWindow
+          );
 
       const stream: MediaStream = await navigator.mediaDevices.getUserMedia({
         audio: false,
@@ -179,31 +194,24 @@ export class MediaStreamService {
         canvas.remove();
 
         if (preview) {
-          await window.rendererProcessCtrl.invoke(
-            "ipc:modifyMainWindow",
-            "show"
-          );
-
-          const previewResult: false | string | undefined = await new Promise<false | string | undefined>(
-            (resolve) => {
-              this.streamNotifications$.next({
-                name: "imagePreview",
-                data: imageDataUrl,
-                callback: (e?: any, updatedPreview?: string) => {
-                  if (e) return resolve(false);
-                  return resolve(updatedPreview);
-                },
-              });
-            }
-          );
+          const previewResult: false | string | undefined = await new Promise<
+            false | string | undefined
+          >((resolve) => {
+            this.streamNotifications$.next({
+              name: "imagePreview",
+              data: imageDataUrl,
+              callback: (e?: any, updatedPreview?: string) => {
+                if (e) return resolve(false);
+                return resolve(updatedPreview);
+              },
+            });
+          });
 
           if (previewResult === false) return;
 
           if (previewResult) {
             imageDataUrl = previewResult;
           }
-
-          console.log(previewResult);
         }
 
         await window.rendererProcessCtrl.invoke("ipc:saveCapture", {

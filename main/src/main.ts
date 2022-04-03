@@ -40,6 +40,11 @@ class Screenmix {
             this._mainWindow.show.bind(this._mainWindow)
          );
 
+         this._ipcHandler.on(
+            "showPreviewPaneWindow",
+            this._handlePreviewPaneWinLifeCycle.bind(this)
+         );
+
          app.on("activate", () => {
             if (BrowserWindow.getAllWindows().length === 0) {
                this._createMainWindow();
@@ -108,6 +113,35 @@ class Screenmix {
          this._mainWindow?.hide();
          return false;
       });
+   }
+
+   private _createPreviewPaneWindow(): BrowserWindow {
+      const win = new BrowserWindow({
+         width: 20,
+         height: 20,
+         webPreferences: {
+            devTools: electronIsDev,
+            preload: PATHS.preload,
+            contextIsolation: true,
+         },
+         icon: PATHS.icons.jpeg,
+         backgroundColor: "#000",
+         frame: false,
+         transparent: true,
+         resizable: false,
+      });
+
+      win.loadFile(PATHS.targetHtml);
+
+      win.removeMenu();
+
+      return win;
+   }
+
+   private _handlePreviewPaneWinLifeCycle(): void {
+      const previewPaneWin: BrowserWindow = this._createPreviewPaneWindow();
+
+      previewPaneWin.webContents.send("fromMain:enablePreviewPaneMode");
    }
 
    private _initializeTray(): void {

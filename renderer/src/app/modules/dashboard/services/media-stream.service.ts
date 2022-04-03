@@ -43,7 +43,7 @@ export class MediaStreamService {
     mode: CaptureMode,
     resolution: string,
     currentWindow: boolean = false,
-    preview: boolean = false
+    selectScreen: boolean = false
   ): Promise<void> {
     try {
       // If video capture is already in progress, stop it.
@@ -58,7 +58,7 @@ export class MediaStreamService {
 
       let selectedScreenSrc: string | undefined;
 
-      if (preview) {
+      if (selectScreen) {
         selectedScreenSrc = await new Promise<string>((resolve, reject) => {
           this.streamNotifications$.next({
             name: "selectScreen",
@@ -95,7 +95,7 @@ export class MediaStreamService {
       });
 
       if (mode === "image")
-        return this.handleImageCapture(stream, [+width, +height], preview);
+        return this.handleImageCapture(stream, [+width, +height], selectScreen);
 
       if (mode === "video") return this.handleVideoCapture(stream);
     } catch (error) {

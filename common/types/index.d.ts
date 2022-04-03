@@ -19,16 +19,21 @@ export type TopMenuEvent = "delete" | "selectToggle";
 export type GalleryEvent = "selectModeOn" | "selectModeOff" | "itemSelected";
 
 export type VideoCaptureStatus = "videoCaptureStart" | "videoCaptureEnd";
-export interface MediaStreamEvent {
+
+export interface ComponentEvent {
+   name: string;
+   data?: any;
+   callback?: (error?: any, data?: string) => void;
+}
+
+export interface MediaStreamEvent extends ComponentEvent {
    name: VideoCaptureStatus | "imagePreview" | "videoPreview" | "selectScreen";
    data?: string;
    callback?: (error?: any, data?: string) => void;
 }
 
-export interface GalleryAction {
+export interface GalleryAction extends ComponentEvent {
    name: "delete" | "imagePreview" | "videoPreview";
-   data?: string;
-   callback?: (error?: any, data?: string) => void;
 }
 
 export type ImageViewerEventType =

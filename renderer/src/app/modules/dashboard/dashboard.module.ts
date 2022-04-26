@@ -9,7 +9,6 @@ import { SettingsComponent } from "./components/settings/settings.component";
 import { FormsModule } from "@angular/forms";
 import { ImageViewerComponent } from "./components/image-viewer/image-viewer.component";
 import { StartupComponent } from "./components/startup/startup.component";
-import { PreviewPaneComponent } from './components/preview-pane/preview-pane.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +17,6 @@ import { PreviewPaneComponent } from './components/preview-pane/preview-pane.com
     GalleryComponent,
     SettingsComponent,
     ImageViewerComponent,
-    PreviewPaneComponent,
   ],
   imports: [
     CommonModule,

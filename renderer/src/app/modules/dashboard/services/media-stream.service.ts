@@ -68,9 +68,6 @@ export class MediaStreamService {
             },
           });
         });
-
-        // await window.rendererProcessCtrl.invoke("ipc:modifyMainWindow", "hide");
-        // await window.rendererProcessCtrl.invoke("ipc:showPreviewPane");
       }
 
       const srcId = selectedScreenSrc
@@ -206,6 +203,8 @@ export class MediaStreamService {
               },
             });
           });
+
+          //false - user has cancelled screenshot.
 
           if (previewResult === false) return;
 

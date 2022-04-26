@@ -86,8 +86,6 @@ export interface RendererProcessCtx {
    handleVideoCaptureStatusChange(status: VideoCaptureStatus): Promise<void>;
    exitApplication(): void;
    openBaseDirectory(): Promise<void>;
-   modifyMainWindow(actionType: "hide" | "show"): Promise<void>;
-   showPreviewPane(): Promise<void>;
    getAvailableScreens(): Promise<ScreenData[]>;
 }
 
@@ -123,10 +121,7 @@ export type MainProcessInternalEvent =
    | "videoCaptureStatusChange"
    | "exitApplication"
    | "hideMainWindow"
-   | "showMainWindow"
-   | "windowHidden"
-   | "windowShown"
-   | "showPreviewPaneWindow";
+   | "showMainWindow";
 
 export interface ScreenData {
    name: string;

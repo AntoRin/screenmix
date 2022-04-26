@@ -80,6 +80,7 @@ export class DashboardComponent implements OnInit {
           case "selectScreen":
             if (!notification.callback) break;
 
+            // Get all available desktop screens and wait until user selects one by using a subscription.
             window.rendererProcessCtrl
               .invoke<ScreenData[]>("ipc:getAvailableScreens")
               ?.then((data) => {

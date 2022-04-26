@@ -422,22 +422,6 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
       }
    }
 
-   async modifyMainWindow(actionType: "hide" | "show"): Promise<void> {
-      await new Promise<void>((resolve, reject) => {
-         if (actionType === "hide") {
-            this.once("windowHidden", resolve);
-            this.emit("hideMainWindow");
-         } else if (actionType === "show") {
-            this.once("windowShown", resolve);
-            this.emit("showMainWindow");
-         }
-      });
-   }
-
-   async showPreviewPane(): Promise<void> {
-      this.emit("showPreviewPaneWindow");
-   }
-
    exitApplication() {
       this.emit("exitApplication");
    }

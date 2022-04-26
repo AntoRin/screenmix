@@ -21,8 +21,6 @@ export const CHANNELS: IpcChannel[] = (
       "handleVideoCaptureStatusChange",
       "exitApplication",
       "openBaseDirectory",
-      "modifyMainWindow",
-      "showPreviewPane",
       "getAvailableScreens",
    ] as IpcApi[]
 ).map(val => `ipc:${val}`) as IpcChannel[];

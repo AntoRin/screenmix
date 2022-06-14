@@ -19,7 +19,6 @@ class Preload {
          "fromMain:newVideo",
          "fromMain:takeScreenshotOfCurrentWindow",
          "fromMain:captureCurrentScreen",
-         "fromMain:enablePreviewPaneMode",
       ];
 
       fromMainEvents.forEach(eventName =>

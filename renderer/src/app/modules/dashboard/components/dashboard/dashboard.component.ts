@@ -145,13 +145,6 @@ export class DashboardComponent implements OnInit {
             separator: true,
           },
           {
-            label: "Export",
-            icon: "pi pi-fw pi-external-link",
-          },
-          {
-            separator: true,
-          },
-          {
             label: "Open Folder",
             icon: "pi pi-folder-open",
             command: this.openBaseDirectory.bind(this),
@@ -265,9 +258,6 @@ export class DashboardComponent implements OnInit {
 
       case "fromMain:refreshGallery":
         return this.getGallery();
-
-      case "fromMain:enablePreviewPaneMode":
-        return this._router.navigate(["preview-pane"]);
 
       default:
         return;

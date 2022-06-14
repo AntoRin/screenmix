@@ -64,9 +64,13 @@ export class DashboardComponent implements OnInit {
         switch (notification.name) {
           case "videoCaptureStart":
             this.showVideoCaptureMarker = true;
+            this.menuItemsDefault = this.getMenuItemsDefault();
+            this.menuItemsSelect = this.getMenuItemsSelect();
             break;
           case "videoCaptureEnd":
             this.showVideoCaptureMarker = false;
+            this.menuItemsDefault = this.getMenuItemsDefault();
+            this.menuItemsSelect = this.getMenuItemsSelect();
             break;
           case "imagePreview":
             if (notification.data && notification.callback) {
@@ -121,7 +125,9 @@ export class DashboardComponent implements OnInit {
                 command: this.handleCaptureOnClick.bind(this, "image"),
               },
               {
-                label: "Capture Screen",
+                label: this.showVideoCaptureMarker
+                  ? "Stop Recording"
+                  : "Capture Screen",
                 icon: "pi pi-fw pi-video",
                 command: this.handleCaptureOnClick.bind(this, "video"),
               },
@@ -201,25 +207,14 @@ export class DashboardComponent implements OnInit {
     ];
   }
 
+  /**
+   * Add dynamic elements to the top menu, based on a particular status change. 
+   */
   addStatusItemsToMenu(currentItems: MenuItem[]): MenuItem[] {
+    const additionalMenuItems: MenuItem | MenuItem[] = [];
+
     return this.showVideoCaptureMarker
-      ? currentItems.concat(
-          {
-            separator: true,
-          },
-          {
-            label: "Recording",
-            icon: "pi pi-video",
-            styleClass: "bg-indigo-800",
-            title: "Recording in progress",
-            command: () => {
-              this._mediaStreamService.captureScreen(
-                "video",
-                this.PREFERENCES.scResolution
-              );
-            },
-          }
-        )
+      ? currentItems.concat(additionalMenuItems)
       : currentItems;
   }
 

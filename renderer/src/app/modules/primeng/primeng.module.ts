@@ -22,6 +22,7 @@ import { ConfirmationService, MessageService } from "primeng/api";
 import { SelectButtonModule } from "primeng/selectbutton";
 import { TooltipModule } from "primeng/tooltip";
 import { ToolbarModule } from "primeng/toolbar";
+import { MessagesModule } from "primeng/messages";
 
 @NgModule({
   declarations: [],
@@ -48,6 +49,7 @@ import { ToolbarModule } from "primeng/toolbar";
     SelectButtonModule,
     TooltipModule,
     ToolbarModule,
+    MessagesModule,
   ],
   providers: [MessageService, ConfirmationService],
 })

@@ -346,7 +346,6 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
 
       this._editedImageRefs.push(this.spotlightImage.name);
     } catch (error) {
-      console.log(error);
     }
   }
 

@@ -23,7 +23,6 @@ export class ExifService {
    async parse(path: string) {
       try {
          const tags = await this._exifTool.read(path);
-         console.log(tags.Comment);
          return JSON.parse(tags.Comment || "{}");
       } catch (error) {
          return {};

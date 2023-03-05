@@ -113,6 +113,8 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
          await this._store.write({
             baseDirectory: dir,
          });
+
+         this._notifyRenderer("fromMain:preferencesUpdated");
       } catch (error) {
          throw error;
       }
@@ -130,6 +132,8 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
             await this._store.write({
                mediaDirectories: [selectedDir, ...prevDirs],
             });
+
+            this._notifyRenderer("fromMain:preferencesUpdated");
          }
       }
 
@@ -149,6 +153,8 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
                baseDirectory: null,
             });
          }
+
+         this._notifyRenderer("fromMain:preferencesUpdated");
       } catch (error) {
          throw error;
       }
@@ -173,6 +179,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    async saveChanges(data: UserDataStore) {
       try {
          await this._store.write(data);
+         this._notifyRenderer("fromMain:preferencesUpdated");
       } catch (error) {
          throw error;
       }
@@ -326,7 +333,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
       this._mainWindow.webContents.send(notification);
    }
 
-   async saveCapture(captureData: CaptureData, notify: boolean = true) {
+   async saveCapture(captureData: CaptureData) {
       try {
          const base64Data = captureData.dataUrl.split(";base64,")[1];
 
@@ -355,7 +362,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
          const notification =
             captureData.mode === "image" ? "fromMain:newImage" : "fromMain:newVideo";
 
-         if (notify) this._notifyRenderer(notification);
+         this._notifyRenderer(notification);
       } catch (error) {
          throw error;
       }
@@ -367,7 +374,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
 
          if (!imageData.name) throw new Error("INVALID_IMAGE_NAME");
 
-         await this.saveCapture(imageData, true);
+         await this.saveCapture(imageData);
       } catch (error) {
          throw error;
       }

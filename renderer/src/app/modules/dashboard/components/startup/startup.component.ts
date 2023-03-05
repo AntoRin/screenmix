@@ -1,5 +1,5 @@
-import { Component, OnInit } from "@angular/core";
-import { ActivatedRoute, Router } from "@angular/router";
+import { Component, OnInit, Output, EventEmitter } from "@angular/core";
+import { DashboardTab } from "../../../../../../../common/types";
 import { ProgressBarService } from "../../../shared/services/progress-bar.service";
 
 @Component({
@@ -8,31 +8,25 @@ import { ProgressBarService } from "../../../shared/services/progress-bar.servic
   styleUrls: ["./startup.component.css"],
 })
 export class StartupComponent implements OnInit {
+  @Output() public tabChangeEvent: EventEmitter<DashboardTab> =
+    new EventEmitter<DashboardTab>();
+
   public mediaDirectories: string[] = [];
   public baseDirectory: string | undefined;
 
-  constructor(
-    private _router: Router,
-    private _route: ActivatedRoute,
-    private _progressBarService: ProgressBarService
-  ) {}
+  constructor(private _progressBarService: ProgressBarService) {}
 
   ngOnInit(): void {
-    this._route.queryParams.subscribe((q) => {
-      const redirect =
-        q?.["redirect"] === "true" || q?.["redirect"] === undefined;
-      this.getBaseDirectory(redirect);
-      if (!redirect) this.getMediaDirectories();
-    });
+    this.getBaseDirectory();
+    this.getMediaDirectories();
   }
 
-  async getBaseDirectory(redirect: boolean = true) {
+  async getBaseDirectory() {
     try {
       this._progressBarService.toggleOn();
       this.baseDirectory = await window.rendererProcessCtrl.invoke(
         "ipc:getBaseDirectory"
       );
-      if (redirect) this._router.navigate(["dashboard"]);
     } catch (error) {
     } finally {
       this._progressBarService.toggleOff();
@@ -56,7 +50,6 @@ export class StartupComponent implements OnInit {
       await window.rendererProcessCtrl.invoke("ipc:addMediaDirectory");
       this.getMediaDirectories();
     } catch (error) {
-      console.log(error);
     }
   }
 
@@ -66,7 +59,7 @@ export class StartupComponent implements OnInit {
         "ipc:setBaseDirectory",
         this.mediaDirectories[idx]
       );
-      this._router.navigate(["dashboard"]);
+      this.tabChangeEvent.emit("gallery");
     } catch (error) {}
   }
 

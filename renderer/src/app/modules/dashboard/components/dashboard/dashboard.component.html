@@ -84,8 +84,12 @@
     <app-settings
       [PREFERENCES]="PREFERENCES"
       (tabChangeEvent)="changeTab($event)"
-      (settingsUpdateEvent)="getAllPreferences()"
       *ngIf="currentTab === 'settings'"
     ></app-settings>
+    <app-startup
+      *ngIf="currentTab === 'workspaces'"
+      (tabChangeEvent)="changeTab($event)"
+    >
+    </app-startup>
   </div>
 </div>

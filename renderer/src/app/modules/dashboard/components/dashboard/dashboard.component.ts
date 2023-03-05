@@ -104,6 +104,64 @@ export class DashboardComponent implements OnInit {
       });
   }
 
+  @HostListener("window:message", ["$event"])
+  handleScreenEvents(event: MessageEvent<MainToRendererEvent>) {
+    switch (event.data) {
+      case "fromMain:takeScreenshot":
+        return this._mediaStreamService.captureScreen(
+          "image",
+          this.PREFERENCES.ssResolution,
+          false
+        );
+
+      case "fromMain:takeScreenshotOfCurrentWindow":
+        return this._mediaStreamService.captureScreen(
+          "image",
+          this.PREFERENCES.ssResolution,
+          true
+        );
+
+      case "fromMain:captureScreen":
+        return this._mediaStreamService.captureScreen(
+          "video",
+          this.PREFERENCES.scResolution,
+          false
+        );
+
+      case "fromMain:captureCurrentScreen":
+        return this._mediaStreamService.captureScreen(
+          "video",
+          this.PREFERENCES.scResolution,
+          true
+        );
+
+      case "fromMain:newImage":
+        this.getGallery();
+        this.currentTab = "gallery";
+        this.mediaFileFilter = "image";
+        return;
+
+      case "fromMain:newVideo":
+        this.getGallery();
+        this.currentTab = "gallery";
+        this.mediaFileFilter = "video";
+        return;
+
+      case "fromMain:refreshGallery":
+        return this.getGallery();
+
+      case "fromMain:enablePreviewPaneMode":
+        return this._router.navigate(["preview-pane"]);
+
+      case "fromMain:preferencesUpdated":
+        this.getRequiredData();
+        return;
+
+      default:
+        return;
+    }
+  }
+
   selectScreen(srcId: string) {
     this.selectScreenModalSubject.next(srcId);
     this.availableScreensList = [];
@@ -176,7 +234,7 @@ export class DashboardComponent implements OnInit {
         label: "Folders",
         icon: "pi pi-folder",
         command: () => {
-          this._router.navigate([""], { queryParams: { redirect: false } });
+          this.currentTab = "workspaces";
         },
       },
       {
@@ -223,61 +281,6 @@ export class DashboardComponent implements OnInit {
     this.mediaFileFilter = event.value;
   }
 
-  @HostListener("window:message", ["$event"])
-  handleScreenEvents(event: MessageEvent<MainToRendererEvent>) {
-    switch (event.data) {
-      case "fromMain:takeScreenshot":
-        return this._mediaStreamService.captureScreen(
-          "image",
-          this.PREFERENCES.ssResolution,
-          false
-        );
-
-      case "fromMain:takeScreenshotOfCurrentWindow":
-        return this._mediaStreamService.captureScreen(
-          "image",
-          this.PREFERENCES.ssResolution,
-          true
-        );
-
-      case "fromMain:captureScreen":
-        return this._mediaStreamService.captureScreen(
-          "video",
-          this.PREFERENCES.scResolution,
-          false
-        );
-
-      case "fromMain:captureCurrentScreen":
-        return this._mediaStreamService.captureScreen(
-          "video",
-          this.PREFERENCES.scResolution,
-          true
-        );
-
-      case "fromMain:newImage":
-        this.getGallery();
-        this.mediaFileFilter = "image";
-        return;
-
-      case "fromMain:newVideo":
-        this.getGallery();
-        this.mediaFileFilter = "video";
-        return;
-
-      case "fromMain:refreshGallery":
-        return this.getGallery();
-
-      case "fromMain:enablePreviewPaneMode":
-        return this._router.navigate(["preview-pane"]);
-
-      case "fromMain:preferencesUpdated":
-        return this.getAllPreferences();
-
-      default:
-        return;
-    }
-  }
-
   handleCaptureOnClick(mode: CaptureMode) {
     const resolution =
       mode === "image"
@@ -321,8 +324,7 @@ export class DashboardComponent implements OnInit {
     try {
       this._progressBarService.toggleOn();
       this.mediaFiles = await window.rendererProcessCtrl.invoke<MediaFile[]>(
-        "ipc:listMediaPaths",
-        this.PREFERENCES.baseDirectory
+        "ipc:listMediaPaths"
       );
     } catch (error) {
     } finally {

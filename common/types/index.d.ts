@@ -12,7 +12,7 @@ export type CaptureMode = "image" | "video";
 
 export type ProcessNotification = "stopVideoCapture";
 
-export type DashboardTab = "gallery" | "settings";
+export type DashboardTab = "gallery" | "settings" | "workspaces";
 
 export type TopMenuEvent = "delete" | "selectToggle";
 

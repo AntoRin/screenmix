@@ -20,7 +20,7 @@ export class StartupComponent implements OnInit {
   ngOnInit(): void {
     this._route.queryParams.subscribe((q) => {
       const redirect =
-        q?.["redirect"] === true || q?.["redirect"] === undefined;
+        q?.["redirect"] === "true" || q?.["redirect"] === undefined;
       this.getBaseDirectory(redirect);
       if (!redirect) this.getMediaDirectories();
     });
@@ -32,7 +32,7 @@ export class StartupComponent implements OnInit {
       this.baseDirectory = await window.rendererProcessCtrl.invoke(
         "ipc:getBaseDirectory"
       );
-      if (this.baseDirectory && redirect) this._router.navigate(["dashboard"]);
+      if (redirect) this._router.navigate(["dashboard"]);
     } catch (error) {
     } finally {
       this._progressBarService.toggleOff();

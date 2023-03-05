@@ -128,3 +128,14 @@ export interface ScreenData {
    id: string;
    thumbnail: string;
 }
+
+export type MainToRendererEvent =
+   | "fromMain:takeScreenshot"
+   | "fromMain:captureScreen"
+   | "fromMain:refreshGallery"
+   | "fromMain:newImage"
+   | "fromMain:newVideo"
+   | "fromMain:takeScreenshotOfCurrentWindow"
+   | "fromMain:captureCurrentScreen"
+   | "fromMain:enablePreviewPaneMode"
+   | "fromMain:preferencesUpdated";

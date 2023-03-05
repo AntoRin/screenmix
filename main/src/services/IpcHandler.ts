@@ -14,6 +14,7 @@ import {
    IpcApi,
    IpcChannel,
    MainProcessInternalEvent,
+   MainToRendererEvent,
    MediaFile,
    RendererProcessCtx,
    ScreenData,
@@ -99,6 +100,10 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
       return globalShortcut.unregisterAll();
    }
 
+   /**
+    *
+    * @returns The directory selected by user from the file explorer.
+    */
    async getDirectorySelection() {
       return (await this._selectDirectories())[0];
    }
@@ -113,8 +118,10 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
       }
    }
 
-   async addMediaDirectory() {
-      const [selectedDir] = await this._selectDirectories();
+   async addMediaDirectory(directoryName?: string) {
+      const selectedDir = directoryName
+         ? directoryName
+         : await this.getDirectorySelection();
 
       if (selectedDir) {
          const prevDirs: string[] = this._store.read("mediaDirectories");
@@ -314,7 +321,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
       }));
    }
 
-   private _notifyRenderer(notification: string) {
+   private _notifyRenderer(notification: MainToRendererEvent) {
       if (!this._mainWindow) return;
       this._mainWindow.webContents.send(notification);
    }
@@ -323,7 +330,18 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
       try {
          const base64Data = captureData.dataUrl.split(";base64,")[1];
 
-         const baseDir = this._store.read("baseDirectory");
+         let baseDir = this._store.read("baseDirectory");
+
+         if (!baseDir) {
+            baseDir = await this.getDirectorySelection();
+            await this._store.write({
+               baseDirectory: baseDir,
+            });
+
+            await this.addMediaDirectory(baseDir);
+
+            this._notifyRenderer("fromMain:preferencesUpdated");
+         }
 
          const fileName =
             captureData.mode === "image"

@@ -17,6 +17,7 @@ import {
   GalleryEvent,
   ImageViewerEvent,
   MediaFile,
+  UserDataStore,
 } from "common-types";
 import { ConfirmationService, MenuItem, MessageService } from "primeng/api";
 import { ContextMenu } from "primeng/contextmenu";
@@ -34,6 +35,7 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
   @Input() public actions$: Subject<GalleryAction> | undefined;
   @Input() public selectMode: boolean = false;
   @Input() public mediaFileFilter: MediaFile["type"] = "image";
+  @Input() public PREFERENCES: UserDataStore = {};
 
   @Output() public itemSelectedEvent: EventEmitter<void> =
     new EventEmitter<void>();

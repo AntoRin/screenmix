@@ -1,11 +1,17 @@
 <div class="min-h-screen bg-gray-900 text-white">
-  <div class="flex justify-start">
+  <div
+    [class]="
+      !mediaDirectories.length
+        ? 'absolute top-2/4 left-2/4 transform -translate-x-1/2 -translate-y-1/2'
+        : 'flex justify-start'
+    "
+  >
     <button
       (click)="selectDirectory()"
       pButton
       pRipple
       type="button"
-      label="Add"
+      label="Add Workspace"
       icon="pi pi-plus"
       iconPos="right"
       class="p-button-sm p-button-outlined m-3"

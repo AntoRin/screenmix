@@ -5,6 +5,7 @@ import {
   DashboardTab,
   GalleryAction,
   GalleryEvent,
+  MainToRendererEvent,
   MediaFile,
   MediaStreamEvent,
   ScreenData,
@@ -208,7 +209,7 @@ export class DashboardComponent implements OnInit {
   }
 
   /**
-   * Add dynamic elements to the top menu, based on a particular status change. 
+   * Add dynamic elements to the top menu, based on a particular status change.
    */
   addStatusItemsToMenu(currentItems: MenuItem[]): MenuItem[] {
     const additionalMenuItems: MenuItem | MenuItem[] = [];
@@ -223,7 +224,7 @@ export class DashboardComponent implements OnInit {
   }
 
   @HostListener("window:message", ["$event"])
-  handleScreenEvents(event: MessageEvent) {
+  handleScreenEvents(event: MessageEvent<MainToRendererEvent>) {
     switch (event.data) {
       case "fromMain:takeScreenshot":
         return this._mediaStreamService.captureScreen(
@@ -268,6 +269,9 @@ export class DashboardComponent implements OnInit {
 
       case "fromMain:enablePreviewPaneMode":
         return this._router.navigate(["preview-pane"]);
+
+      case "fromMain:preferencesUpdated":
+        return this.getAllPreferences();
 
       default:
         return;

@@ -1,10 +1,10 @@
 import { Component, HostListener, OnInit } from "@angular/core";
-import { Router } from "@angular/router";
 import {
   CaptureMode,
   DashboardTab,
   GalleryAction,
   GalleryEvent,
+  MainToRendererEvent,
   MediaFile,
   MediaStreamEvent,
   ScreenData,
@@ -51,7 +51,6 @@ export class DashboardComponent implements OnInit {
   public selectScreenModalSubject: Subject<string> = new Subject<string>();
 
   constructor(
-    private _router: Router,
     private _mediaStreamService: MediaStreamService,
     private _progressBarService: ProgressBarService
   ) {}
@@ -101,6 +100,61 @@ export class DashboardComponent implements OnInit {
             break;
         }
       });
+  }
+
+  @HostListener("window:message", ["$event"])
+  handleScreenEvents(event: MessageEvent<MainToRendererEvent>) {
+    switch (event.data) {
+      case "fromMain:takeScreenshot":
+        return this._mediaStreamService.captureScreen(
+          "image",
+          this.PREFERENCES.ssResolution,
+          false
+        );
+
+      case "fromMain:takeScreenshotOfCurrentWindow":
+        return this._mediaStreamService.captureScreen(
+          "image",
+          this.PREFERENCES.ssResolution,
+          true
+        );
+
+      case "fromMain:captureScreen":
+        return this._mediaStreamService.captureScreen(
+          "video",
+          this.PREFERENCES.scResolution,
+          false
+        );
+
+      case "fromMain:captureCurrentScreen":
+        return this._mediaStreamService.captureScreen(
+          "video",
+          this.PREFERENCES.scResolution,
+          true
+        );
+
+      case "fromMain:newImage":
+        this.getGallery();
+        this.currentTab = "gallery";
+        this.mediaFileFilter = "image";
+        return;
+
+      case "fromMain:newVideo":
+        this.getGallery();
+        this.currentTab = "gallery";
+        this.mediaFileFilter = "video";
+        return;
+
+      case "fromMain:refreshGallery":
+        return this.getGallery();
+
+      case "fromMain:preferencesUpdated":
+        this.getRequiredData();
+        return;
+
+      default:
+        return;
+    }
   }
 
   selectScreen(srcId: string) {
@@ -168,7 +222,7 @@ export class DashboardComponent implements OnInit {
         label: "Folders",
         icon: "pi pi-folder",
         command: () => {
-          this._router.navigate([""], { queryParams: { redirect: false } });
+          this.currentTab = "workspaces";
         },
       },
       {
@@ -201,7 +255,7 @@ export class DashboardComponent implements OnInit {
   }
 
   /**
-   * Add dynamic elements to the top menu, based on a particular status change. 
+   * Add dynamic elements to the top menu, based on a particular status change.
    */
   addStatusItemsToMenu(currentItems: MenuItem[]): MenuItem[] {
     const additionalMenuItems: MenuItem | MenuItem[] = [];
@@ -213,55 +267,6 @@ export class DashboardComponent implements OnInit {
 
   handleFilterTypeChange(event: any) {
     this.mediaFileFilter = event.value;
-  }
-
-  @HostListener("window:message", ["$event"])
-  handleScreenEvents(event: MessageEvent) {
-    switch (event.data) {
-      case "fromMain:takeScreenshot":
-        return this._mediaStreamService.captureScreen(
-          "image",
-          this.PREFERENCES.ssResolution,
-          false
-        );
-
-      case "fromMain:takeScreenshotOfCurrentWindow":
-        return this._mediaStreamService.captureScreen(
-          "image",
-          this.PREFERENCES.ssResolution,
-          true
-        );
-
-      case "fromMain:captureScreen":
-        return this._mediaStreamService.captureScreen(
-          "video",
-          this.PREFERENCES.scResolution,
-          false
-        );
-
-      case "fromMain:captureCurrentScreen":
-        return this._mediaStreamService.captureScreen(
-          "video",
-          this.PREFERENCES.scResolution,
-          true
-        );
-
-      case "fromMain:newImage":
-        this.getGallery();
-        this.mediaFileFilter = "image";
-        return;
-
-      case "fromMain:newVideo":
-        this.getGallery();
-        this.mediaFileFilter = "video";
-        return;
-
-      case "fromMain:refreshGallery":
-        return this.getGallery();
-
-      default:
-        return;
-    }
   }
 
   handleCaptureOnClick(mode: CaptureMode) {
@@ -307,8 +312,7 @@ export class DashboardComponent implements OnInit {
     try {
       this._progressBarService.toggleOn();
       this.mediaFiles = await window.rendererProcessCtrl.invoke<MediaFile[]>(
-        "ipc:listMediaPaths",
-        this.PREFERENCES.baseDirectory
+        "ipc:listMediaPaths"
       );
     } catch (error) {
     } finally {

@@ -12,7 +12,7 @@ export type CaptureMode = "image" | "video";
 
 export type ProcessNotification = "stopVideoCapture";
 
-export type DashboardTab = "gallery" | "settings";
+export type DashboardTab = "gallery" | "settings" | "workspaces";
 
 export type TopMenuEvent = "delete" | "selectToggle";
 
@@ -128,3 +128,13 @@ export interface ScreenData {
    id: string;
    thumbnail: string;
 }
+
+export type MainToRendererEvent =
+   | "fromMain:takeScreenshot"
+   | "fromMain:captureScreen"
+   | "fromMain:refreshGallery"
+   | "fromMain:newImage"
+   | "fromMain:newVideo"
+   | "fromMain:takeScreenshotOfCurrentWindow"
+   | "fromMain:captureCurrentScreen"
+   | "fromMain:preferencesUpdated";

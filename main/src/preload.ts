@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { IpcChannel, RendererExposedApi } from "common-types";
+import { IpcChannel, MainToRendererEvent, RendererExposedApi } from "common-types";
 import { CHANNELS } from "./constants";
 
 class Preload {
@@ -11,7 +11,7 @@ class Preload {
          });
       });
 
-      const fromMainEvents: string[] = [
+      const fromMainEvents: MainToRendererEvent[] = [
          "fromMain:takeScreenshot",
          "fromMain:captureScreen",
          "fromMain:refreshGallery",
@@ -19,6 +19,7 @@ class Preload {
          "fromMain:newVideo",
          "fromMain:takeScreenshotOfCurrentWindow",
          "fromMain:captureCurrentScreen",
+         "fromMain:preferencesUpdated"
       ];
 
       fromMainEvents.forEach(eventName =>

@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { IpcChannel, RendererExposedApi } from "common-types";
+import { IpcChannel, MainToRendererEvent, RendererExposedApi } from "common-types";
 import { CHANNELS } from "./constants";
 
 class Preload {
@@ -11,7 +11,7 @@ class Preload {
          });
       });
 
-      const fromMainEvents: string[] = [
+      const fromMainEvents: MainToRendererEvent[] = [
          "fromMain:takeScreenshot",
          "fromMain:captureScreen",
          "fromMain:refreshGallery",
@@ -19,7 +19,7 @@ class Preload {
          "fromMain:newVideo",
          "fromMain:takeScreenshotOfCurrentWindow",
          "fromMain:captureCurrentScreen",
-         "fromMain:enablePreviewPaneMode",
+         "fromMain:preferencesUpdated",
       ];
 
       fromMainEvents.forEach(eventName =>
@@ -29,9 +29,26 @@ class Preload {
 
    getExposedApis(): RendererExposedApi {
       return {
-         invoke: <T>(channel: IpcChannel, data?: any): Promise<T> => {
-            if (!CHANNELS.includes(channel)) throw new Error("Invalid Channel");
-            return data ? ipcRenderer.invoke(channel, data) : ipcRenderer.invoke(channel);
+         invoke: async <T>(channel: IpcChannel, data?: any): Promise<T> => {
+            try {
+               if (!CHANNELS.includes(channel)) throw new Error("Invalid Channel");
+
+               let response: any = data
+                  ? ipcRenderer.invoke(channel, data)
+                  : ipcRenderer.invoke(channel);
+
+               if (response instanceof Promise) response = await response;
+
+               const [error, result] = [response?.error, response?.result];
+
+               if (error) {
+                  throw error;
+               }
+
+               return result;
+            } catch (error: any) {
+               throw error;
+            }
          },
       };
    }

@@ -1,31 +1,37 @@
+import { ChildProcess, spawn } from "child_process";
+import EventEmitter from "events";
+import { Dirent, promises as fsp, statSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+
+import activeWin from "active-win";
 import {
    BrowserWindow,
-   dialog,
+   clipboard,
    desktopCapturer,
+   dialog,
    globalShortcut,
    ipcMain,
    nativeImage,
-   clipboard,
 } from "electron";
+
 import {
    CaptureData,
    IpcApi,
    IpcChannel,
    MainProcessInternalEvent,
+   MainToRendererEvent,
    MediaFile,
    RendererProcessCtx,
    ScreenData,
    UserDataStore,
    VideoCaptureStatus,
 } from "common-types";
-import { Store } from "./Store";
-import { Dirent, promises as fsp, statSync } from "fs";
-import activeWin from "active-win";
 import { CHANNELS } from "../constants";
-import EventEmitter from "events";
-import { ChildProcess, spawn } from "child_process";
+import { Store } from "./Store";
+import { MainCtxError } from "../errors/MainCtxError";
+import { Utils } from "./Utils";
+import { ERROR_CODE_MAP } from "../errors/error-codes";
 
 export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    private _store: Store;
@@ -57,14 +63,25 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
 
    public initializeIpcListeners() {
       CHANNELS.forEach((channel: IpcChannel) => {
-         ipcMain.handle(channel, (e, ...args: any[]) => {
-            const method: IpcApi = channel.split(":")[1] as IpcApi;
+         ipcMain.handle(channel, async (e, ...args: any[]) => {
+            try {
+               const method: IpcApi = channel.split(":")[1] as IpcApi;
 
-            if (!this[method] || typeof this[method] !== "function") {
-               throw new Error("Handler not registered");
+               if (!this[method] || typeof this[method] !== "function") {
+                  throw new Error("Handler not registered");
+               }
+
+               let result = (this[method] as Function).apply(this, args);
+
+               if (result instanceof Promise) result = await result;
+
+               return { error: null, result };
+            } catch (error: any) {
+               return {
+                  error: Utils.serializeError(error),
+                  result: null,
+               };
             }
-
-            return (this[method] as Function).apply(this, args);
          });
       });
    }
@@ -99,6 +116,10 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
       return globalShortcut.unregisterAll();
    }
 
+   /**
+    *
+    * @returns The directory selected by user from the file explorer.
+    */
    async getDirectorySelection() {
       return (await this._selectDirectories())[0];
    }
@@ -108,13 +129,17 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
          await this._store.write({
             baseDirectory: dir,
          });
+
+         this._notifyRenderer("fromMain:preferencesUpdated");
       } catch (error) {
          throw error;
       }
    }
 
-   async addMediaDirectory() {
-      const [selectedDir] = await this._selectDirectories();
+   async addMediaDirectory(directoryName?: string) {
+      const selectedDir = directoryName
+         ? directoryName
+         : await this.getDirectorySelection();
 
       if (selectedDir) {
          const prevDirs: string[] = this._store.read("mediaDirectories");
@@ -123,6 +148,8 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
             await this._store.write({
                mediaDirectories: [selectedDir, ...prevDirs],
             });
+
+            this._notifyRenderer("fromMain:preferencesUpdated");
          }
       }
 
@@ -142,6 +169,8 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
                baseDirectory: null,
             });
          }
+
+         this._notifyRenderer("fromMain:preferencesUpdated");
       } catch (error) {
          throw error;
       }
@@ -166,6 +195,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    async saveChanges(data: UserDataStore) {
       try {
          await this._store.write(data);
+         this._notifyRenderer("fromMain:preferencesUpdated");
       } catch (error) {
          throw error;
       }
@@ -178,7 +208,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    async listMediaPaths(baseDirectory?: string): Promise<MediaFile[]> {
       try {
          if (!baseDirectory) {
-            baseDirectory = this._store.read("baseDirectory");
+            baseDirectory = this._store.read("baseDirectory") as string;
          }
 
          if (!baseDirectory) return [];
@@ -191,8 +221,16 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
          );
 
          return files;
-      } catch (error) {
-         throw error;
+      } catch (error: any) {
+         if (error?.code === "ENOENT" && baseDirectory) {
+            await this.removeMediaDirectory(baseDirectory);
+            throw new MainCtxError(
+               ERROR_CODE_MAP.MP_ENOENT_BASE_DIR(baseDirectory),
+               "MP_ENOENT_BASE_DIR"
+            );
+         } else {
+            throw error;
+         }
       }
    }
 
@@ -314,16 +352,27 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
       }));
    }
 
-   private _notifyRenderer(notification: string) {
+   private _notifyRenderer(notification: MainToRendererEvent) {
       if (!this._mainWindow) return;
       this._mainWindow.webContents.send(notification);
    }
 
-   async saveCapture(captureData: CaptureData, notify: boolean = true) {
+   async saveCapture(captureData: CaptureData) {
       try {
          const base64Data = captureData.dataUrl.split(";base64,")[1];
 
-         const baseDir = this._store.read("baseDirectory");
+         let baseDir = this._store.read("baseDirectory");
+
+         if (!baseDir) {
+            baseDir = await this.getDirectorySelection();
+            await this._store.write({
+               baseDirectory: baseDir,
+            });
+
+            await this.addMediaDirectory(baseDir);
+
+            this._notifyRenderer("fromMain:preferencesUpdated");
+         }
 
          const fileName =
             captureData.mode === "image"
@@ -337,7 +386,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
          const notification =
             captureData.mode === "image" ? "fromMain:newImage" : "fromMain:newVideo";
 
-         if (notify) this._notifyRenderer(notification);
+         this._notifyRenderer(notification);
       } catch (error) {
          throw error;
       }
@@ -349,7 +398,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
 
          if (!imageData.name) throw new Error("INVALID_IMAGE_NAME");
 
-         await this.saveCapture(imageData, true);
+         await this.saveCapture(imageData);
       } catch (error) {
          throw error;
       }

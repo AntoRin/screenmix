@@ -13,10 +13,12 @@ import {
   ViewChild,
 } from "@angular/core";
 import {
+  DashboardTab,
   GalleryAction,
   GalleryEvent,
   ImageViewerEvent,
   MediaFile,
+  UserDataStore,
 } from "common-types";
 import { ConfirmationService, MenuItem, MessageService } from "primeng/api";
 import { ContextMenu } from "primeng/contextmenu";
@@ -34,11 +36,14 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
   @Input() public actions$: Subject<GalleryAction> | undefined;
   @Input() public selectMode: boolean = false;
   @Input() public mediaFileFilter: MediaFile["type"] = "image";
+  @Input() public PREFERENCES: UserDataStore = {};
 
   @Output() public itemSelectedEvent: EventEmitter<void> =
     new EventEmitter<void>();
   @Output() galleryEvent: EventEmitter<GalleryEvent> =
     new EventEmitter<GalleryEvent>();
+  @Output() public tabChangeEvent: EventEmitter<DashboardTab> =
+    new EventEmitter<DashboardTab>();
 
   @ViewChild("spotlightImageElement") public spotlightImgRef:
     | ElementRef
@@ -343,9 +348,7 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
       });
 
       this._editedImageRefs.push(this.spotlightImage.name);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   }
 
   handleViewerEvent(event: ImageViewerEvent) {

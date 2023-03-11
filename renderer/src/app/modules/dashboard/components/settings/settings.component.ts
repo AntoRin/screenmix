@@ -16,8 +16,6 @@ import {
 export class SettingsComponent implements OnInit, OnDestroy {
   @Input() public PREFERENCES: UserDataStore = {};
 
-  @Output() public settingsUpdateEvent: EventEmitter<void> =
-    new EventEmitter<void>();
   @Output() public tabChangeEvent: EventEmitter<DashboardTab> =
     new EventEmitter<DashboardTab>();
 
@@ -130,7 +128,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
       );
       await window.rendererProcessCtrl.invoke("ipc:registerGlobalShortcuts");
 
-      this.settingsUpdateEvent.emit();
       this._messageServ.add({
         severity: "success",
         detail: "Settings updated successfully",

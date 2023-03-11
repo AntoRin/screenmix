@@ -8,9 +8,8 @@
   class="absolute top-2/4 left-2/4 transform -translate-x-1/2 -translate-y-1/2"
 >
   <p-button
-    routerLink="/products"
-    [queryParams]="{ redirect: false }"
-    label="No workspace selected. Go to your workspaces."
+    (click)="tabChangeEvent.emit('workspaces')"
+    label="No workspace selected. Go to your workspaces"
     styleClass="p-button-link"
     icon="pi pi-arrow-circle-right"
     iconPos="right"

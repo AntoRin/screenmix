@@ -138,3 +138,7 @@ export type MainToRendererEvent =
    | "fromMain:takeScreenshotOfCurrentWindow"
    | "fromMain:captureCurrentScreen"
    | "fromMain:preferencesUpdated";
+
+export interface CustomError extends Error {
+   [key: string]: any;
+}

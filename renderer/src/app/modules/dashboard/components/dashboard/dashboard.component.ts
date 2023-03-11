@@ -1,4 +1,9 @@
-import { Component, HostListener, OnInit } from "@angular/core";
+import {
+  ChangeDetectorRef,
+  Component,
+  HostListener,
+  OnInit,
+} from "@angular/core";
 import {
   CaptureMode,
   DashboardTab,
@@ -11,7 +16,7 @@ import {
   TopMenuEvent,
   UserDataStore,
 } from "common-types";
-import { MenuItem } from "primeng/api";
+import { ConfirmationService, MenuItem } from "primeng/api";
 import { Subject } from "rxjs";
 import { ProgressBarService } from "../../../shared/services/progress-bar.service";
 import { MediaStreamService } from "../../services/media-stream.service";
@@ -52,7 +57,9 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private _mediaStreamService: MediaStreamService,
-    private _progressBarService: ProgressBarService
+    private _progressBarService: ProgressBarService,
+    private _confirmationServ: ConfirmationService,
+    private _cd: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -73,6 +80,9 @@ export class DashboardComponent implements OnInit {
             break;
           case "imagePreview":
             if (notification.data && notification.callback) {
+              this.currentTab = "gallery";
+              this._cd.detectChanges();
+
               this.galleryActions$.next({
                 name: "imagePreview",
                 data: notification.data,
@@ -314,7 +324,16 @@ export class DashboardComponent implements OnInit {
       this.mediaFiles = await window.rendererProcessCtrl.invoke<MediaFile[]>(
         "ipc:listMediaPaths"
       );
-    } catch (error) {
+    } catch (error: any) {
+      if (error.code === "MP_ENOENT_BASE_DIR") {
+        this._confirmationServ.confirm({
+          header: "Workspace Not Found",
+          acceptLabel: "Got it",
+          dismissableMask: false,
+          message: error.message,
+          rejectVisible: false,
+        });
+      }
     } finally {
       this._progressBarService.toggleOff();
       this.updateSelectedItemsCount();

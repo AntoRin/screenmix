@@ -13,6 +13,7 @@ import {
   ViewChild,
 } from "@angular/core";
 import {
+  DashboardTab,
   GalleryAction,
   GalleryEvent,
   ImageViewerEvent,
@@ -41,6 +42,8 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
     new EventEmitter<void>();
   @Output() galleryEvent: EventEmitter<GalleryEvent> =
     new EventEmitter<GalleryEvent>();
+  @Output() public tabChangeEvent: EventEmitter<DashboardTab> =
+    new EventEmitter<DashboardTab>();
 
   @ViewChild("spotlightImageElement") public spotlightImgRef:
     | ElementRef
@@ -345,8 +348,7 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
       });
 
       this._editedImageRefs.push(this.spotlightImage.name);
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   handleViewerEvent(event: ImageViewerEvent) {

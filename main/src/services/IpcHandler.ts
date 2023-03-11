@@ -1,14 +1,20 @@
+import { ChildProcess, spawn } from "child_process";
+import EventEmitter from "events";
+import { Dirent, promises as fsp, statSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+
+import activeWin from "active-win";
 import {
    BrowserWindow,
-   dialog,
+   clipboard,
    desktopCapturer,
+   dialog,
    globalShortcut,
    ipcMain,
    nativeImage,
-   clipboard,
 } from "electron";
+
 import {
    CaptureData,
    IpcApi,
@@ -21,12 +27,11 @@ import {
    UserDataStore,
    VideoCaptureStatus,
 } from "common-types";
-import { Store } from "./Store";
-import { Dirent, promises as fsp, statSync } from "fs";
-import activeWin from "active-win";
 import { CHANNELS } from "../constants";
-import EventEmitter from "events";
-import { ChildProcess, spawn } from "child_process";
+import { Store } from "./Store";
+import { MainCtxError } from "../errors/MainCtxError";
+import { Utils } from "./Utils";
+import { ERROR_CODE_MAP } from "../errors/error-codes";
 
 export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    private _store: Store;
@@ -58,14 +63,25 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
 
    public initializeIpcListeners() {
       CHANNELS.forEach((channel: IpcChannel) => {
-         ipcMain.handle(channel, (e, ...args: any[]) => {
-            const method: IpcApi = channel.split(":")[1] as IpcApi;
+         ipcMain.handle(channel, async (e, ...args: any[]) => {
+            try {
+               const method: IpcApi = channel.split(":")[1] as IpcApi;
 
-            if (!this[method] || typeof this[method] !== "function") {
-               throw new Error("Handler not registered");
+               if (!this[method] || typeof this[method] !== "function") {
+                  throw new Error("Handler not registered");
+               }
+
+               let result = (this[method] as Function).apply(this, args);
+
+               if (result instanceof Promise) result = await result;
+
+               return { error: null, result };
+            } catch (error: any) {
+               return {
+                  error: Utils.serializeError(error),
+                  result: null,
+               };
             }
-
-            return (this[method] as Function).apply(this, args);
          });
       });
    }
@@ -192,7 +208,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    async listMediaPaths(baseDirectory?: string): Promise<MediaFile[]> {
       try {
          if (!baseDirectory) {
-            baseDirectory = this._store.read("baseDirectory");
+            baseDirectory = this._store.read("baseDirectory") as string;
          }
 
          if (!baseDirectory) return [];
@@ -205,8 +221,16 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
          );
 
          return files;
-      } catch (error) {
-         throw error;
+      } catch (error: any) {
+         if (error?.code === "ENOENT" && baseDirectory) {
+            await this.removeMediaDirectory(baseDirectory);
+            throw new MainCtxError(
+               ERROR_CODE_MAP.MP_ENOENT_BASE_DIR(baseDirectory),
+               "MP_ENOENT_BASE_DIR"
+            );
+         } else {
+            throw error;
+         }
       }
    }
 

@@ -142,6 +142,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
          : await this.getDirectorySelection();
 
       if (selectedDir) {
+         // User has successfully selected a directory
          const prevDirs: string[] = this._store.read("mediaDirectories");
 
          if (!prevDirs.includes(selectedDir)) {
@@ -365,6 +366,12 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
 
          if (!baseDir) {
             baseDir = await this.getDirectorySelection();
+
+            if (!baseDir) {
+               // User has cancelled directory selection
+               return;
+            }
+
             await this._store.write({
                baseDirectory: baseDir,
             });

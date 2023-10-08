@@ -77,19 +77,32 @@ export class MediaStreamService {
             currentWindow
           );
 
-      const stream: MediaStream = await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: {
-          mandatory: {
-            chromeMediaSource: "desktop",
-            chromeMediaSourceId: srcId,
-            minWidth: width,
-            maxWidth: width,
-            minHeight: height,
-            maxHeight: height,
-          },
-        } as any,
-      });
+      const videoStream: MediaStream =
+        await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: {
+            mandatory: {
+              chromeMediaSource: "desktop",
+              chromeMediaSourceId: srcId,
+              minWidth: width,
+              maxWidth: width,
+              minHeight: height,
+              maxHeight: height,
+            },
+          } as any,
+        });
+
+      const audioStream: MediaStream =
+        await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: false,
+        });
+
+      // Creating a stream with both video and audio in the first place does not work. So create streams separately and get respective tracks and create a new stream with those tracks.
+      const [videoTrack]: MediaStreamTrack[] = videoStream.getVideoTracks();
+      const [audioTrack]: MediaStreamTrack[] = audioStream.getAudioTracks();
+
+      const stream = new MediaStream([videoTrack, audioTrack]);
 
       if (mode === "image")
         return this.handleImageCapture(stream, [+width, +height], selectScreen);

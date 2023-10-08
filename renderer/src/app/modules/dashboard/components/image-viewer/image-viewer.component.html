@@ -136,7 +136,7 @@
               *ngIf="editing"
               pTooltip="Save"
               tooltipPosition="bottom"
-              (onClick)="!previewMode ? handleSave(true) : acceptPreview()"
+              (onClick)="!previewMode ? handleSave(false) : acceptPreview()"
               label="Save"
               icon="pi pi-save"
               styleClass="p-button-sm p-button-text"

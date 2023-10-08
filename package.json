@@ -11,7 +11,7 @@
       "start": "cd main && npm run electron",
       "build": "npx concurrently \"cd renderer && npm run build\" \"cd main && npm run build\"",
       "watch": "npx concurrently \"cd renderer && npm run watch\" \"cd main && npm run watch\"",
-      "package-exe": "npm run build && cd main && npm run make",
+      "package-exe": "npm run build && cd main && npm run make && mv ./out ../release/",
       "package-appx": "cd main && npm run make-appx",
       "release": "rm -rf release && npm run package-exe && npm run package-appx && mkdir release && mv main/appx main/out release/"
    },

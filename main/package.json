@@ -16,7 +16,7 @@
       "dev": "rm -rf dist && tsc && cp -r src/assets dist/ && npm run electron",
       "package": "electron-forge package",
       "make": "electron-forge make",
-      "make-appx": "electron-windows-store --input-directory .\\out\\Screenmix-win32-x64  --output-directory .\\appx --package-version 0.0.0.0 --package-name screenmix"
+      "make-appx": "electron-windows-store --input-directory ..\\release\\out\\Screenmix-win32-x64  --output-directory ..\\release\\appx --package-version 0.0.0.0 --package-name screenmix"
    },
    "private": true,
    "dependencies": {

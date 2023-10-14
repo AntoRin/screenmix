@@ -15,5 +15,9 @@
       "package-appx": "cd main && npm run make-appx",
       "release": "rm -rf release && npm run package-exe && npm run package-appx && mkdir release && mv main/appx main/out release/"
    },
-   "private": true
+   "private": true,
+   "repository": {
+      "type": "git",
+      "url": "https://github.com/AntoRin/screenmix"
+   }
 }

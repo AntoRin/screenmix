@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, MenuItemConstructorOptions, Tray } from "electron";
+import { app, BrowserWindow, Menu, MenuItemConstructorOptions, Tray, autoUpdater } from "electron";
 import { IpcHandler } from "./services/IpcHandler";
 
 import ess from "electron-squirrel-startup";
@@ -20,6 +20,14 @@ class Screenmix {
       try {
          await app.whenReady();
 
+         if (!electronIsDev) {
+            autoUpdater.setFeedURL({
+               url: "https://github.com/AntoRin/screenmix/releases/download/v0.0.0/screenmix-0.0.0.Setup.exe",
+            });
+
+            autoUpdater.checkForUpdates();
+         }
+
          this._createMainWindow();
 
          if (!this._mainWindow) {
@@ -30,15 +38,9 @@ class Screenmix {
 
          this._ipcHandler.on("exitApplication", this._setFlagAndExit.bind(this));
 
-         this._ipcHandler.on(
-            "hideMainWindow",
-            this._mainWindow.hide.bind(this._mainWindow)
-         );
+         this._ipcHandler.on("hideMainWindow", this._mainWindow.hide.bind(this._mainWindow));
 
-         this._ipcHandler.on(
-            "showMainWindow",
-            this._mainWindow.show.bind(this._mainWindow)
-         );
+         this._ipcHandler.on("showMainWindow", this._mainWindow.show.bind(this._mainWindow));
 
          app.on("activate", () => {
             if (BrowserWindow.getAllWindows().length === 0) {
@@ -107,15 +109,11 @@ class Screenmix {
       this._tray.setContextMenu(Menu.buildFromTemplate(this._generateTrayCtxMenu()));
 
       this._ipcHandler.on("videoCaptureStatusChange", (status: VideoCaptureStatus) => {
-         this._tray?.setContextMenu(
-            Menu.buildFromTemplate(this._generateTrayCtxMenu(status))
-         );
+         this._tray?.setContextMenu(Menu.buildFromTemplate(this._generateTrayCtxMenu(status)));
       });
    }
 
-   private _generateTrayCtxMenu(
-      videoCaptureStatus?: VideoCaptureStatus
-   ): MenuItemConstructorOptions[] {
+   private _generateTrayCtxMenu(videoCaptureStatus?: VideoCaptureStatus): MenuItemConstructorOptions[] {
       if (!this._ipcHandler) return [];
 
       return [
@@ -125,10 +123,7 @@ class Screenmix {
             click: this._ipcHandler.takeScreenshot.bind(this._ipcHandler),
          },
          {
-            label:
-               !videoCaptureStatus || videoCaptureStatus === "videoCaptureEnd"
-                  ? "Start Recording"
-                  : "Stop Recording",
+            label: !videoCaptureStatus || videoCaptureStatus === "videoCaptureEnd" ? "Start Recording" : "Stop Recording",
             type: "normal",
             click: this._ipcHandler.captureScreen.bind(this._ipcHandler),
          },

@@ -1,8 +1,8 @@
-import { app, BrowserWindow, Menu, MenuItemConstructorOptions, Tray, autoUpdater } from "electron";
+import { app, BrowserWindow, Menu, MenuItemConstructorOptions, Tray, autoUpdater, dialog } from "electron";
 import { IpcHandler } from "./services/IpcHandler";
 
 import ess from "electron-squirrel-startup";
-import { PATHS } from "./constants";
+import { PATHS, generalConfig } from "./constants";
 import { VideoCaptureStatus } from "common-types";
 import electronIsDev from "electron-is-dev";
 
@@ -19,14 +19,6 @@ class Screenmix {
    public async init(): Promise<void> {
       try {
          await app.whenReady();
-
-         if (!electronIsDev) {
-            autoUpdater.setFeedURL({
-               url: "https://github.com/AntoRin/screenmix/releases/download/v0.0.0/screenmix-0.0.0.Setup.exe",
-            });
-
-            autoUpdater.checkForUpdates();
-         }
 
          this._createMainWindow();
 
@@ -54,6 +46,8 @@ class Screenmix {
 
          this._initializeTray();
 
+         this._setupAutoUpdater();
+
          app.on("window-all-closed", () => {
             if (process.platform !== "darwin") app.quit();
          });
@@ -66,6 +60,55 @@ class Screenmix {
       } catch (error) {
          throw error;
       }
+   }
+
+   private _setupAutoUpdater() {
+      if (electronIsDev) return;
+
+      autoUpdater.setFeedURL({
+         url: `${generalConfig.updateServerUrl}/${app.getVersion()}`,
+      });
+
+      autoUpdater.on("checking-for-update", async () => {
+         await dialog.showMessageBox({
+            message: "Checking for update",
+         });
+      });
+
+      autoUpdater.on("error", async e => {
+         await dialog.showMessageBox({
+            message: JSON.stringify(e),
+         });
+      });
+
+      autoUpdater.on("update-available", async () => {
+         await dialog.showMessageBox({
+            message: "update-available",
+         });
+      });
+
+      autoUpdater.on("update-not-available", async () => {
+         await dialog.showMessageBox({
+            message: "update-not-available",
+         });
+      });
+
+      autoUpdater.on("update-downloaded", async () => {
+         await dialog.showMessageBox({
+            message: "update-downloaded",
+         });
+      });
+
+      autoUpdater.on("before-quit-for-update", async () => {
+         await dialog.showMessageBox({
+            message: "before-quit-for-update",
+         });
+      });
+
+      setTimeout(() => {
+         // If update-availability needs to be checked for automatically, it needs to be after sometime since the app has started. Checking for updates requires some resources that might be in use by other services on start-up.
+         autoUpdater.checkForUpdates();
+      }, 20000);
    }
 
    private _createMainWindow(): void {

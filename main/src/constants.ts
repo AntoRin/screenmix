@@ -32,3 +32,7 @@ export const PATHS = {
    targetHtml: path.join(__dirname, "../ui/index.html"),
    preload: path.join(__dirname, "preload"),
 };
+
+export const generalConfig = {
+   updateServerUrl: "https://update.electronjs.org/AntoRin/screenmix/win32",
+};

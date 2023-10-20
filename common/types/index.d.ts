@@ -87,17 +87,14 @@ export interface RendererProcessCtx {
    exitApplication(): void;
    openBaseDirectory(): Promise<void>;
    getAvailableScreens(): Promise<ScreenData[]>;
+   getAppMetaData(): AppMetaData;
 }
 
 export type IpcApi = Required<keyof RendererProcessCtx>;
 
 export type IpcChannel = `ipc:${IpcApi}`;
 
-export type KeybindType =
-   | "ssHotKey"
-   | "scHotKey"
-   | "ssHotKeyCurrentWindow"
-   | "scHotKeyCurrentWindow";
+export type KeybindType = "ssHotKey" | "scHotKey" | "ssHotKeyCurrentWindow" | "scHotKeyCurrentWindow";
 
 export type UserDataField =
    | "baseDirectory"
@@ -117,11 +114,7 @@ export interface CaptureData {
    name?: string;
 }
 
-export type MainProcessInternalEvent =
-   | "videoCaptureStatusChange"
-   | "exitApplication"
-   | "hideMainWindow"
-   | "showMainWindow";
+export type MainProcessInternalEvent = "videoCaptureStatusChange" | "exitApplication" | "hideMainWindow" | "showMainWindow";
 
 export interface ScreenData {
    name: string;
@@ -141,4 +134,12 @@ export type MainToRendererEvent =
 
 export interface CustomError extends Error {
    [key: string]: any;
+}
+
+export interface AppMetaData {
+   appVersion: string;
+   releaseNotesUrl: string;
+   licenseUrl: string;
+   lastCheckedForUpdateAt: number;
+   icon: string;
 }

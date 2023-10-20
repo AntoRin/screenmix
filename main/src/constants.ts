@@ -22,6 +22,7 @@ export const CHANNELS: IpcChannel[] = (
       "exitApplication",
       "openBaseDirectory",
       "getAvailableScreens",
+      "getAppMetaData",
    ] as IpcApi[]
 ).map(val => `ipc:${val}`) as IpcChannel[];
 
@@ -35,4 +36,6 @@ export const PATHS = {
 
 export const generalConfig = {
    updateServerUrl: "https://update.electronjs.org/AntoRin/screenmix/win32",
+   releaseNotesBaseUrl: "https://github.com/AntoRin/screenmix/releases/tag",
+   licenseUrl: "https://github.com/AntoRin/screenmix/blob/master/LICENSE",
 };

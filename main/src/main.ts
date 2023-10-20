@@ -26,7 +26,7 @@ class Screenmix {
             throw new Error("Error creating window");
          }
 
-         this._ipcHandler = new IpcHandler(this._mainWindow);
+         this._ipcHandler = new IpcHandler(this._mainWindow, app.getVersion());
 
          this._ipcHandler.on("exitApplication", this._setFlagAndExit.bind(this));
 

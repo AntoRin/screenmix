@@ -16,6 +16,7 @@ import {
 } from "electron";
 
 import {
+   AppMetaData,
    CaptureData,
    IpcApi,
    IpcChannel,
@@ -27,7 +28,7 @@ import {
    UserDataStore,
    VideoCaptureStatus,
 } from "common-types";
-import { CHANNELS } from "../constants";
+import { CHANNELS, generalConfig, PATHS } from "../constants";
 import { Store } from "./Store";
 import { MainCtxError } from "../errors/MainCtxError";
 import { Utils } from "./Utils";
@@ -38,13 +39,15 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    private _mainWindow: BrowserWindow;
    private _imageExtensions: string[];
    private _videoExtensions: string[];
+   public appVersion: string;
 
-   constructor(mainWindow: BrowserWindow) {
+   constructor(mainWindow: BrowserWindow, appVersion: string) {
       super();
       this._store = new Store();
       this._mainWindow = mainWindow;
       this._imageExtensions = [".jpg", ".jpeg", ".png"];
       this._videoExtensions = [".mp4"];
+      this.appVersion = appVersion;
    }
 
    override emit(event: MainProcessInternalEvent, ...args: any[]) {
@@ -84,6 +87,16 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
             }
          });
       });
+   }
+
+   getAppMetaData(): AppMetaData {
+      return {
+         appVersion: this.appVersion,
+         releaseNotesUrl: `${generalConfig.releaseNotesBaseUrl}/v${this.appVersion}`,
+         licenseUrl: generalConfig.licenseUrl,
+         lastCheckedForUpdateAt: Date.now(),
+         icon: path.join("file:///", PATHS.icons.jpeg)
+      };
    }
 
    registerGlobalShortcuts() {

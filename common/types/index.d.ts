@@ -88,6 +88,8 @@ export interface RendererProcessCtx {
    openBaseDirectory(): Promise<void>;
    getAvailableScreens(): Promise<ScreenData[]>;
    getAppMetaData(): AppMetaData;
+   checkForAppUpdates(): void;
+   getAppUpdaterState(): any;
 }
 
 export type IpcApi = Required<keyof RendererProcessCtx>;
@@ -114,7 +116,11 @@ export interface CaptureData {
    name?: string;
 }
 
-export type MainProcessInternalEvent = "videoCaptureStatusChange" | "exitApplication" | "hideMainWindow" | "showMainWindow";
+export type MainProcessInternalEvent =
+   | "videoCaptureStatusChange"
+   | "exitApplication"
+   | "hideMainWindow"
+   | "showMainWindow";
 
 export interface ScreenData {
    name: string;
@@ -130,7 +136,8 @@ export type MainToRendererEvent =
    | "fromMain:newVideo"
    | "fromMain:takeScreenshotOfCurrentWindow"
    | "fromMain:captureCurrentScreen"
-   | "fromMain:preferencesUpdated";
+   | "fromMain:preferencesUpdated"
+   | "fromMain:appUpdater:stateChange";
 
 export interface CustomError extends Error {
    [key: string]: any;
@@ -142,4 +149,16 @@ export interface AppMetaData {
    licenseUrl: string;
    lastCheckedForUpdateAt: number;
    icon: string;
+}
+
+export type AppUpdateStatus =
+   | "checkingForUpdate"
+   | "updateNotAvailable"
+   | "updateAvailable"
+   | "updateDownloaded"
+   | "updateError";
+
+export interface AppUpdaterState {
+   status: AppUpdateStatus;
+   error?: Error | CustomError | null;
 }

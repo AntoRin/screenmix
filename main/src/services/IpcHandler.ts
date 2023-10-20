@@ -5,10 +5,23 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import activeWin from "active-win";
-import { BrowserWindow, clipboard, desktopCapturer, dialog, globalShortcut, ipcMain, nativeImage } from "electron";
+import {
+   BrowserWindow,
+   clipboard,
+   desktopCapturer,
+   dialog,
+   globalShortcut,
+   ipcMain,
+   nativeImage,
+   autoUpdater,
+} from "electron";
+
+// import electronIsDev from "electron-is-dev";
 
 import {
    AppMetaData,
+   AppUpdaterState,
+   AppUpdateStatus,
    CaptureData,
    IpcApi,
    IpcChannel,
@@ -31,6 +44,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    private _mainWindow: BrowserWindow;
    private _imageExtensions: string[];
    private _videoExtensions: string[];
+   private _appUpdaterState: AppUpdaterState;
    public appVersion: string;
 
    constructor(mainWindow: BrowserWindow, appVersion: string) {
@@ -40,6 +54,13 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
       this._imageExtensions = [".jpg", ".jpeg", ".png"];
       this._videoExtensions = [".mp4"];
       this.appVersion = appVersion;
+
+      this._appUpdaterState = {
+         status: "updateNotAvailable",
+         error: null,
+      };
+
+      this.setupAppUpdater();
    }
 
    override emit(event: MainProcessInternalEvent, ...args: any[]) {
@@ -79,6 +100,58 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
             }
          });
       });
+   }
+
+   setupAppUpdater() {
+      autoUpdater.setFeedURL({
+         url: `${generalConfig.updateServerUrl}/${this.appVersion}`,
+      });
+
+      autoUpdater.on("error", (e) => {
+         this._appUpdaterState.status = "updateError";
+         this._appUpdaterState.error = Utils.serializeError(e);
+         this._notifyRenderer("fromMain:appUpdater:stateChange");
+      });
+
+      autoUpdater.on("checking-for-update", () => {
+         this._appUpdaterState.status = "checkingForUpdate";
+         this._notifyRenderer("fromMain:appUpdater:stateChange");
+      });
+
+      autoUpdater.on("update-available", () => {
+         this._appUpdaterState.status = "updateAvailable";
+         this._notifyRenderer("fromMain:appUpdater:stateChange");
+      });
+
+      autoUpdater.on("update-not-available", () => {
+         this._appUpdaterState.status = "updateNotAvailable";
+         this._notifyRenderer("fromMain:appUpdater:stateChange");
+      });
+
+      autoUpdater.on("update-downloaded", () => {
+         this._appUpdaterState.status = "updateDownloaded";
+         this._notifyRenderer("fromMain:appUpdater:stateChange");
+      });
+
+      autoUpdater.on("before-quit-for-update", () => {});
+   }
+
+   checkForAppUpdates() {
+      if (
+         !(["checkingForUpdate", "updateAvailable", "updateDownloaded"] as AppUpdateStatus[]).includes(
+            this._appUpdaterState.status
+         )
+      ) {
+         autoUpdater.checkForUpdates();
+      }
+   }
+
+   getAppUpdaterState() {
+      return this._appUpdaterState;
+   }
+
+   quitAndInstallUpdate() {
+      autoUpdater.quitAndInstall();
    }
 
    getAppMetaData(): AppMetaData {
@@ -219,7 +292,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
             await fsp.readdir(baseDirectory, {
                withFileTypes: true,
             }),
-            baseDirectory,
+            baseDirectory
          );
 
          return files;

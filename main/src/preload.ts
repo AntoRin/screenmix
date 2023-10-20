@@ -20,6 +20,7 @@ class Preload {
          "fromMain:takeScreenshotOfCurrentWindow",
          "fromMain:captureCurrentScreen",
          "fromMain:preferencesUpdated",
+         "fromMain:appUpdater:stateChange",
       ];
 
       fromMainEvents.forEach((eventName) => ipcRenderer.on(eventName, () => window.postMessage(eventName)));

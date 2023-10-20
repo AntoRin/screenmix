@@ -23,6 +23,8 @@ export const CHANNELS: IpcChannel[] = (
       "openBaseDirectory",
       "getAvailableScreens",
       "getAppMetaData",
+      "checkForAppUpdates",
+      "getAppUpdaterState",
    ] as IpcApi[]
 ).map((val) => `ipc:${val}`) as IpcChannel[];
 

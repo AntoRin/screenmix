@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, HostListener, OnInit } from "@angular/core";
 import {
    AppMetaData,
+   AppUpdaterState,
    CaptureMode,
    DashboardTab,
    GalleryAction,
@@ -52,12 +53,16 @@ export class DashboardComponent implements OnInit {
    public showSelectScreenModal: boolean = false;
    public selectScreenModalSubject: Subject<string> = new Subject<string>();
    public showAboutModal: boolean = false;
+   public appUpdaterState: AppUpdaterState | null = null;
+   public appUpdateStatusMessage: string | null = null;
+
+   private _defaultUpdateError: string = "Something went wrong while fetching updates...";
 
    constructor(
       private _mediaStreamService: MediaStreamService,
       private _progressBarService: ProgressBarService,
       private _confirmationServ: ConfirmationService,
-      private _cd: ChangeDetectorRef,
+      private _cd: ChangeDetectorRef
    ) {}
 
    ngOnInit(): void {
@@ -136,6 +141,10 @@ export class DashboardComponent implements OnInit {
 
          case "fromMain:preferencesUpdated":
             this.getRequiredData();
+            return;
+
+         case "fromMain:appUpdater:stateChange":
+            this.getAppUpdaterState();
             return;
 
          default:
@@ -274,7 +283,8 @@ export class DashboardComponent implements OnInit {
    async getRequiredData() {
       try {
          this._progressBarService.toggleOn();
-         this.getAppMetaData();
+         await this.getAppMetaData();
+         await this.getAppUpdaterState();
          await this.getAllPreferences();
          await this.getGallery();
          this._progressBarService.toggleOff();
@@ -283,7 +293,38 @@ export class DashboardComponent implements OnInit {
 
    async getAppMetaData() {
       this.appMetaData = await window.rendererProcessCtrl.invoke("ipc:getAppMetaData");
-      console.log("meta", this.appMetaData);
+   }
+
+   async checkForAppUpdates() {
+      try {
+         await window.rendererProcessCtrl.invoke("ipc:checkForAppUpdates");
+      } catch (error: any) {
+         this.appUpdateStatusMessage = error?.message || this._defaultUpdateError;
+      }
+   }
+
+   async getAppUpdaterState() {
+      const updaterState = await window.rendererProcessCtrl.invoke<AppUpdaterState>("ipc:getAppUpdaterState");
+
+      switch (updaterState.status) {
+         case "updateError":
+            this.appUpdateStatusMessage = updaterState?.error?.message || this._defaultUpdateError;
+            break;
+         case "checkingForUpdate":
+            this.appUpdateStatusMessage = updaterState?.error?.message || this._defaultUpdateError;
+            break;
+         case "updateNotAvailable":
+            this.appUpdateStatusMessage = "You have the latest version.";
+            break;
+         case "updateAvailable":
+            this.appUpdateStatusMessage = "Downloading update...";
+            break;
+         case "updateDownloaded":
+            this.appUpdateStatusMessage = "Update ready to install.";
+            break;
+      }
+
+      this.appUpdaterState = updaterState;
    }
 
    async getAllPreferences() {
@@ -373,8 +414,6 @@ export class DashboardComponent implements OnInit {
          await window.rendererProcessCtrl.invoke("ipc:openBaseDirectory");
       } catch (error) {}
    }
-
-   async checkForAppUpdates() {}
 
    exitApp() {
       try {

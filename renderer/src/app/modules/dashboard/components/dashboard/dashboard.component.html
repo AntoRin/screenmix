@@ -34,7 +34,10 @@
          <div>
             <a class="link-primary" [href]="appMetaData.licenseUrl" target="_blank">License and Open Source Notices</a>
          </div>
-         <div class="mt-4">
+         <div class="mt-4" [ngClass]="{ 'text-red-500': appUpdaterState?.status === 'updateError' }">
+            {{ appUpdateStatusMessage }}
+         </div>
+         <div class="mt-2">
             <button
                pButton
                label="Check for Updates"

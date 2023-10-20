@@ -5,6 +5,7 @@ import {
   OnInit,
 } from "@angular/core";
 import {
+  AppMetaData,
   CaptureMode,
   DashboardTab,
   GalleryAction,
@@ -28,6 +29,7 @@ import { MediaStreamService } from "../../services/media-stream.service";
 })
 export class DashboardComponent implements OnInit {
   public currentTab: DashboardTab = "gallery";
+  public appMetaData: AppMetaData | null = null;
   public PREFERENCES: UserDataStore = {};
   public mediaFiles: MediaFile[] = [];
   public showVideoCaptureMarker: boolean = false;
@@ -54,6 +56,7 @@ export class DashboardComponent implements OnInit {
   public availableScreensList: ScreenData[] = [];
   public showSelectScreenModal: boolean = false;
   public selectScreenModalSubject: Subject<string> = new Subject<string>();
+  public showAboutModal: boolean = false;
 
   constructor(
     private _mediaStreamService: MediaStreamService,
@@ -217,6 +220,16 @@ export class DashboardComponent implements OnInit {
             separator: true,
           },
           {
+            label: "About screenmix",
+            icon: "pi pi-exclamation-circle",
+            command: () => {
+              this.showAboutModal = true;
+            },
+          },
+          {
+            separator: true,
+          },
+          {
             label: "Exit",
             icon: "pi pi-power-off",
             command: this.exitApp.bind(this),
@@ -300,10 +313,18 @@ export class DashboardComponent implements OnInit {
   async getRequiredData() {
     try {
       this._progressBarService.toggleOn();
+      this.getAppMetaData();
       await this.getAllPreferences();
       await this.getGallery();
       this._progressBarService.toggleOff();
     } catch (error) {}
+  }
+
+  async getAppMetaData() {
+    this.appMetaData = await window.rendererProcessCtrl.invoke(
+      "ipc:getAppMetaData"
+    );
+    console.log("meta", this.appMetaData);
   }
 
   async getAllPreferences() {
@@ -397,6 +418,10 @@ export class DashboardComponent implements OnInit {
     try {
       await window.rendererProcessCtrl.invoke("ipc:openBaseDirectory");
     } catch (error) {}
+  }
+
+  async checkForAppUpdates() {
+    
   }
 
   exitApp() {

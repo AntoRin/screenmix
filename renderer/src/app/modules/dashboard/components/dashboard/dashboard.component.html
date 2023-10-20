@@ -10,6 +10,7 @@
   acceptButtonStyleClass="p-button-sm"
   rejectButtonStyleClass="p-button-sm"
 ></p-confirmDialog>
+
 <p-dialog header="Select Screen" [(visible)]="showSelectScreenModal">
   <div style="max-width: 85vw" class="flex justify-center flex-wrap">
     <div
@@ -29,6 +30,57 @@
     </div>
   </div>
 </p-dialog>
+
+<p-dialog
+  *ngIf="appMetaData"
+  [(visible)]="showAboutModal"
+  [modal]="true"
+  [closable]="false"
+  [closeOnEscape]="false"
+>
+  <ng-template pTemplate="header">
+    <div class="flex justify-center items-center w-full">
+      <img width="64px" height="auto" [src]="appMetaData.icon" />
+    </div>
+  </ng-template>
+  <div
+    style="max-width: 85vw; min-width: 40vw"
+    class="flex justify-center flex-wrap flex-col text-sm"
+  >
+    <div class="flex justify-center items-center flex-col">
+      <div class="text-xl">screenmix</div>
+      <div>
+        Version {{ appMetaData.appVersion }}
+        <a class="link-primary" [href]="appMetaData.releaseNotesUrl" target="_blank"
+          >(release notes)</a
+        >
+      </div>
+      <div>
+        <a class="link-primary" [href]="appMetaData.licenseUrl" target="_blank"
+          >License and Open Source Notices</a
+        >
+      </div>
+      <div class="mt-4">
+        <button
+          pButton
+          label="Check for Updates"
+          class="p-button-secondary p-button-outlined"
+          (click)="checkForAppUpdates()"
+        ></button>
+      </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end">
+      <p-button
+        label="Close"
+        styleClass="p-button-sm"
+        (click)="showAboutModal = false"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
 <div class="h-screen w-screen bg-gray-900 overflow-x-hidden">
   <p-menubar
     [model]="

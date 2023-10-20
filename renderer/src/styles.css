@@ -8,11 +8,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global styles */
+
+:root {
+  --link-color: #2e8fff;
+  --theme-color: rgba(69, 203, 178, 255);
+}
+
 html,
 body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+.link-primary {
+  color: var(--link-color);
+}
+
+.link-primary:hover {
+  text-decoration: underline;
 }
 
 ::-webkit-scrollbar {

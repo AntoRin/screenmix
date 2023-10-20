@@ -1,37 +1,37 @@
 .image-toolbar * {
-  color: white;
-  padding: 0.25rem;
-  font-size: 22px;
-  cursor: pointer;
-  margin: 0 2px 0 2px;
-  transition: 0.2s;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.3);
+   color: white;
+   padding: 0.25rem;
+   font-size: 22px;
+   cursor: pointer;
+   margin: 0 2px 0 2px;
+   transition: 0.2s;
+   border-radius: 50%;
+   background-color: rgba(0, 0, 0, 0.3);
 }
 
 .image-toolbar *:hover {
-  background-color: #000;
+   background-color: #000;
 }
 
 .image-item {
-  -webkit-transform: scale(1);
-  transform: scale(1);
-  -webkit-transition: 0.5s ease-in-out;
-  transition: 0.5s ease-in-out;
+   -webkit-transform: scale(1);
+   transform: scale(1);
+   -webkit-transition: 0.5s ease-in-out;
+   transition: 0.5s ease-in-out;
 }
 
 .image-item:hover {
-  -webkit-transform: scale(1.15);
-  transform: scale(1.15);
+   -webkit-transform: scale(1.15);
+   transform: scale(1.15);
 }
 
 .toolbar-grid {
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
+   display: grid;
+   grid-template-columns: 1fr 2fr 1fr;
 }
 
 .toolbar-grid * {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+   display: flex;
+   justify-content: center;
+   align-items: center;
 }

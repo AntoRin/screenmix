@@ -5,15 +5,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import activeWin from "active-win";
-import {
-   BrowserWindow,
-   clipboard,
-   desktopCapturer,
-   dialog,
-   globalShortcut,
-   ipcMain,
-   nativeImage,
-} from "electron";
+import { BrowserWindow, clipboard, desktopCapturer, dialog, globalShortcut, ipcMain, nativeImage } from "electron";
 
 import {
    AppMetaData,
@@ -95,7 +87,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
          releaseNotesUrl: `${generalConfig.releaseNotesBaseUrl}/v${this.appVersion}`,
          licenseUrl: generalConfig.licenseUrl,
          lastCheckedForUpdateAt: Date.now(),
-         icon: path.join("file:///", PATHS.icons.jpeg)
+         icon: path.join("file:///", PATHS.icons.jpeg),
       };
    }
 
@@ -150,9 +142,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    }
 
    async addMediaDirectory(directoryName?: string) {
-      const selectedDir = directoryName
-         ? directoryName
-         : await this.getDirectorySelection();
+      const selectedDir = directoryName ? directoryName : await this.getDirectorySelection();
 
       if (selectedDir) {
          // User has successfully selected a directory
@@ -173,9 +163,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    async removeMediaDirectory(path: string) {
       try {
          await this._store.write({
-            mediaDirectories: (this._store.read("mediaDirectories") as string[]).filter(
-               p => p !== path
-            ),
+            mediaDirectories: (this._store.read("mediaDirectories") as string[]).filter((p) => p !== path),
          });
 
          if (this._store.read("baseDirectory") === path) {
@@ -231,27 +219,21 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
             await fsp.readdir(baseDirectory, {
                withFileTypes: true,
             }),
-            baseDirectory
+            baseDirectory,
          );
 
          return files;
       } catch (error: any) {
          if (error?.code === "ENOENT" && baseDirectory) {
             await this.removeMediaDirectory(baseDirectory);
-            throw new MainCtxError(
-               ERROR_CODE_MAP.MP_ENOENT_BASE_DIR(baseDirectory),
-               "MP_ENOENT_BASE_DIR"
-            );
+            throw new MainCtxError(ERROR_CODE_MAP.MP_ENOENT_BASE_DIR(baseDirectory), "MP_ENOENT_BASE_DIR");
          } else {
             throw error;
          }
       }
    }
 
-   private _createSortedMediaFileList(
-      dirents: Dirent[],
-      baseDirectory: string
-   ): MediaFile[] {
+   private _createSortedMediaFileList(dirents: Dirent[], baseDirectory: string): MediaFile[] {
       let files: MediaFile[] = [];
 
       for (const dirent of dirents) {
@@ -264,23 +246,14 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
                const mediaFile: MediaFile = {
                   name: path.basename(dirent.name),
                   path: path.join("file:///", baseDirectory, dirent.name),
-                  type: this._imageExtensions.includes(
-                     path.extname(dirent.name).toLowerCase()
-                  )
-                     ? "image"
-                     : "video",
-                  createdAt: statSync(
-                     path.join(baseDirectory, dirent.name)
-                  ).birthtime.getTime(),
+                  type: this._imageExtensions.includes(path.extname(dirent.name).toLowerCase()) ? "image" : "video",
+                  createdAt: statSync(path.join(baseDirectory, dirent.name)).birthtime.getTime(),
                };
 
                let idx = 0;
 
                do {
-                  if (
-                     mediaFile.createdAt >=
-                     (files[idx]?.createdAt || Number.NEGATIVE_INFINITY)
-                  ) {
+                  if (mediaFile.createdAt >= (files[idx]?.createdAt || Number.NEGATIVE_INFINITY)) {
                      files.splice(idx, 0, mediaFile);
                      break;
                   }
@@ -339,14 +312,12 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
                  try {
                     const activeSource = await activeWin();
                     if (!activeSource) return undefined;
-                    return sources.find(
-                       s => s.id.indexOf(String(activeSource.id)) !== -1
-                    );
+                    return sources.find((s) => s.id.indexOf(String(activeSource.id)) !== -1);
                  } catch (error) {
                     return undefined;
                  }
               })()
-            : sources.find(s => s.name === "Entire Screen");
+            : sources.find((s) => s.name === "Entire Screen");
 
          return requiredSource?.id;
       } catch (error) {
@@ -359,7 +330,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
          await desktopCapturer.getSources({
             types: ["window", "screen"],
          })
-      ).map(source => ({
+      ).map((source) => ({
          id: source.id,
          name: source.name,
          thumbnail: source.thumbnail.toDataURL(),
@@ -403,8 +374,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
             encoding: "base64",
          });
 
-         const notification =
-            captureData.mode === "image" ? "fromMain:newImage" : "fromMain:newVideo";
+         const notification = captureData.mode === "image" ? "fromMain:newImage" : "fromMain:newVideo";
 
          this._notifyRenderer(notification);
       } catch (error) {
@@ -459,16 +429,12 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    async openBaseDirectory() {
       try {
          await new Promise<void>((resolve, reject) => {
-            const proc: ChildProcess = spawn(
-               "explorer",
-               [this._store.read("baseDirectory")],
-               {
-                  stdio: ["pipe", "pipe", "pipe"],
-                  detached: false,
-                  windowsHide: true,
-                  shell: true,
-               }
-            );
+            const proc: ChildProcess = spawn("explorer", [this._store.read("baseDirectory")], {
+               stdio: ["pipe", "pipe", "pipe"],
+               detached: false,
+               windowsHide: true,
+               shell: true,
+            });
 
             let promiseEnded: boolean = false;
 

@@ -1,148 +1,108 @@
-<p-toast
-  styleClass="opacity-100"
-  [baseZIndex]="10000"
-  position="bottom-center"
-></p-toast>
+<p-toast styleClass="opacity-100" [baseZIndex]="10000" position="bottom-center"></p-toast>
 <p-confirmDialog
-  [baseZIndex]="10000"
-  styleClass="w-[50vw]"
-  icon="pi pi-exclamation-triangle"
-  acceptButtonStyleClass="p-button-sm"
-  rejectButtonStyleClass="p-button-sm"
+   [baseZIndex]="10000"
+   styleClass="w-[50vw]"
+   icon="pi pi-exclamation-triangle"
+   acceptButtonStyleClass="p-button-sm"
+   rejectButtonStyleClass="p-button-sm"
 ></p-confirmDialog>
 
 <p-dialog header="Select Screen" [(visible)]="showSelectScreenModal">
-  <div style="max-width: 85vw" class="flex justify-center flex-wrap">
-    <div
-      *ngFor="let screen of availableScreensList"
-      class="flex justify-between items-center flex-col m-3"
-    >
-      <img
-        class="cursor-pointer"
-        (click)="selectScreen(screen.id)"
-        [src]="screen.thumbnail"
-      />
-      <span
-        class="overflow-hidden overflow-ellipsis whitespace-nowrap max-w-[20ch]"
-        [title]="screen.name"
-        >{{ screen.name }}</span
-      >
-    </div>
-  </div>
+   <div style="max-width: 85vw" class="flex justify-center flex-wrap">
+      <div *ngFor="let screen of availableScreensList" class="flex justify-between items-center flex-col m-3">
+         <img class="cursor-pointer" (click)="selectScreen(screen.id)" [src]="screen.thumbnail" />
+         <span class="overflow-hidden overflow-ellipsis whitespace-nowrap max-w-[20ch]" [title]="screen.name">{{
+            screen.name
+         }}</span>
+      </div>
+   </div>
 </p-dialog>
 
-<p-dialog
-  *ngIf="appMetaData"
-  [(visible)]="showAboutModal"
-  [modal]="true"
-  [closable]="false"
-  [closeOnEscape]="false"
->
-  <ng-template pTemplate="header">
-    <div class="flex justify-center items-center w-full">
-      <img width="64px" height="auto" [src]="appMetaData.icon" />
-    </div>
-  </ng-template>
-  <div
-    style="max-width: 85vw; min-width: 40vw"
-    class="flex justify-center flex-wrap flex-col text-sm"
-  >
-    <div class="flex justify-center items-center flex-col">
-      <div class="text-xl">screenmix</div>
-      <div>
-        Version {{ appMetaData.appVersion }}
-        <a class="link-primary" [href]="appMetaData.releaseNotesUrl" target="_blank"
-          >(release notes)</a
-        >
+<p-dialog *ngIf="appMetaData" [(visible)]="showAboutModal" [modal]="true" [closable]="false" [closeOnEscape]="false">
+   <ng-template pTemplate="header">
+      <div class="flex justify-center items-center w-full">
+         <img width="64px" height="auto" [src]="appMetaData.icon" />
       </div>
-      <div>
-        <a class="link-primary" [href]="appMetaData.licenseUrl" target="_blank"
-          >License and Open Source Notices</a
-        >
+   </ng-template>
+   <div style="max-width: 85vw; min-width: 40vw" class="flex justify-center flex-wrap flex-col text-sm">
+      <div class="flex justify-center items-center flex-col">
+         <div class="text-xl">screenmix</div>
+         <div>
+            Version {{ appMetaData.appVersion }}
+            <a class="link-primary" [href]="appMetaData.releaseNotesUrl" target="_blank">(release notes)</a>
+         </div>
+         <div>
+            <a class="link-primary" [href]="appMetaData.licenseUrl" target="_blank">License and Open Source Notices</a>
+         </div>
+         <div class="mt-4">
+            <button
+               pButton
+               label="Check for Updates"
+               class="p-button-secondary p-button-outlined"
+               (click)="checkForAppUpdates()"
+            ></button>
+         </div>
       </div>
-      <div class="mt-4">
-        <button
-          pButton
-          label="Check for Updates"
-          class="p-button-secondary p-button-outlined"
-          (click)="checkForAppUpdates()"
-        ></button>
+   </div>
+   <ng-template pTemplate="footer">
+      <div class="flex justify-end">
+         <p-button label="Close" styleClass="p-button-sm" (click)="showAboutModal = false"></p-button>
       </div>
-    </div>
-  </div>
-  <ng-template pTemplate="footer">
-    <div class="flex justify-end">
-      <p-button
-        label="Close"
-        styleClass="p-button-sm"
-        (click)="showAboutModal = false"
-      ></p-button>
-    </div>
-  </ng-template>
+   </ng-template>
 </p-dialog>
 
 <div class="h-screen w-screen bg-gray-900 overflow-x-hidden">
-  <p-menubar
-    [model]="
-      gallerySelectMode
-        ? addStatusItemsToMenu(menuItemsSelect)
-        : addStatusItemsToMenu(menuItemsDefault)
-    "
-    styleClass="fixed top-0 priority-menu-bar"
-  >
-    <ng-template pTemplate="end">
-      <p-selectButton
-        [options]="filterTypeOptions"
-        [(ngModel)]="mediaFileFilter"
-        optionLabel="label"
-        optionValue="value"
-        styleClass="p-button-sm text-sm p-0"
-        (onChange)="handleFilterTypeChange($event)"
-      ></p-selectButton>
-    </ng-template>
-  </p-menubar>
-  <div [ngStyle]="{ marginTop: '90px' }">
-    <!-- Recording Active Banner     -->
-    <div *ngIf="showVideoCaptureMarker" class="bg-indigo-600">
-      <div class="max-w-7xl mx-auto py-3 px-3 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between flex-wrap">
-          <div class="w-0 flex-1 flex items-center">
-            <p class="ml-3 font-medium text-white truncate">
-              <span>Recording in progress.</span>
-            </p>
-          </div>
-          <div
-            class="order-3 mt-2 flex-shrink-0 w-full sm:order-2 sm:mt-0 sm:w-auto"
-          >
-            <a
-              (click)="handleCaptureOnClick('video')"
-              class="flex cursor-pointer items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-600 bg-white hover:bg-indigo-50"
-            >
-              Stop Recording
-            </a>
-          </div>
-        </div>
+   <p-menubar
+      [model]="gallerySelectMode ? addStatusItemsToMenu(menuItemsSelect) : addStatusItemsToMenu(menuItemsDefault)"
+      styleClass="fixed top-0 priority-menu-bar"
+   >
+      <ng-template pTemplate="end">
+         <p-selectButton
+            [options]="filterTypeOptions"
+            [(ngModel)]="mediaFileFilter"
+            optionLabel="label"
+            optionValue="value"
+            styleClass="p-button-sm text-sm p-0"
+            (onChange)="handleFilterTypeChange($event)"
+         ></p-selectButton>
+      </ng-template>
+   </p-menubar>
+   <div [ngStyle]="{ marginTop: '90px' }">
+      <!-- Recording Active Banner     -->
+      <div *ngIf="showVideoCaptureMarker" class="bg-indigo-600">
+         <div class="max-w-7xl mx-auto py-3 px-3 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between flex-wrap">
+               <div class="w-0 flex-1 flex items-center">
+                  <p class="ml-3 font-medium text-white truncate">
+                     <span>Recording in progress.</span>
+                  </p>
+               </div>
+               <div class="order-3 mt-2 flex-shrink-0 w-full sm:order-2 sm:mt-0 sm:w-auto">
+                  <a
+                     (click)="handleCaptureOnClick('video')"
+                     class="flex cursor-pointer items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-600 bg-white hover:bg-indigo-50"
+                  >
+                     Stop Recording
+                  </a>
+               </div>
+            </div>
+         </div>
       </div>
-    </div>
-    <app-gallery
-      (galleryEvent)="handleGalleryEvent($event)"
-      *ngIf="currentTab === 'gallery'"
-      [mediaFileFilter]="mediaFileFilter"
-      [mediaFiles]="mediaFiles"
-      [PREFERENCES]="PREFERENCES"
-      [actions$]="galleryActions$"
-      [selectMode]="gallerySelectMode"
-      (tabChangeEvent)="changeTab($event)"
-    ></app-gallery>
-    <app-settings
-      [PREFERENCES]="PREFERENCES"
-      (tabChangeEvent)="changeTab($event)"
-      *ngIf="currentTab === 'settings'"
-    ></app-settings>
-    <app-startup
-      *ngIf="currentTab === 'workspaces'"
-      (tabChangeEvent)="changeTab($event)"
-    >
-    </app-startup>
-  </div>
+      <app-gallery
+         (galleryEvent)="handleGalleryEvent($event)"
+         *ngIf="currentTab === 'gallery'"
+         [mediaFileFilter]="mediaFileFilter"
+         [mediaFiles]="mediaFiles"
+         [PREFERENCES]="PREFERENCES"
+         [actions$]="galleryActions$"
+         [selectMode]="gallerySelectMode"
+         (tabChangeEvent)="changeTab($event)"
+      ></app-gallery>
+      <app-settings
+         [PREFERENCES]="PREFERENCES"
+         (tabChangeEvent)="changeTab($event)"
+         *ngIf="currentTab === 'settings'"
+      ></app-settings>
+      <app-startup *ngIf="currentTab === 'workspaces'" (tabChangeEvent)="changeTab($event)"> </app-startup>
+   </div>
 </div>

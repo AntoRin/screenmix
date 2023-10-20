@@ -24,7 +24,7 @@ export const CHANNELS: IpcChannel[] = (
       "getAvailableScreens",
       "getAppMetaData",
    ] as IpcApi[]
-).map(val => `ipc:${val}`) as IpcChannel[];
+).map((val) => `ipc:${val}`) as IpcChannel[];
 
 export const PATHS = {
    icons: {

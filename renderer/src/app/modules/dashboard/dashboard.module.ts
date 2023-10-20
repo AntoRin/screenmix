@@ -11,19 +11,7 @@ import { ImageViewerComponent } from "./components/image-viewer/image-viewer.com
 import { StartupComponent } from "./components/startup/startup.component";
 
 @NgModule({
-  declarations: [
-    StartupComponent,
-    DashboardComponent,
-    GalleryComponent,
-    SettingsComponent,
-    ImageViewerComponent,
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    DashboardRoutingModule,
-    PrimengModule,
-    SharedModule,
-  ],
+   declarations: [StartupComponent, DashboardComponent, GalleryComponent, SettingsComponent, ImageViewerComponent],
+   imports: [CommonModule, FormsModule, DashboardRoutingModule, PrimengModule, SharedModule],
 })
 export class DashboardModule {}

@@ -1,321 +1,275 @@
 <div class="card">
-  <p-tabView>
-    <p-tabPanel header="Configure Your Preferences">
-      <p-fieldset styleClass="my-5" legend="Storage" [toggleable]="true">
-        <div class="container-grid">
-          <ng-container
-            *ngTemplateOutlet="
-              settingsDetails;
-              context: {
-                title: 'Current Directory',
-                description: 'Here\'s where your files are saved'
-              }
-            "
-          >
-          </ng-container>
-          <div class="m-2">
-            <div class="p-inputgroup">
-              <button
-                type="button"
-                pButton
-                pRipple
-                icon="pi pi-folder"
-                disabled
-              ></button>
-              <input
-                type="text"
-                disabled
-                pInputText
-                [(ngModel)]="configSettings.baseDirectory"
-              />
+   <p-tabView>
+      <p-tabPanel header="Configure Your Preferences">
+         <p-fieldset styleClass="my-5" legend="Storage" [toggleable]="true">
+            <div class="container-grid">
+               <ng-container
+                  *ngTemplateOutlet="
+                     settingsDetails;
+                     context: {
+                        title: 'Current Directory',
+                        description: 'Here\'s where your files are saved'
+                     }
+                  "
+               >
+               </ng-container>
+               <div class="m-2">
+                  <div class="p-inputgroup">
+                     <button type="button" pButton pRipple icon="pi pi-folder" disabled></button>
+                     <input type="text" disabled pInputText [(ngModel)]="configSettings.baseDirectory" />
+                  </div>
+               </div>
             </div>
-          </div>
-        </div>
-      </p-fieldset>
+         </p-fieldset>
 
-      <!-- - Screenshot Tab -->
+         <!-- - Screenshot Tab -->
 
-      <p-fieldset styleClass="my-5" legend="Screenshot" [toggleable]="true">
-        <!-- ssHotKey -->
+         <p-fieldset styleClass="my-5" legend="Screenshot" [toggleable]="true">
+            <!-- ssHotKey -->
 
-        <div class="container-grid">
-          <ng-container
-            *ngTemplateOutlet="
-              settingsDetails;
-              context: {
-                title: 'Screenshot Hot-Key',
-                description: 'Set up key combinations for taking screenshots'
-              }
-            "
-          >
-          </ng-container>
-          <div class="m-2">
-            <div class="p-inputgroup">
-              <button
-                type="button"
-                pButton
-                pRipple
-                icon="pi pi-camera"
-                (click)="keybindSelectionActive = 'ssHotKey'"
-              ></button>
-              <input
-                type="text"
-                disabled
-                pInputText
-                [value]="configSettings.ssHotKey"
-              />
-              <ng-container
-                *ngTemplateOutlet="
-                  keybindRecordDialogTemplate;
-                  context: { keybindFor: 'ssHotKey' }
-                "
-              >
-              </ng-container>
+            <div class="container-grid">
+               <ng-container
+                  *ngTemplateOutlet="
+                     settingsDetails;
+                     context: {
+                        title: 'Screenshot Hot-Key',
+                        description: 'Set up key combinations for taking screenshots'
+                     }
+                  "
+               >
+               </ng-container>
+               <div class="m-2">
+                  <div class="p-inputgroup">
+                     <button
+                        type="button"
+                        pButton
+                        pRipple
+                        icon="pi pi-camera"
+                        (click)="keybindSelectionActive = 'ssHotKey'"
+                     ></button>
+                     <input type="text" disabled pInputText [value]="configSettings.ssHotKey" />
+                     <ng-container *ngTemplateOutlet="keybindRecordDialogTemplate; context: { keybindFor: 'ssHotKey' }">
+                     </ng-container>
+                  </div>
+               </div>
             </div>
-          </div>
-        </div>
-        <p-divider></p-divider>
+            <p-divider></p-divider>
 
-        <!-- ssHotKeyCurrentWindow -->
+            <!-- ssHotKeyCurrentWindow -->
 
-        <div class="container-grid">
-          <ng-container
-            *ngTemplateOutlet="
-              settingsDetails;
-              context: {
-                title: 'Current Window Screenshot Hot-Key',
-                description:
-                  'Set up key combinations for taking screenshots of the currently focused window.'
-              }
-            "
-          >
-          </ng-container>
-          <div class="m-2">
-            <div class="p-inputgroup">
-              <button
-                type="button"
-                pButton
-                pRipple
-                icon="pi pi-camera"
-                (click)="keybindSelectionActive = 'ssHotKeyCurrentWindow'"
-              ></button>
-              <input
-                type="text"
-                disabled
-                pInputText
-                [value]="configSettings.ssHotKeyCurrentWindow"
-              />
-              <ng-container
-                *ngTemplateOutlet="
-                  keybindRecordDialogTemplate;
-                  context: { keybindFor: 'ssHotKeyCurrentWindow' }
-                "
-              >
-              </ng-container>
+            <div class="container-grid">
+               <ng-container
+                  *ngTemplateOutlet="
+                     settingsDetails;
+                     context: {
+                        title: 'Current Window Screenshot Hot-Key',
+                        description: 'Set up key combinations for taking screenshots of the currently focused window.'
+                     }
+                  "
+               >
+               </ng-container>
+               <div class="m-2">
+                  <div class="p-inputgroup">
+                     <button
+                        type="button"
+                        pButton
+                        pRipple
+                        icon="pi pi-camera"
+                        (click)="keybindSelectionActive = 'ssHotKeyCurrentWindow'"
+                     ></button>
+                     <input type="text" disabled pInputText [value]="configSettings.ssHotKeyCurrentWindow" />
+                     <ng-container
+                        *ngTemplateOutlet="
+                           keybindRecordDialogTemplate;
+                           context: { keybindFor: 'ssHotKeyCurrentWindow' }
+                        "
+                     >
+                     </ng-container>
+                  </div>
+               </div>
             </div>
-          </div>
-        </div>
-        <p-divider></p-divider>
+            <p-divider></p-divider>
 
-        <!-- ssScreenResolution -->
+            <!-- ssScreenResolution -->
 
-        <div class="container-grid">
-          <ng-container
-            *ngTemplateOutlet="
-              settingsDetails;
-              context: {
-                title: 'Screenshot Resolution',
-                description: 'The resolution for screenshots'
-              }
-            "
-          >
-          </ng-container>
-          <div class="m-2">
-            <p-dropdown
-              [options]="availableScreenResolutions"
-              [(ngModel)]="configSettings.ssResolution"
-              placeholder="Resolution"
-              [showClear]="false"
-            ></p-dropdown>
-          </div>
-        </div>
-      </p-fieldset>
-
-      <!-- - Screen Recorder Tab -->
-
-      <p-fieldset styleClass="my-5" legend="Screen Capture" [toggleable]="true">
-        <!-- scHotKey -->
-
-        <div class="container-grid">
-          <ng-container
-            *ngTemplateOutlet="
-              settingsDetails;
-              context: {
-                title: 'Screen Capture Hot-Key',
-                description:
-                  'Set up key combinations for enabling Screen Capture'
-              }
-            "
-          >
-          </ng-container>
-          <div class="m-2">
-            <div class="p-inputgroup">
-              <button
-                type="button"
-                pButton
-                pRipple
-                icon="pi pi-video"
-                (click)="keybindSelectionActive = 'scHotKey'"
-              ></button>
-              <input
-                type="text"
-                disabled
-                pInputText
-                [value]="configSettings.scHotKey"
-              />
-              <ng-container
-                *ngTemplateOutlet="
-                  keybindRecordDialogTemplate;
-                  context: { keybindFor: 'scHotKey' }
-                "
-              >
-              </ng-container>
+            <div class="container-grid">
+               <ng-container
+                  *ngTemplateOutlet="
+                     settingsDetails;
+                     context: {
+                        title: 'Screenshot Resolution',
+                        description: 'The resolution for screenshots'
+                     }
+                  "
+               >
+               </ng-container>
+               <div class="m-2">
+                  <p-dropdown
+                     [options]="availableScreenResolutions"
+                     [(ngModel)]="configSettings.ssResolution"
+                     placeholder="Resolution"
+                     [showClear]="false"
+                  ></p-dropdown>
+               </div>
             </div>
-          </div>
-        </div>
-        <p-divider></p-divider>
+         </p-fieldset>
 
-        <!-- scHotKeyCurrentWindow -->
+         <!-- - Screen Recorder Tab -->
 
-        <div class="container-grid">
-          <ng-container
-            *ngTemplateOutlet="
-              settingsDetails;
-              context: {
-                title: 'Screen Capture Hot-Key (current window)',
-                description:
-                  'Set up key combinations for enabling Screen Capture for the currently focused window'
-              }
-            "
-          >
-          </ng-container>
-          <div class="m-2">
-            <div class="p-inputgroup">
-              <button
-                type="button"
-                pButton
-                pRipple
-                icon="pi pi-video"
-                (click)="keybindSelectionActive = 'scHotKeyCurrentWindow'"
-              ></button>
-              <input
-                type="text"
-                disabled
-                pInputText
-                [value]="configSettings.scHotKeyCurrentWindow"
-              />
-              <ng-container
-                *ngTemplateOutlet="
-                  keybindRecordDialogTemplate;
-                  context: { keybindFor: 'scHotKeyCurrentWindow' }
-                "
-              >
-              </ng-container>
+         <p-fieldset styleClass="my-5" legend="Screen Capture" [toggleable]="true">
+            <!-- scHotKey -->
+
+            <div class="container-grid">
+               <ng-container
+                  *ngTemplateOutlet="
+                     settingsDetails;
+                     context: {
+                        title: 'Screen Capture Hot-Key',
+                        description: 'Set up key combinations for enabling Screen Capture'
+                     }
+                  "
+               >
+               </ng-container>
+               <div class="m-2">
+                  <div class="p-inputgroup">
+                     <button
+                        type="button"
+                        pButton
+                        pRipple
+                        icon="pi pi-video"
+                        (click)="keybindSelectionActive = 'scHotKey'"
+                     ></button>
+                     <input type="text" disabled pInputText [value]="configSettings.scHotKey" />
+                     <ng-container *ngTemplateOutlet="keybindRecordDialogTemplate; context: { keybindFor: 'scHotKey' }">
+                     </ng-container>
+                  </div>
+               </div>
             </div>
-          </div>
-        </div>
-        <p-divider></p-divider>
+            <p-divider></p-divider>
 
-        <!-- scResolution -->
+            <!-- scHotKeyCurrentWindow -->
 
-        <div class="container-grid">
-          <ng-container
-            *ngTemplateOutlet="
-              settingsDetails;
-              context: {
-                title: 'Screen Capture Resolution',
-                description: 'The resolution for screen captures'
-              }
-            "
-          >
-          </ng-container>
-          <div class="m-2">
-            <p-dropdown
-              [options]="availableScreenResolutions"
-              [(ngModel)]="configSettings.scResolution"
-              placeholder="Resolution"
-              [showClear]="false"
-            ></p-dropdown>
-          </div>
-        </div>
-      </p-fieldset>
-      <ng-container *ngTemplateOutlet="settingsActionTemplate"></ng-container>
-    </p-tabPanel>
-  </p-tabView>
+            <div class="container-grid">
+               <ng-container
+                  *ngTemplateOutlet="
+                     settingsDetails;
+                     context: {
+                        title: 'Screen Capture Hot-Key (current window)',
+                        description:
+                           'Set up key combinations for enabling Screen Capture for the currently focused window'
+                     }
+                  "
+               >
+               </ng-container>
+               <div class="m-2">
+                  <div class="p-inputgroup">
+                     <button
+                        type="button"
+                        pButton
+                        pRipple
+                        icon="pi pi-video"
+                        (click)="keybindSelectionActive = 'scHotKeyCurrentWindow'"
+                     ></button>
+                     <input type="text" disabled pInputText [value]="configSettings.scHotKeyCurrentWindow" />
+                     <ng-container
+                        *ngTemplateOutlet="
+                           keybindRecordDialogTemplate;
+                           context: { keybindFor: 'scHotKeyCurrentWindow' }
+                        "
+                     >
+                     </ng-container>
+                  </div>
+               </div>
+            </div>
+            <p-divider></p-divider>
+
+            <!-- scResolution -->
+
+            <div class="container-grid">
+               <ng-container
+                  *ngTemplateOutlet="
+                     settingsDetails;
+                     context: {
+                        title: 'Screen Capture Resolution',
+                        description: 'The resolution for screen captures'
+                     }
+                  "
+               >
+               </ng-container>
+               <div class="m-2">
+                  <p-dropdown
+                     [options]="availableScreenResolutions"
+                     [(ngModel)]="configSettings.scResolution"
+                     placeholder="Resolution"
+                     [showClear]="false"
+                  ></p-dropdown>
+               </div>
+            </div>
+         </p-fieldset>
+         <ng-container *ngTemplateOutlet="settingsActionTemplate"></ng-container>
+      </p-tabPanel>
+   </p-tabView>
 </div>
 
 <!-- - Tab Action Items Template -->
 
 <ng-template #settingsDetails let-title="title" let-description="description">
-  <div class="m-1">
-    <h4 class="text-xl font-bold">{{ title }}</h4>
-    <span class="text-base">{{ description }}</span>
-  </div>
+   <div class="m-1">
+      <h4 class="text-xl font-bold">{{ title }}</h4>
+      <span class="text-base">{{ description }}</span>
+   </div>
 </ng-template>
 
 <ng-template #settingsActionTemplate>
-  <div class="flex justify-end m-4">
-    <button
-      pButton
-      pRipple
-      type="button"
-      label="Save"
-      class="p-button-raised p-button-sm mx-2"
-      (click)="saveSettings()"
-    ></button>
-    <button
-      pButton
-      pRipple
-      type="button"
-      label="Cancel"
-      class="p-button-outlined p-button-sm mx-2"
-      (click)="cancelSettings()"
-    ></button>
-  </div>
+   <div class="flex justify-end m-4">
+      <button
+         pButton
+         pRipple
+         type="button"
+         label="Save"
+         class="p-button-raised p-button-sm mx-2"
+         (click)="saveSettings()"
+      ></button>
+      <button
+         pButton
+         pRipple
+         type="button"
+         label="Cancel"
+         class="p-button-outlined p-button-sm mx-2"
+         (click)="cancelSettings()"
+      ></button>
+   </div>
 </ng-template>
 
 <ng-template #keybindRecordDialogTemplate let-keybindFor="keybindFor">
-  <p-dialog
-    (onHide)="removeListenerAndUpdateKeybind(keybindFor)"
-    (onShow)="listenForKeybinds()"
-    [focusTrap]="true"
-    [focusOnShow]="true"
-    [modal]="true"
-    [resizable]="true"
-    header="Listening for new Keybind"
-    [closable]="false"
-    [visible]="keybindSelectionActive === keybindFor"
-    [style]="{
-      width: '50vw',
-      height: '50vh'
-    }"
-  >
-    <div
-      class="flex flex-col justify-center items-center"
-      style="height: fit-content"
-    >
-      <div *ngIf="keybindError">{{ keybindError }}</div>
-      <div class="text-2xl text-green-300 flex justify-center">
-        {{ recordedKeybind }}
+   <p-dialog
+      (onHide)="removeListenerAndUpdateKeybind(keybindFor)"
+      (onShow)="listenForKeybinds()"
+      [focusTrap]="true"
+      [focusOnShow]="true"
+      [modal]="true"
+      [resizable]="true"
+      header="Listening for new Keybind"
+      [closable]="false"
+      [visible]="keybindSelectionActive === keybindFor"
+      [style]="{
+         width: '50vw',
+         height: '50vh'
+      }"
+   >
+      <div class="flex flex-col justify-center items-center" style="height: fit-content">
+         <div *ngIf="keybindError">{{ keybindError }}</div>
+         <div class="text-2xl text-green-300 flex justify-center">
+            {{ recordedKeybind }}
+         </div>
       </div>
-    </div>
-    <ng-template pTemplate="footer">
-      <p-button
-        icon="pi pi-check"
-        (click)="keybindSelectionActive = null"
-        label="Okay"
-        styleClass="p-button-text"
-      ></p-button>
-    </ng-template>
-  </p-dialog>
+      <ng-template pTemplate="footer">
+         <p-button
+            icon="pi pi-check"
+            (click)="keybindSelectionActive = null"
+            label="Okay"
+            styleClass="p-button-text"
+         ></p-button>
+      </ng-template>
+   </p-dialog>
 </ng-template>

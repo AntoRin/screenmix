@@ -19,5 +19,9 @@
    "repository": {
       "type": "git",
       "url": "https://github.com/AntoRin/screenmix"
+   },
+   "prettier": {
+      "tabWidth": 3,
+      "printWidth": 120
    }
 }

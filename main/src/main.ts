@@ -75,7 +75,7 @@ class Screenmix {
          });
       });
 
-      autoUpdater.on("error", async e => {
+      autoUpdater.on("error", async (e) => {
          await dialog.showMessageBox({
             message: JSON.stringify(e),
          });
@@ -131,7 +131,7 @@ class Screenmix {
 
       this._mainWindow.setMinimumSize(640, 480);
 
-      this._mainWindow.on("close", event => {
+      this._mainWindow.on("close", (event) => {
          if (this._isQuitting) return true;
 
          event.preventDefault();
@@ -166,7 +166,8 @@ class Screenmix {
             click: this._ipcHandler.takeScreenshot.bind(this._ipcHandler),
          },
          {
-            label: !videoCaptureStatus || videoCaptureStatus === "videoCaptureEnd" ? "Start Recording" : "Stop Recording",
+            label:
+               !videoCaptureStatus || videoCaptureStatus === "videoCaptureEnd" ? "Start Recording" : "Stop Recording",
             type: "normal",
             click: this._ipcHandler.captureScreen.bind(this._ipcHandler),
          },
@@ -189,7 +190,7 @@ class Screenmix {
 
 const screenmix: Screenmix = new Screenmix();
 
-screenmix.init().catch(e => {
+screenmix.init().catch((e) => {
    console.log(e);
    process.exit(1);
 });

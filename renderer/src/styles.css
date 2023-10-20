@@ -11,8 +11,8 @@
 /* Global styles */
 
 :root {
+   --screenmix-theme-color: rgba(69, 203, 178, 255);
    --link-color: #2e8fff;
-   --theme-color: rgba(69, 203, 178, 255);
 }
 
 html,

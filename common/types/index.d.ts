@@ -120,6 +120,7 @@ export interface CaptureData {
 export type MainProcessInternalEvent =
    | "videoCaptureStatusChange"
    | "exitApplication"
+   | "setExitFlag"
    | "hideMainWindow"
    | "showMainWindow";
 

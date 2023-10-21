@@ -30,6 +30,9 @@ class Screenmix {
 
          this._ipcHandler.on("exitApplication", this._setFlagAndExit.bind(this));
 
+         // The handler for setExitFlag needs to be purely synchronous, since the emitting code depends on this being sync.
+         this._ipcHandler.on("setExitFlag", this._setFlagAndExit.bind(this, true));
+
          this._ipcHandler.on("hideMainWindow", this._mainWindow.hide.bind(this._mainWindow));
 
          this._ipcHandler.on("showMainWindow", this._mainWindow.show.bind(this._mainWindow));
@@ -126,13 +129,16 @@ class Screenmix {
          {
             label: "Exit",
             type: "normal",
-            click: this._setFlagAndExit.bind(this),
+            click: () => {
+               this._setFlagAndExit();
+            },
          },
       ];
    }
 
-   private _setFlagAndExit() {
+   private _setFlagAndExit(setFlagOnly: boolean = false) {
       this._isQuitting = true;
+      if (setFlagOnly) return;
       app.quit();
    }
 }

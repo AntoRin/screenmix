@@ -151,6 +151,8 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    }
 
    quitAndInstallUpdate() {
+      // The handler of this particular event needs to be synchronous all the way.
+      this.emit("setExitFlag");
       autoUpdater.quitAndInstall();
    }
 

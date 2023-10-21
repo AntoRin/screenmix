@@ -313,7 +313,7 @@ export class DashboardComponent implements OnInit {
             this.updateBtnDisabled = false;
             break;
          case "checkingForUpdate":
-            this.appUpdateStatusMessage = updaterState?.error?.message || this._defaultUpdateError;
+            this.appUpdateStatusMessage = "Checking for updates...";
             this.updateBtnDisabled = true;
             break;
          case "updateNotAvailable":

@@ -26,19 +26,16 @@ class Screenmix {
             throw new Error("Error creating window");
          }
 
-         this._ipcHandler = new IpcHandler(this._mainWindow);
+         this._ipcHandler = new IpcHandler(this._mainWindow, app.getVersion());
 
          this._ipcHandler.on("exitApplication", this._setFlagAndExit.bind(this));
 
-         this._ipcHandler.on(
-            "hideMainWindow",
-            this._mainWindow.hide.bind(this._mainWindow)
-         );
+         // The handler for setExitFlag needs to be purely synchronous, since the emitting code depends on this being sync.
+         this._ipcHandler.on("setExitFlag", this._setFlagAndExit.bind(this, true));
 
-         this._ipcHandler.on(
-            "showMainWindow",
-            this._mainWindow.show.bind(this._mainWindow)
-         );
+         this._ipcHandler.on("hideMainWindow", this._mainWindow.hide.bind(this._mainWindow));
+
+         this._ipcHandler.on("showMainWindow", this._mainWindow.show.bind(this._mainWindow));
 
          app.on("activate", () => {
             if (BrowserWindow.getAllWindows().length === 0) {
@@ -86,7 +83,7 @@ class Screenmix {
 
       this._mainWindow.setMinimumSize(640, 480);
 
-      this._mainWindow.on("close", event => {
+      this._mainWindow.on("close", (event) => {
          if (this._isQuitting) return true;
 
          event.preventDefault();
@@ -107,15 +104,11 @@ class Screenmix {
       this._tray.setContextMenu(Menu.buildFromTemplate(this._generateTrayCtxMenu()));
 
       this._ipcHandler.on("videoCaptureStatusChange", (status: VideoCaptureStatus) => {
-         this._tray?.setContextMenu(
-            Menu.buildFromTemplate(this._generateTrayCtxMenu(status))
-         );
+         this._tray?.setContextMenu(Menu.buildFromTemplate(this._generateTrayCtxMenu(status)));
       });
    }
 
-   private _generateTrayCtxMenu(
-      videoCaptureStatus?: VideoCaptureStatus
-   ): MenuItemConstructorOptions[] {
+   private _generateTrayCtxMenu(videoCaptureStatus?: VideoCaptureStatus): MenuItemConstructorOptions[] {
       if (!this._ipcHandler) return [];
 
       return [
@@ -126,9 +119,7 @@ class Screenmix {
          },
          {
             label:
-               !videoCaptureStatus || videoCaptureStatus === "videoCaptureEnd"
-                  ? "Start Recording"
-                  : "Stop Recording",
+               !videoCaptureStatus || videoCaptureStatus === "videoCaptureEnd" ? "Start Recording" : "Stop Recording",
             type: "normal",
             click: this._ipcHandler.captureScreen.bind(this._ipcHandler),
          },
@@ -138,20 +129,23 @@ class Screenmix {
          {
             label: "Exit",
             type: "normal",
-            click: this._setFlagAndExit.bind(this),
+            click: () => {
+               this._setFlagAndExit();
+            },
          },
       ];
    }
 
-   private _setFlagAndExit() {
+   private _setFlagAndExit(setFlagOnly: boolean = false) {
       this._isQuitting = true;
+      if (setFlagOnly) return;
       app.quit();
    }
 }
 
 const screenmix: Screenmix = new Screenmix();
 
-screenmix.init().catch(e => {
+screenmix.init().catch((e) => {
    console.log(e);
    process.exit(1);
 });

@@ -6,7 +6,7 @@
       "email": "antorinish@gmail.com"
    },
    "description": "A desktop app for taking screenshots and capturing screen",
-   "version": "0.0.0",
+   "version": "0.1.0",
    "main": "dist/main.js",
    "scripts": {
       "start": "electron-forge start",
@@ -16,9 +16,13 @@
       "dev": "rm -rf dist && tsc && cp -r src/assets dist/ && npm run electron",
       "package": "electron-forge package",
       "make": "electron-forge make",
-      "make-appx": "electron-windows-store --input-directory ..\\release\\out\\Screenmix-win32-x64  --output-directory ..\\release\\appx --package-version 0.0.0.0 --package-name screenmix"
+      "make-appx": "electron-windows-store --input-directory ..\\release\\out\\Screenmix-win32-x64  --output-directory ..\\release\\appx --package-version 0.1.0 --package-name screenmix"
    },
    "private": true,
+   "repository": {
+      "type": "git",
+      "url": "https://github.com/AntoRin/screenmix"
+   },
    "dependencies": {
       "active-win": "^7.7.1",
       "electron-is-dev": "^2.0.0",

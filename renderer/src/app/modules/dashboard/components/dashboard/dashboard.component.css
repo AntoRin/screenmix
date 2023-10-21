@@ -1,9 +1,9 @@
 .container-grid {
-  display: grid;
-  grid-template-columns: 2fr 5fr;
+   display: grid;
+   grid-template-columns: 2fr 5fr;
 }
 
 ::ng-deep .priority-menu-bar {
-  z-index: 40;
-  width: calc(100vw - 7px);
+   z-index: 40;
+   width: calc(100vw - 7px);
 }

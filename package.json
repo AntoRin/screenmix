@@ -6,14 +6,22 @@
       "email": "antorinish@gmail.com"
    },
    "description": "A desktop app for taking screenshots and capturing screen",
-   "version": "0.0.0",
+   "version": "0.1.0",
    "scripts": {
       "start": "cd main && npm run electron",
       "build": "npx concurrently \"cd renderer && npm run build\" \"cd main && npm run build\"",
       "watch": "npx concurrently \"cd renderer && npm run watch\" \"cd main && npm run watch\"",
-      "package-exe": "npm run build && cd main && npm run make && mv ./out ../release/",
+      "package-exe": "rm -rf ./release/* && npm run build && cd main && npm run make && mv ./out ../release/",
       "package-appx": "cd main && npm run make-appx",
       "release": "rm -rf release && npm run package-exe && npm run package-appx && mkdir release && mv main/appx main/out release/"
    },
-   "private": true
+   "private": true,
+   "repository": {
+      "type": "git",
+      "url": "https://github.com/AntoRin/screenmix"
+   },
+   "prettier": {
+      "tabWidth": 3,
+      "printWidth": 120
+   }
 }

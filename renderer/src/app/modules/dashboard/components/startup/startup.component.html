@@ -1,77 +1,63 @@
 <div class="min-h-screen bg-gray-900 text-white">
-  <div
-    [class]="
-      !mediaDirectories.length
-        ? 'absolute top-2/4 left-2/4 transform -translate-x-1/2 -translate-y-1/2'
-        : 'flex justify-start'
-    "
-  >
-    <button
-      (click)="selectDirectory()"
-      pButton
-      pRipple
-      type="button"
-      label="Add Workspace"
-      icon="pi pi-plus"
-      iconPos="right"
-      class="p-button-sm p-button-outlined m-3"
-    ></button>
-  </div>
-  <div class="mx-auto container py-20 px-6">
-    <div
-      class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-    >
-      <div
-        class="rounded"
-        *ngFor="let dir of mediaDirectories; let dirIdx = index"
-      >
-        <div
-          class="w-full h-56 flex flex-col justify-between items-start bg-gray-900 rounded-lg border mb-6 py-5 px-2"
-          [ngClass]="
-            baseDirectory === dir ? 'border-blue-300' : 'border-[#34475e]'
-          "
-        >
-          <div (click)="navigateToWorkspace(dirIdx)" class="cursor-pointer">
-            <h4 class="text-white font-bold mb-3">{{ baseName(dir) }}</h4>
-          </div>
-          <div
-            class="w-full flex flex-col items-start cursor-pointer"
-            (click)="navigateToWorkspace(dirIdx)"
-          >
+   <div
+      [class]="
+         !mediaDirectories.length
+            ? 'absolute top-2/4 left-2/4 transform -translate-x-1/2 -translate-y-1/2'
+            : 'flex justify-start'
+      "
+   >
+      <button
+         (click)="selectDirectory()"
+         pButton
+         pRipple
+         type="button"
+         label="Add Workspace"
+         icon="pi pi-plus"
+         iconPos="right"
+         class="p-button-sm p-button-outlined m-3"
+      ></button>
+   </div>
+   <div class="mx-auto container py-20 px-6">
+      <div class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+         <div class="rounded" *ngFor="let dir of mediaDirectories; let dirIdx = index">
             <div
-              class="mb-3 border border-gray-800 rounded-full px-3 py-1 text-white text-xs flex items-center w-[75%]"
-              [pTooltip]="dir"
-              tooltipPosition="top"
+               class="w-full h-56 flex flex-col justify-between items-start bg-gray-900 rounded-lg border mb-6 py-5 px-2"
+               [ngClass]="baseDirectory === dir ? 'border-blue-300' : 'border-[#34475e]'"
             >
-              <button
-                pButton
-                pRipple
-                type="button"
-                icon="pi pi-folder-open"
-                class="p-button-rounded p-button-secondary p-button-text"
-              ></button>
-              <p
-                class="ml-2 overflow-ellipsis overflow-hidden whitespace-nowrap"
-              >
-                {{ dir }}
-              </p>
+               <div (click)="navigateToWorkspace(dirIdx)" class="cursor-pointer">
+                  <h4 class="text-white font-bold mb-3">{{ baseName(dir) }}</h4>
+               </div>
+               <div class="w-full flex flex-col items-start cursor-pointer" (click)="navigateToWorkspace(dirIdx)">
+                  <div
+                     class="mb-3 border border-gray-800 rounded-full px-3 py-1 text-white text-xs flex items-center w-[75%]"
+                     [pTooltip]="dir"
+                     tooltipPosition="top"
+                  >
+                     <button
+                        pButton
+                        pRipple
+                        type="button"
+                        icon="pi pi-folder-open"
+                        class="p-button-rounded p-button-secondary p-button-text"
+                     ></button>
+                     <p class="ml-2 overflow-ellipsis overflow-hidden whitespace-nowrap">
+                        {{ dir }}
+                     </p>
+                  </div>
+               </div>
+               <p-divider></p-divider>
+               <div class="flex items-center justify-end text-gray-800 w-full p-[5px]">
+                  <button
+                     pButton
+                     pRipple
+                     type="button"
+                     icon="pi pi-trash"
+                     class="p-button-rounded p-button-danger p-button-outlined"
+                     (click)="removeMediaDir(dir)"
+                  ></button>
+               </div>
             </div>
-          </div>
-          <p-divider></p-divider>
-          <div
-            class="flex items-center justify-end text-gray-800 w-full p-[5px]"
-          >
-            <button
-              pButton
-              pRipple
-              type="button"
-              icon="pi pi-trash"
-              class="p-button-rounded p-button-danger p-button-outlined"
-              (click)="removeMediaDir(dir)"
-            ></button>
-          </div>
-        </div>
+         </div>
       </div>
-    </div>
-  </div>
+   </div>
 </div>

@@ -4,8 +4,8 @@ import { PrimengModule } from "../primeng/primeng.module";
 import { ProgressBarComponent } from "./components/progress-bar/progress-bar.component";
 
 @NgModule({
-  declarations: [ProgressBarComponent],
-  imports: [CommonModule, PrimengModule],
-  exports: [ProgressBarComponent],
+   declarations: [ProgressBarComponent],
+   imports: [CommonModule, PrimengModule],
+   exports: [ProgressBarComponent],
 })
 export class SharedModule {}

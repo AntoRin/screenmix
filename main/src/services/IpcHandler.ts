@@ -13,9 +13,15 @@ import {
    globalShortcut,
    ipcMain,
    nativeImage,
+   autoUpdater,
 } from "electron";
 
+// import electronIsDev from "electron-is-dev";
+
 import {
+   AppMetaData,
+   AppUpdaterState,
+   AppUpdateStatus,
    CaptureData,
    IpcApi,
    IpcChannel,
@@ -27,7 +33,7 @@ import {
    UserDataStore,
    VideoCaptureStatus,
 } from "common-types";
-import { CHANNELS } from "../constants";
+import { CHANNELS, generalConfig, PATHS } from "../constants";
 import { Store } from "./Store";
 import { MainCtxError } from "../errors/MainCtxError";
 import { Utils } from "./Utils";
@@ -38,13 +44,23 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    private _mainWindow: BrowserWindow;
    private _imageExtensions: string[];
    private _videoExtensions: string[];
+   private _appUpdaterState: AppUpdaterState;
+   public appVersion: string;
 
-   constructor(mainWindow: BrowserWindow) {
+   constructor(mainWindow: BrowserWindow, appVersion: string) {
       super();
       this._store = new Store();
       this._mainWindow = mainWindow;
       this._imageExtensions = [".jpg", ".jpeg", ".png"];
       this._videoExtensions = [".mp4"];
+      this.appVersion = appVersion;
+
+      this._appUpdaterState = {
+         status: "updateNotAvailable",
+         error: null,
+      };
+
+      this.setupAppUpdater();
    }
 
    override emit(event: MainProcessInternalEvent, ...args: any[]) {
@@ -84,6 +100,70 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
             }
          });
       });
+   }
+
+   setupAppUpdater() {
+      autoUpdater.setFeedURL({
+         url: `${generalConfig.updateServerUrl}/${this.appVersion}`,
+      });
+
+      autoUpdater.on("error", (e) => {
+         this._appUpdaterState.status = "updateError";
+         this._appUpdaterState.error = Utils.serializeError(e);
+         this._notifyRenderer("fromMain:appUpdater:stateChange");
+      });
+
+      autoUpdater.on("checking-for-update", () => {
+         this._appUpdaterState.status = "checkingForUpdate";
+         this._notifyRenderer("fromMain:appUpdater:stateChange");
+      });
+
+      autoUpdater.on("update-available", () => {
+         this._appUpdaterState.status = "updateAvailable";
+         this._notifyRenderer("fromMain:appUpdater:stateChange");
+      });
+
+      autoUpdater.on("update-not-available", () => {
+         this._appUpdaterState.status = "updateNotAvailable";
+         this._notifyRenderer("fromMain:appUpdater:stateChange");
+      });
+
+      autoUpdater.on("update-downloaded", () => {
+         this._appUpdaterState.status = "updateDownloaded";
+         this._notifyRenderer("fromMain:appUpdater:stateChange");
+      });
+
+      autoUpdater.on("before-quit-for-update", () => {});
+   }
+
+   checkForAppUpdates() {
+      if (
+         !(["checkingForUpdate", "updateAvailable", "updateDownloaded"] as AppUpdateStatus[]).includes(
+            this._appUpdaterState.status
+         )
+      ) {
+         autoUpdater.checkForUpdates();
+      }
+   }
+
+   getAppUpdaterState() {
+      return this._appUpdaterState;
+   }
+
+   quitAndInstallUpdate() {
+      // The handler of this particular event needs to be synchronous all the way.
+      this.emit("setExitFlag");
+      autoUpdater.quitAndInstall();
+   }
+
+   getAppMetaData(): AppMetaData {
+      return {
+         appVersion: this.appVersion,
+         releaseNotesUrl: `${generalConfig.releaseNotesBaseUrl}/v${this.appVersion}`,
+         licenseUrl: generalConfig.licenseUrl,
+         lastCheckedForUpdateAt: Date.now(),
+         icon: path.join("file:///", PATHS.icons.jpeg),
+      };
    }
 
    registerGlobalShortcuts() {
@@ -137,9 +217,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    }
 
    async addMediaDirectory(directoryName?: string) {
-      const selectedDir = directoryName
-         ? directoryName
-         : await this.getDirectorySelection();
+      const selectedDir = directoryName ? directoryName : await this.getDirectorySelection();
 
       if (selectedDir) {
          // User has successfully selected a directory
@@ -160,9 +238,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    async removeMediaDirectory(path: string) {
       try {
          await this._store.write({
-            mediaDirectories: (this._store.read("mediaDirectories") as string[]).filter(
-               p => p !== path
-            ),
+            mediaDirectories: (this._store.read("mediaDirectories") as string[]).filter((p) => p !== path),
          });
 
          if (this._store.read("baseDirectory") === path) {
@@ -225,20 +301,14 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
       } catch (error: any) {
          if (error?.code === "ENOENT" && baseDirectory) {
             await this.removeMediaDirectory(baseDirectory);
-            throw new MainCtxError(
-               ERROR_CODE_MAP.MP_ENOENT_BASE_DIR(baseDirectory),
-               "MP_ENOENT_BASE_DIR"
-            );
+            throw new MainCtxError(ERROR_CODE_MAP.MP_ENOENT_BASE_DIR(baseDirectory), "MP_ENOENT_BASE_DIR");
          } else {
             throw error;
          }
       }
    }
 
-   private _createSortedMediaFileList(
-      dirents: Dirent[],
-      baseDirectory: string
-   ): MediaFile[] {
+   private _createSortedMediaFileList(dirents: Dirent[], baseDirectory: string): MediaFile[] {
       let files: MediaFile[] = [];
 
       for (const dirent of dirents) {
@@ -251,23 +321,14 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
                const mediaFile: MediaFile = {
                   name: path.basename(dirent.name),
                   path: path.join("file:///", baseDirectory, dirent.name),
-                  type: this._imageExtensions.includes(
-                     path.extname(dirent.name).toLowerCase()
-                  )
-                     ? "image"
-                     : "video",
-                  createdAt: statSync(
-                     path.join(baseDirectory, dirent.name)
-                  ).birthtime.getTime(),
+                  type: this._imageExtensions.includes(path.extname(dirent.name).toLowerCase()) ? "image" : "video",
+                  createdAt: statSync(path.join(baseDirectory, dirent.name)).birthtime.getTime(),
                };
 
                let idx = 0;
 
                do {
-                  if (
-                     mediaFile.createdAt >=
-                     (files[idx]?.createdAt || Number.NEGATIVE_INFINITY)
-                  ) {
+                  if (mediaFile.createdAt >= (files[idx]?.createdAt || Number.NEGATIVE_INFINITY)) {
                      files.splice(idx, 0, mediaFile);
                      break;
                   }
@@ -326,14 +387,12 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
                  try {
                     const activeSource = await activeWin();
                     if (!activeSource) return undefined;
-                    return sources.find(
-                       s => s.id.indexOf(String(activeSource.id)) !== -1
-                    );
+                    return sources.find((s) => s.id.indexOf(String(activeSource.id)) !== -1);
                  } catch (error) {
                     return undefined;
                  }
               })()
-            : sources.find(s => s.name === "Entire Screen");
+            : sources.find((s) => s.name === "Entire Screen");
 
          return requiredSource?.id;
       } catch (error) {
@@ -346,7 +405,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
          await desktopCapturer.getSources({
             types: ["window", "screen"],
          })
-      ).map(source => ({
+      ).map((source) => ({
          id: source.id,
          name: source.name,
          thumbnail: source.thumbnail.toDataURL(),
@@ -390,8 +449,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
             encoding: "base64",
          });
 
-         const notification =
-            captureData.mode === "image" ? "fromMain:newImage" : "fromMain:newVideo";
+         const notification = captureData.mode === "image" ? "fromMain:newImage" : "fromMain:newVideo";
 
          this._notifyRenderer(notification);
       } catch (error) {
@@ -446,16 +504,12 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
    async openBaseDirectory() {
       try {
          await new Promise<void>((resolve, reject) => {
-            const proc: ChildProcess = spawn(
-               "explorer",
-               [this._store.read("baseDirectory")],
-               {
-                  stdio: ["pipe", "pipe", "pipe"],
-                  detached: false,
-                  windowsHide: true,
-                  shell: true,
-               }
-            );
+            const proc: ChildProcess = spawn("explorer", [this._store.read("baseDirectory")], {
+               stdio: ["pipe", "pipe", "pipe"],
+               detached: false,
+               windowsHide: true,
+               shell: true,
+            });
 
             let promiseEnded: boolean = false;
 

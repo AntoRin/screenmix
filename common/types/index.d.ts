@@ -87,17 +87,17 @@ export interface RendererProcessCtx {
    exitApplication(): void;
    openBaseDirectory(): Promise<void>;
    getAvailableScreens(): Promise<ScreenData[]>;
+   getAppMetaData(): AppMetaData;
+   checkForAppUpdates(): void;
+   getAppUpdaterState(): any;
+   quitAndInstallUpdate(): void;
 }
 
 export type IpcApi = Required<keyof RendererProcessCtx>;
 
 export type IpcChannel = `ipc:${IpcApi}`;
 
-export type KeybindType =
-   | "ssHotKey"
-   | "scHotKey"
-   | "ssHotKeyCurrentWindow"
-   | "scHotKeyCurrentWindow";
+export type KeybindType = "ssHotKey" | "scHotKey" | "ssHotKeyCurrentWindow" | "scHotKeyCurrentWindow";
 
 export type UserDataField =
    | "baseDirectory"
@@ -120,6 +120,7 @@ export interface CaptureData {
 export type MainProcessInternalEvent =
    | "videoCaptureStatusChange"
    | "exitApplication"
+   | "setExitFlag"
    | "hideMainWindow"
    | "showMainWindow";
 
@@ -137,8 +138,29 @@ export type MainToRendererEvent =
    | "fromMain:newVideo"
    | "fromMain:takeScreenshotOfCurrentWindow"
    | "fromMain:captureCurrentScreen"
-   | "fromMain:preferencesUpdated";
+   | "fromMain:preferencesUpdated"
+   | "fromMain:appUpdater:stateChange";
 
 export interface CustomError extends Error {
    [key: string]: any;
+}
+
+export interface AppMetaData {
+   appVersion: string;
+   releaseNotesUrl: string;
+   licenseUrl: string;
+   lastCheckedForUpdateAt: number;
+   icon: string;
+}
+
+export type AppUpdateStatus =
+   | "checkingForUpdate"
+   | "updateNotAvailable"
+   | "updateAvailable"
+   | "updateDownloaded"
+   | "updateError";
+
+export interface AppUpdaterState {
+   status: AppUpdateStatus;
+   error?: Error | CustomError | null;
 }

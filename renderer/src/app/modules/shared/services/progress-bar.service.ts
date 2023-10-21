@@ -2,22 +2,22 @@ import { Injectable } from "@angular/core";
 import { Subject } from "rxjs";
 
 @Injectable({
-  providedIn: "root",
+   providedIn: "root",
 })
 export class ProgressBarService {
-  private _progressBarToggle: Subject<boolean> = new Subject<boolean>();
+   private _progressBarToggle: Subject<boolean> = new Subject<boolean>();
 
-  constructor() {}
+   constructor() {}
 
-  get subject(): Subject<boolean> {
-    return this._progressBarToggle;
-  }
+   get subject(): Subject<boolean> {
+      return this._progressBarToggle;
+   }
 
-  toggleOn() {
-    this._progressBarToggle.next(true);
-  }
+   toggleOn() {
+      this._progressBarToggle.next(true);
+   }
 
-  toggleOff() {
-    this._progressBarToggle.next(false);
-  }
+   toggleOff() {
+      this._progressBarToggle.next(false);
+   }
 }

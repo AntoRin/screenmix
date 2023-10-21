@@ -8,32 +8,47 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global styles */
+
+:root {
+   --screenmix-theme-color: rgba(69, 203, 178, 255);
+   --link-color: #2e8fff;
+}
+
 html,
 body {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+   margin: 0;
+   padding: 0;
+   box-sizing: border-box;
+}
+
+.link-primary {
+   color: var(--link-color);
+}
+
+.link-primary:hover {
+   text-decoration: underline;
 }
 
 ::-webkit-scrollbar {
-  width: 7px;
+   width: 7px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 2px;
+   background: #333;
+   border-radius: 2px;
 }
 
 /* Image viewer custom button */
 .viewer-options {
-  color: #fff !important;
-  font-family: FontAwesome, serif, sans-serif !important;
-  font-size: 0.75rem !important;
-  line-height: 1.5rem !important;
-  text-align: center !important;
-  background-color: #000 !important;
+   color: #fff !important;
+   font-family: FontAwesome, serif, sans-serif !important;
+   font-size: 0.75rem !important;
+   line-height: 1.5rem !important;
+   text-align: center !important;
+   background-color: #000 !important;
 }
 
 .viewer-options:before {
-  content: "🎞" !important;
+   content: "🎞" !important;
 }

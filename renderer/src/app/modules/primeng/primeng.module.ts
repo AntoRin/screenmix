@@ -4,6 +4,7 @@ import { MenuModule } from "primeng/menu";
 import { CardModule } from "primeng/card";
 import { ButtonModule } from "primeng/button";
 import { ProgressBarModule } from "primeng/progressbar";
+import { ProgressSpinnerModule } from "primeng/progressspinner";
 import { MenubarModule } from "primeng/menubar";
 import { InputTextModule } from "primeng/inputtext";
 import { ImageModule } from "primeng/image";
@@ -25,32 +26,33 @@ import { ToolbarModule } from "primeng/toolbar";
 import { MessagesModule } from "primeng/messages";
 
 @NgModule({
-  declarations: [],
-  imports: [CommonModule],
-  exports: [
-    MenuModule,
-    CardModule,
-    ButtonModule,
-    ProgressBarModule,
-    MenubarModule,
-    InputTextModule,
-    ImageModule,
-    BlockUIModule,
-    TagModule,
-    TabViewModule,
-    FieldsetModule,
-    DialogModule,
-    DropdownModule,
-    DividerModule,
-    SplitButtonModule,
-    ContextMenuModule,
-    ConfirmDialogModule,
-    ToastModule,
-    SelectButtonModule,
-    TooltipModule,
-    ToolbarModule,
-    MessagesModule,
-  ],
-  providers: [MessageService, ConfirmationService],
+   declarations: [],
+   imports: [CommonModule],
+   exports: [
+      MenuModule,
+      CardModule,
+      ButtonModule,
+      ProgressBarModule,
+      ProgressSpinnerModule,
+      MenubarModule,
+      InputTextModule,
+      ImageModule,
+      BlockUIModule,
+      TagModule,
+      TabViewModule,
+      FieldsetModule,
+      DialogModule,
+      DropdownModule,
+      DividerModule,
+      SplitButtonModule,
+      ContextMenuModule,
+      ConfirmDialogModule,
+      ToastModule,
+      SelectButtonModule,
+      TooltipModule,
+      ToolbarModule,
+      MessagesModule,
+   ],
+   providers: [MessageService, ConfirmationService],
 })
 export class PrimengModule {}

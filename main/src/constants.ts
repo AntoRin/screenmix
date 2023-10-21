@@ -22,8 +22,12 @@ export const CHANNELS: IpcChannel[] = (
       "exitApplication",
       "openBaseDirectory",
       "getAvailableScreens",
+      "getAppMetaData",
+      "checkForAppUpdates",
+      "getAppUpdaterState",
+      "quitAndInstallUpdate",
    ] as IpcApi[]
-).map(val => `ipc:${val}`) as IpcChannel[];
+).map((val) => `ipc:${val}`) as IpcChannel[];
 
 export const PATHS = {
    icons: {
@@ -31,4 +35,10 @@ export const PATHS = {
    },
    targetHtml: path.join(__dirname, "../ui/index.html"),
    preload: path.join(__dirname, "preload"),
+};
+
+export const generalConfig = {
+   updateServerUrl: "https://update.electronjs.org/AntoRin/screenmix/win32",
+   releaseNotesBaseUrl: "https://github.com/AntoRin/screenmix/releases/tag",
+   licenseUrl: "https://github.com/AntoRin/screenmix/blob/master/LICENSE",
 };

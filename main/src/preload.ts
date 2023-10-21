@@ -20,11 +20,10 @@ class Preload {
          "fromMain:takeScreenshotOfCurrentWindow",
          "fromMain:captureCurrentScreen",
          "fromMain:preferencesUpdated",
+         "fromMain:appUpdater:stateChange",
       ];
 
-      fromMainEvents.forEach(eventName =>
-         ipcRenderer.on(eventName, () => window.postMessage(eventName))
-      );
+      fromMainEvents.forEach((eventName) => ipcRenderer.on(eventName, () => window.postMessage(eventName)));
    }
 
    getExposedApis(): RendererExposedApi {
@@ -33,9 +32,7 @@ class Preload {
             try {
                if (!CHANNELS.includes(channel)) throw new Error("Invalid Channel");
 
-               let response: any = data
-                  ? ipcRenderer.invoke(channel, data)
-                  : ipcRenderer.invoke(channel);
+               let response: any = data ? ipcRenderer.invoke(channel, data) : ipcRenderer.invoke(channel);
 
                if (response instanceof Promise) response = await response;
 

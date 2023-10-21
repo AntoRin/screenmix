@@ -4,6 +4,7 @@ import { MenuModule } from "primeng/menu";
 import { CardModule } from "primeng/card";
 import { ButtonModule } from "primeng/button";
 import { ProgressBarModule } from "primeng/progressbar";
+import { ProgressSpinnerModule } from "primeng/progressspinner";
 import { MenubarModule } from "primeng/menubar";
 import { InputTextModule } from "primeng/inputtext";
 import { ImageModule } from "primeng/image";
@@ -32,6 +33,7 @@ import { MessagesModule } from "primeng/messages";
       CardModule,
       ButtonModule,
       ProgressBarModule,
+      ProgressSpinnerModule,
       MenubarModule,
       InputTextModule,
       ImageModule,

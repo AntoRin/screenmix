@@ -25,6 +25,7 @@ export const CHANNELS: IpcChannel[] = (
       "getAppMetaData",
       "checkForAppUpdates",
       "getAppUpdaterState",
+      "quitAndInstallUpdate",
    ] as IpcApi[]
 ).map((val) => `ipc:${val}`) as IpcChannel[];
 

@@ -36,8 +36,8 @@
          </div>
          <div class="mt-4" [ngClass]="{ 'text-red-500': appUpdaterState?.status === 'updateError' }">
             {{ appUpdateStatusMessage }}
-            <span *ngIf="appUpdaterState?.status === 'checkingForUpdate'">
-               <p-progressSpinner style="width: 8px"></p-progressSpinner>
+            <span *ngIf="appUpdaterState?.status === 'checkingForUpdate'" class="ml-1">
+               <p-progressSpinner strokeWidth="8" [style]="{ width: '1.2em', height: '1.2em' }"></p-progressSpinner>
             </span>
          </div>
          <div class="mt-2">
@@ -45,7 +45,8 @@
                pButton
                label="Check for Updates"
                class="p-button-secondary p-button-outlined"
-               (click)="checkForAppUpdates()"
+               [disabled]="updateBtnDisabled"
+               (click)="appUpdaterState?.status === 'updateDownloaded' ? quitAndInstallUpdate() : checkForAppUpdates()"
             ></button>
          </div>
       </div>

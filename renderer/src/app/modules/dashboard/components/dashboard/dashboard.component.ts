@@ -56,6 +56,7 @@ export class DashboardComponent implements OnInit {
    public appUpdaterState: AppUpdaterState | null = null;
    public appUpdateStatusMessage: string | null = null;
 
+   public updateBtnDisabled: boolean = false;
    private _defaultUpdateError: string = "Something went wrong while fetching updates...";
 
    constructor(
@@ -309,22 +310,31 @@ export class DashboardComponent implements OnInit {
       switch (updaterState.status) {
          case "updateError":
             this.appUpdateStatusMessage = updaterState?.error?.message || this._defaultUpdateError;
+            this.updateBtnDisabled = false;
             break;
          case "checkingForUpdate":
             this.appUpdateStatusMessage = updaterState?.error?.message || this._defaultUpdateError;
+            this.updateBtnDisabled = true;
             break;
          case "updateNotAvailable":
             this.appUpdateStatusMessage = "You have the latest version.";
+            this.updateBtnDisabled = false;
             break;
          case "updateAvailable":
+            this.updateBtnDisabled = true;
             this.appUpdateStatusMessage = "Downloading update...";
             break;
          case "updateDownloaded":
+            this.updateBtnDisabled = false;
             this.appUpdateStatusMessage = "Update ready to install.";
             break;
       }
 
       this.appUpdaterState = updaterState;
+   }
+
+   async quitAndInstallUpdate() {
+      await window.rendererProcessCtrl.invoke<void>("ipc:quitAndInstallUpdate");
    }
 
    async getAllPreferences() {

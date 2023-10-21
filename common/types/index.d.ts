@@ -90,6 +90,7 @@ export interface RendererProcessCtx {
    getAppMetaData(): AppMetaData;
    checkForAppUpdates(): void;
    getAppUpdaterState(): any;
+   quitAndInstallUpdate(): void;
 }
 
 export type IpcApi = Required<keyof RendererProcessCtx>;

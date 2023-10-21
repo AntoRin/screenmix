@@ -36,7 +36,10 @@
          </div>
          <div class="mt-4" [ngClass]="{ 'text-red-500': appUpdaterState?.status === 'updateError' }">
             {{ appUpdateStatusMessage }}
-            <span *ngIf="appUpdaterState?.status === 'checkingForUpdate'" class="ml-1">
+            <span
+               *ngIf="appUpdaterState?.status === 'checkingForUpdate' || appUpdaterState?.status === 'updateAvailable'"
+               class="ml-1"
+            >
                <p-progressSpinner strokeWidth="8" [style]="{ width: '1.2em', height: '1.2em' }"></p-progressSpinner>
             </span>
          </div>

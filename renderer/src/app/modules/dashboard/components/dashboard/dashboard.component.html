@@ -43,7 +43,9 @@
          <div class="mt-2">
             <button
                pButton
-               label="Quit and Install Update"
+               [label]="
+                  appUpdaterState?.status === 'updateDownloaded' ? 'Quit and Install Update' : 'Check for Updates'
+               "
                class="p-button-secondary p-button-outlined"
                [disabled]="updateBtnDisabled"
                (click)="appUpdaterState?.status === 'updateDownloaded' ? quitAndInstallUpdate() : checkForAppUpdates()"

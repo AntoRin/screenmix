@@ -29,8 +29,8 @@ export class Store {
          scHotKeyCurrentWindow: "Alt+Delete",
          ssHotKey: "Alt+Insert",
          ssHotKeyCurrentWindow: "Alt+End",
-         ssResolution: "800x600",
-         scResolution: "800x600",
+         ssResolution: "1920x1080",
+         scResolution: "1920x1080",
       };
    }
 

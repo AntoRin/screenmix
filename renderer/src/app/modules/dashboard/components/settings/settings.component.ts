@@ -2,6 +2,7 @@ import { OnDestroy } from "@angular/core";
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { ConfirmationService, MessageService } from "primeng/api";
 import { UserDataStore, UserDataField, KeybindType, DashboardTab } from "common-types";
+import { ErrorHandlerService } from "../../../shared/services/error-handler.service";
 
 @Component({
    selector: "app-settings",
@@ -19,11 +20,11 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
    public availableScreenResolutions: string[] = [
       "1920x1080",
-      "1600×900",
-      "1366×768",
-      "1280×720",
-      "1152×648",
-      "1024×576",
+      "1600x900",
+      "1366x768",
+      "1280x720",
+      "1152x648",
+      "1024x576",
       "800x600",
    ];
 
@@ -33,13 +34,18 @@ export class SettingsComponent implements OnInit, OnDestroy {
    constructor(
       private _confirmationServ: ConfirmationService,
       private _messageServ: MessageService,
+      private _errorHandlerService: ErrorHandlerService
    ) {
       // For passing method reference
       this.handleNewKeybind = this.handleNewKeybind.bind(this);
    }
 
    ngOnInit(): void {
-      this.configSettings = JSON.parse(JSON.stringify(this.PREFERENCES));
+      try {
+         this.configSettings = JSON.parse(JSON.stringify(this.PREFERENCES));
+      } catch (error) {
+         this._errorHandlerService.handleError(error);
+      }
    }
 
    listenForKeybinds() {
@@ -123,9 +129,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
          });
          this.tabChangeEvent.emit("gallery");
       } catch (error) {
-         this._messageServ.add({
-            severity: "error",
-            detail: "There was an error updating your settings",
+         this._errorHandlerService.handleError(error, {
+            header: "There was an error updating your settings",
          });
       }
    }

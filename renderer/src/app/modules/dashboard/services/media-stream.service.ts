@@ -93,6 +93,11 @@ export class MediaStreamService {
 
          if (mode === "video") return this.handleVideoCapture(stream);
       } catch (error) {
+         if (error instanceof DOMException && error.name === "NotReadableError") {
+            error = new Error(
+               `${error.name} - ${error.message}; this might be because the current screen is not available, or cannot be found.`
+            );
+         }
          this._errorHandlerService.handleError(error, {
             header: "Capture Failure",
          });
@@ -203,8 +208,7 @@ export class MediaStreamService {
                   }
                );
 
-               //false - user has cancelled screenshot.
-
+               // false - user has cancelled the screenshot.
                if (previewResult === false) return;
 
                if (previewResult) {

@@ -13,10 +13,11 @@ import {
    TopMenuEvent,
    UserDataStore,
 } from "common-types";
-import { ConfirmationService, MenuItem } from "primeng/api";
+import { MenuItem } from "primeng/api";
 import { Subject } from "rxjs";
 import { ProgressBarService } from "../../../shared/services/progress-bar.service";
 import { MediaStreamService } from "../../services/media-stream.service";
+import { ErrorHandlerService } from "../../../shared/services/error-handler.service";
 
 @Component({
    selector: "app-dashboard",
@@ -62,8 +63,8 @@ export class DashboardComponent implements OnInit {
    constructor(
       private _mediaStreamService: MediaStreamService,
       private _progressBarService: ProgressBarService,
-      private _confirmationServ: ConfirmationService,
-      private _cd: ChangeDetectorRef
+      private _cd: ChangeDetectorRef,
+      private _errorHandlerService: ErrorHandlerService
    ) {}
 
    ngOnInit(): void {
@@ -96,15 +97,18 @@ export class DashboardComponent implements OnInit {
                if (!notification.callback) break;
 
                // Get all available desktop screens and wait until user selects one by using a subscription.
-               window.rendererProcessCtrl.invoke<ScreenData[]>("ipc:getAvailableScreens")?.then((data) => {
-                  this.availableScreensList = data;
-                  this.showSelectScreenModal = true;
-                  const selectModalSubscription = this.selectScreenModalSubject.asObservable().subscribe((srcId) => {
-                     if (!notification.callback) return;
-                     notification.callback(undefined, srcId);
-                     selectModalSubscription.unsubscribe();
-                  });
-               });
+               window.rendererProcessCtrl
+                  .invoke<ScreenData[]>("ipc:getAvailableScreens")
+                  ?.then((data) => {
+                     this.availableScreensList = data;
+                     this.showSelectScreenModal = true;
+                     const selectModalSubscription = this.selectScreenModalSubject.asObservable().subscribe((srcId) => {
+                        if (!notification.callback) return;
+                        notification.callback(undefined, srcId);
+                        selectModalSubscription.unsubscribe();
+                     });
+                  })
+                  .catch(this._errorHandlerService.handleError.bind(this._errorHandlerService));
                break;
          }
       });
@@ -112,44 +116,48 @@ export class DashboardComponent implements OnInit {
 
    @HostListener("window:message", ["$event"])
    handleScreenEvents(event: MessageEvent<MainToRendererEvent>) {
-      switch (event.data) {
-         case "fromMain:takeScreenshot":
-            return this._mediaStreamService.captureScreen("image", this.PREFERENCES.ssResolution, false);
+      try {
+         switch (event.data) {
+            case "fromMain:takeScreenshot":
+               return this._mediaStreamService.captureScreen("image", this.PREFERENCES.ssResolution, false);
 
-         case "fromMain:takeScreenshotOfCurrentWindow":
-            return this._mediaStreamService.captureScreen("image", this.PREFERENCES.ssResolution, true);
+            case "fromMain:takeScreenshotOfCurrentWindow":
+               return this._mediaStreamService.captureScreen("image", this.PREFERENCES.ssResolution, true);
 
-         case "fromMain:captureScreen":
-            return this._mediaStreamService.captureScreen("video", this.PREFERENCES.scResolution, false);
+            case "fromMain:captureScreen":
+               return this._mediaStreamService.captureScreen("video", this.PREFERENCES.scResolution, false);
 
-         case "fromMain:captureCurrentScreen":
-            return this._mediaStreamService.captureScreen("video", this.PREFERENCES.scResolution, true);
+            case "fromMain:captureCurrentScreen":
+               return this._mediaStreamService.captureScreen("video", this.PREFERENCES.scResolution, true);
 
-         case "fromMain:newImage":
-            this.getGallery();
-            this.currentTab = "gallery";
-            this.mediaFileFilter = "image";
-            return;
+            case "fromMain:newImage":
+               this.getGallery();
+               this.currentTab = "gallery";
+               this.mediaFileFilter = "image";
+               return;
 
-         case "fromMain:newVideo":
-            this.getGallery();
-            this.currentTab = "gallery";
-            this.mediaFileFilter = "video";
-            return;
+            case "fromMain:newVideo":
+               this.getGallery();
+               this.currentTab = "gallery";
+               this.mediaFileFilter = "video";
+               return;
 
-         case "fromMain:refreshGallery":
-            return this.getGallery();
+            case "fromMain:refreshGallery":
+               return this.getGallery();
 
-         case "fromMain:preferencesUpdated":
-            this.getRequiredData();
-            return;
+            case "fromMain:preferencesUpdated":
+               this.getRequiredData();
+               return;
 
-         case "fromMain:appUpdater:stateChange":
-            this.getAppUpdaterState();
-            return;
+            case "fromMain:appUpdater:stateChange":
+               this.getAppUpdaterState();
+               return;
 
-         default:
-            return;
+            default:
+               return;
+         }
+      } catch (error) {
+         return this._errorHandlerService.handleError(error);
       }
    }
 
@@ -274,7 +282,9 @@ export class DashboardComponent implements OnInit {
    handleCaptureOnClick(mode: CaptureMode) {
       const resolution = mode === "image" ? this.PREFERENCES.ssResolution : this.PREFERENCES.scResolution;
 
-      return this._mediaStreamService.captureScreen(mode, resolution, false, true);
+      return this._mediaStreamService
+         .captureScreen(mode, resolution, false, true)
+         .catch(this._errorHandlerService.handleError.bind(this._errorHandlerService));
    }
 
    changeTab(tab: DashboardTab) {
@@ -288,12 +298,19 @@ export class DashboardComponent implements OnInit {
          await this.getAppUpdaterState();
          await this.getAllPreferences();
          await this.getGallery();
+      } catch (error) {
+         this._errorHandlerService.handleError(error);
+      } finally {
          this._progressBarService.toggleOff();
-      } catch (error) {}
+      }
    }
 
    async getAppMetaData() {
-      this.appMetaData = await window.rendererProcessCtrl.invoke("ipc:getAppMetaData");
+      try {
+         this.appMetaData = await window.rendererProcessCtrl.invoke("ipc:getAppMetaData");
+      } catch (error) {
+         this._errorHandlerService.handleError(error);
+      }
    }
 
    async checkForAppUpdates() {
@@ -305,43 +322,52 @@ export class DashboardComponent implements OnInit {
    }
 
    async getAppUpdaterState() {
-      const updaterState = await window.rendererProcessCtrl.invoke<AppUpdaterState>("ipc:getAppUpdaterState");
+      try {
+         const updaterState = await window.rendererProcessCtrl.invoke<AppUpdaterState>("ipc:getAppUpdaterState");
 
-      switch (updaterState.status) {
-         case "updateError":
-            this.appUpdateStatusMessage = updaterState?.error?.message || this._defaultUpdateError;
-            this.updateBtnDisabled = false;
-            break;
-         case "checkingForUpdate":
-            this.appUpdateStatusMessage = "Checking for updates...";
-            this.updateBtnDisabled = true;
-            break;
-         case "updateNotAvailable":
-            this.appUpdateStatusMessage = "You have the latest version.";
-            this.updateBtnDisabled = false;
-            break;
-         case "updateAvailable":
-            this.updateBtnDisabled = true;
-            this.appUpdateStatusMessage = "Downloading update...";
-            break;
-         case "updateDownloaded":
-            this.updateBtnDisabled = false;
-            this.appUpdateStatusMessage = "Update ready to install.";
-            break;
+         switch (updaterState.status) {
+            case "updateError":
+               this.appUpdateStatusMessage = updaterState?.error?.message || this._defaultUpdateError;
+               this.updateBtnDisabled = false;
+               break;
+            case "checkingForUpdate":
+               this.appUpdateStatusMessage = "Checking for updates...";
+               this.updateBtnDisabled = true;
+               break;
+            case "updateNotAvailable":
+               this.appUpdateStatusMessage = "You have the latest version.";
+               this.updateBtnDisabled = false;
+               break;
+            case "updateAvailable":
+               this.updateBtnDisabled = true;
+               this.appUpdateStatusMessage = "Downloading update...";
+               break;
+            case "updateDownloaded":
+               this.updateBtnDisabled = false;
+               this.appUpdateStatusMessage = "Update ready to install.";
+               break;
+         }
+
+         this.appUpdaterState = updaterState;
+      } catch (error) {
+         this._errorHandlerService.handleError(error);
       }
-
-      this.appUpdaterState = updaterState;
    }
 
    async quitAndInstallUpdate() {
-      await window.rendererProcessCtrl.invoke<void>("ipc:quitAndInstallUpdate");
+      try {
+         await window.rendererProcessCtrl.invoke<void>("ipc:quitAndInstallUpdate");
+      } catch (error) {
+         this._errorHandlerService.handleError(error);
+      }
    }
 
    async getAllPreferences() {
       try {
          this._progressBarService.toggleOn();
          this.PREFERENCES = await window.rendererProcessCtrl.invoke<UserDataStore>("ipc:getAllPreferences");
-      } catch (error) {
+      } catch (error: any) {
+         this._errorHandlerService.handleError(error);
       } finally {
          this._progressBarService.toggleOff();
       }
@@ -353,13 +379,11 @@ export class DashboardComponent implements OnInit {
          this.mediaFiles = await window.rendererProcessCtrl.invoke<MediaFile[]>("ipc:listMediaPaths");
       } catch (error: any) {
          if (error.code === "MP_ENOENT_BASE_DIR") {
-            this._confirmationServ.confirm({
+            this._errorHandlerService.handleError(error, {
                header: "Workspace Not Found",
-               acceptLabel: "Got it",
-               dismissableMask: false,
-               message: error.message,
-               rejectVisible: false,
             });
+         } else {
+            this._errorHandlerService.handleError(error);
          }
       } finally {
          this._progressBarService.toggleOff();
@@ -422,12 +446,16 @@ export class DashboardComponent implements OnInit {
    async openBaseDirectory() {
       try {
          await window.rendererProcessCtrl.invoke("ipc:openBaseDirectory");
-      } catch (error) {}
+      } catch (error) {
+         this._errorHandlerService.handleError(error);
+      }
    }
 
-   exitApp() {
+   async exitApp() {
       try {
-         window.rendererProcessCtrl.invoke("ipc:exitApplication");
-      } catch (error) {}
+         await window.rendererProcessCtrl.invoke("ipc:exitApplication");
+      } catch (error) {
+         this._errorHandlerService.handleError(error);
+      }
    }
 }

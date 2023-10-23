@@ -404,6 +404,7 @@ export class IpcHandler extends EventEmitter implements RendererProcessCtx {
       return (
          await desktopCapturer.getSources({
             types: ["window", "screen"],
+            fetchWindowIcons: false, // Todo - send windows icons to the renderer to be used in the UI.
          })
       ).map((source) => ({
          id: source.id,

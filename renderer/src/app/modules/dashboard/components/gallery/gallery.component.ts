@@ -17,6 +17,7 @@ import { ConfirmationService, MenuItem, MessageService } from "primeng/api";
 import { ContextMenu } from "primeng/contextmenu";
 import { Menu } from "primeng/menu";
 import { Subject } from "rxjs";
+import { ErrorHandlerService } from "../../../shared/services/error-handler.service";
 
 @Component({
    selector: "app-gallery",
@@ -65,6 +66,7 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
       private _cd: ChangeDetectorRef,
       private _confirmationServ: ConfirmationService,
       private _messageServ: MessageService,
+      private _errorHandlerService: ErrorHandlerService
    ) {}
 
    ngOnInit(): void {
@@ -240,16 +242,18 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
    }
 
    async copyImageToClipboard(mediaFile: MediaFile) {
-      await window.rendererProcessCtrl.invoke("ipc:copyImageToClipboard", mediaFile)?.catch((e: any) => {
+      try {
+         await window.rendererProcessCtrl.invoke("ipc:copyImageToClipboard", mediaFile);
+
          this._messageServ.add({
-            severity: "error",
-            detail: "There was an error copying the image to clipboard.",
+            severity: "info",
+            detail: "Copied to clipboard.",
          });
-      });
-      this._messageServ.add({
-         severity: "info",
-         detail: "Copied to clipboard.",
-      });
+      } catch (error) {
+         this._errorHandlerService.handleError(error, {
+            header: "There was an error copying the image to clipboard.",
+         });
+      }
    }
 
    nextImage() {
@@ -307,7 +311,9 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
          });
 
          this._editedImageRefs.push(this.spotlightImage.name);
-      } catch (error) {}
+      } catch (error) {
+         this._errorHandlerService.handleError(error);
+      }
    }
 
    handleViewerEvent(event: ImageViewerEvent) {
@@ -363,7 +369,7 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
                try {
                   await window.rendererProcessCtrl.invoke(
                      "ipc:deleteMediaFiles",
-                     selectedItems.map((f) => f.name),
+                     selectedItems.map((f) => f.name)
                   );
                   this._messageServ.add({
                      severity: "info",
@@ -372,15 +378,15 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
                   });
                   this.galleryEvent.emit("selectModeOff");
                } catch (error) {
-                  this._messageServ.add({
-                     severity: "error",
-                     summary: "Error",
-                     detail: "There was an error deleting the file(s)",
+                  this._errorHandlerService.handleError(error, {
+                     header: "There was an error deleting the file(s)",
                   });
                }
             },
          });
-      } catch (error) {}
+      } catch (error) {
+         this._errorHandlerService.handleError(error);
+      }
    }
 
    ngOnDestroy(): void {

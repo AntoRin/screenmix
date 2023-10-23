@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Subject } from "rxjs";
 import { CaptureMode, MediaStreamEvent, ProcessNotification } from "common-types";
+import { ErrorHandlerService } from "../../shared/services/error-handler.service";
 
 @Injectable({
    providedIn: "root",
@@ -11,7 +12,7 @@ export class MediaStreamService {
 
    streamNotifications$ = new Subject<MediaStreamEvent>();
 
-   constructor() {}
+   constructor(private _errorHandlerService: ErrorHandlerService) {}
 
    get videoCaptureInProgress() {
       return this._videoCaptureInProgress;
@@ -32,7 +33,7 @@ export class MediaStreamService {
       mode: CaptureMode,
       resolution: string,
       currentWindow: boolean = false,
-      selectScreen: boolean = false,
+      selectScreen: boolean = false
    ): Promise<void> {
       try {
          // If video capture is already in progress, stop it.
@@ -92,7 +93,9 @@ export class MediaStreamService {
 
          if (mode === "video") return this.handleVideoCapture(stream);
       } catch (error) {
-         console.log(error);
+         this._errorHandlerService.handleError(error, {
+            header: "Capture Failure",
+         });
       }
    }
 
@@ -163,7 +166,7 @@ export class MediaStreamService {
    async handleImageCapture(
       stream: MediaStream,
       [width, height]: [number, number] = [1280, 720],
-      preview: boolean = false,
+      preview: boolean = false
    ) {
       try {
          const videoElement: HTMLVideoElement = document.createElement("video");
@@ -197,7 +200,7 @@ export class MediaStreamService {
                            return resolve(updatedPreview);
                         },
                      });
-                  },
+                  }
                );
 
                //false - user has cancelled screenshot.

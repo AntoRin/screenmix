@@ -5,6 +5,7 @@ import ess from "electron-squirrel-startup";
 import { PATHS } from "./constants";
 import { VideoCaptureStatus } from "common-types";
 import electronIsDev from "electron-is-dev";
+import logger from "electron-log/main";
 
 if (ess) app.quit();
 
@@ -143,9 +144,22 @@ class Screenmix {
    }
 }
 
+logger.initialize({ preload: true });
+
+logger.errorHandler.startCatching({
+   showDialog: true,
+});
+
+logger.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] [{level}] {text}";
+logger.transports.file.sync = false;
+
+if (!electronIsDev) logger.transports.console.level = false;
+
 const screenmix: Screenmix = new Screenmix();
 
 screenmix.init().catch((e) => {
-   console.log(e);
+   // Make it sync because the application is about to be crashed, and there won't be time to perform async calls.
+   logger.transports.file.sync = true;
+   logger.error("Cannot initialize Screenmix.", e);
    process.exit(1);
 });

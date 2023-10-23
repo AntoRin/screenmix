@@ -26,6 +26,7 @@
    "dependencies": {
       "active-win": "^7.7.1",
       "electron-is-dev": "^2.0.0",
+      "electron-log": "^5.0.0-rc.1",
       "electron-squirrel-startup": "^1.0.0",
       "exiftool-vendored": "^15.9.1",
       "tslib": "^2.3.0"

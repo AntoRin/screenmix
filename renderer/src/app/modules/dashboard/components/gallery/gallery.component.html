@@ -30,13 +30,18 @@
          class="object-contain h-full w-full cursor-pointer image-item"
          alt=""
       />
-      <video
-         class="h-full w-full object-contain"
-         *ngIf="mediaFile.type === 'video'"
-         [src]="mediaFile.path"
-         controls
-         (click)="selectMode ? selectItem(mediaIdx, $event) : true"
-      ></video>
+      <div *ngIf="mediaFile.type === 'video'">
+         <span
+            class="pi pi-play text-teal-200 text text-4xl cursor-pointer absolute-centre z-10"
+            (click)="videoElement.play()"
+         ></span>
+         <video
+            #videoElement
+            class="h-full w-full object-contain"
+            [src]="mediaFile.path"
+            (click)="selectMode ? selectItem(mediaIdx, $event) : true"
+         ></video>
+      </div>
    </div>
 </div>
 

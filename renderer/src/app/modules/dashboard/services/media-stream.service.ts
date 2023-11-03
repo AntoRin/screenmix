@@ -78,6 +78,11 @@ export class MediaStreamService {
             } as any,
          });
 
+         if (mode === "image") {
+            // Audio is not required.
+            return this.handleImageCapture(videoStream, [+width, +height], selectScreen);
+         }
+
          const audioStream: MediaStream = await navigator.mediaDevices.getUserMedia({
             audio: true,
             video: false,
@@ -87,11 +92,9 @@ export class MediaStreamService {
          const [videoTrack]: MediaStreamTrack[] = videoStream.getVideoTracks();
          const [audioTrack]: MediaStreamTrack[] = audioStream.getAudioTracks();
 
-         const stream = new MediaStream([videoTrack, audioTrack]);
+         const multimediaStream = new MediaStream([videoTrack, audioTrack]);
 
-         if (mode === "image") return this.handleImageCapture(stream, [+width, +height], selectScreen);
-
-         if (mode === "video") return this.handleVideoCapture(stream);
+         if (mode === "video") return this.handleVideoCapture(multimediaStream);
       } catch (error) {
          if (error instanceof DOMException && error.name === "NotReadableError") {
             error = new Error(

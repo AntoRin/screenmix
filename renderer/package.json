@@ -6,7 +6,7 @@
       "email": "antorinish@gmail.com"
    },
    "description": "A desktop app for taking screenshots and capturing screen",
-   "version": "0.0.0",
+   "version": "0.1.0",
    "scripts": {
       "ng": "ng",
       "serve": "ng serve -o",

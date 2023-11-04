@@ -316,6 +316,24 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
       }
    }
 
+   async playVideo(videoElement: HTMLVideoElement) {
+      const duration = await new Promise((resolve, reject) => {
+         videoElement.addEventListener("durationchange", () => {
+            resolve(videoElement.duration);
+         });
+         videoElement.load();
+         videoElement.currentTime = 9999999999;
+      });
+      console.log(duration);
+   }
+
+   handleVideoPlay(event: Event) {
+      const videoElement: HTMLVideoElement = event.target as HTMLVideoElement;
+      videoElement.requestFullscreen();
+      console.log("videoElement.duration: ", videoElement.duration);
+      console.log("event: ", event);
+   }
+
    handleViewerEvent(event: ImageViewerEvent) {
       switch (event.eventName) {
          case "save":

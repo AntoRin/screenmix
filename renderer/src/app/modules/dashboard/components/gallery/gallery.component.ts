@@ -45,6 +45,9 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
    public editing: boolean = false;
    public previewMode: boolean = false;
 
+   public spotlightVideo: MediaFile | null = null;
+
+
    public saveOptions = [
       {
          label: "Save a copy",
@@ -316,15 +319,8 @@ export class GalleryComponent implements OnInit, OnChanges, OnDestroy {
       }
    }
 
-   async playVideo(videoElement: HTMLVideoElement) {
-      const duration = await new Promise((resolve, reject) => {
-         videoElement.addEventListener("durationchange", () => {
-            resolve(videoElement.duration);
-         });
-         videoElement.load();
-         videoElement.currentTime = 9999999999;
-      });
-      console.log(duration);
+   async playVideo(video: MediaFile) {
+      this.spotlightVideo = video;
    }
 
    handleVideoPlay(event: Event) {

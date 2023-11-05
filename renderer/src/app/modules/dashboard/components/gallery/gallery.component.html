@@ -31,7 +31,7 @@
          alt=""
       />
       <div *ngIf="mediaFile.type === 'video'">
-         <span class="text-teal-200 cursor-pointer absolute-centre z-10" (click)="playVideo(VideoElement)">
+         <span class="text-teal-200 cursor-pointer absolute-centre z-10" (click)="playVideo(mediaFile)">
             <svg
                class="text-teal-100 dark:text-white"
                style="width: 50px"
@@ -59,6 +59,17 @@
          ></video>
       </div>
    </div>
+</div>
+
+<!-- - Spotlight Video -->
+
+<div *ngIf="spotlightVideo" class="bg-black-alpha-70 absolute top-0 left-0 right-0 bottom-0">
+   <video
+      *ngIf="spotlightVideo"
+      [src]="spotlightVideo.path"
+      controls
+      class="h-3/4 absolute-centre border-solid border-2 border-gray-500"
+   ></video>
 </div>
 
 <!-- - Spotlight Image -->
